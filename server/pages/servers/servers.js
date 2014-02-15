@@ -94,7 +94,25 @@ if (Meteor.isServer) {
 				digitalocean: droplet
 			}});
 
-			console.log(droplet);
+			if (!droplet) {
+				console.log("Error create Droplet");
+				return;
+			}
+
+			DO_eventCheck(droplet.event_id, user, null,
+				function(result, data) {
+					var creds = data.user.apis.digitalocean;
+			  	var DO = new DigitalOceanAPI(creds.clientId, creds.apiKey);
+  				DO = Async.wrap(DO, ['dropletGet']);
+
+  				var droplet = DO.dropletGet(result.droplet_id);
+					servers.update(server._id, { $set: {
+						digitalocean: droplet
+					}});
+				}, {});
+
+			//console.log(droplet);
+			return { droplet: droplet };
 		},
 
   	DO_refresh: function() {
@@ -119,23 +137,73 @@ if (Meteor.isServer) {
 	  	DO = Async.wrap(DO, ['dropletDestroy']);
 
 			var server = servers.findOne(serverId);
+
+			if (!server.digitalocean) {
+				// Failure in creating, just delete stale entry
+				Meteor.users.remove(serverId);
+				servers.remove(serverId);
+				serverStats.remove(serverId);
+				return;
+			}
+
 			var dropletId = server.digitalocean.id;
 
 			try {
-				var result = DO.dropletDestroy(dropletId);
+				var eventId = DO.dropletDestroy(dropletId);
 			} catch (error) {
 				//console.log(error.toString());
 				throw new Meteor.Error(404, error.toString());
 			}
 			// console.log(result);
 
-			// only remove from database if successfully destroyed
-			Meteor.users.remove(serverId);
-			servers.remove(serverId);
-			serverStats.remove(serverId);
+			DO_eventCheck(eventId, user, null,
+				function(result, data) {
+					Meteor.users.remove(serverId);
+					servers.remove(serverId);
+					serverStats.remove(serverId);
+				}, {});
 
-			return result;
+			return {};
 		}
 
 	}); /* Meteor.methods */
+
+	/*
+	 * Follow event progress, requires: eventId, user
+	 * Will call update() callback and finished() callback when relevant
+	 * with callback(result, data);  (Data is passed on first call)
+	 */
+	var DO_eventCheck = function(eventId, user, update, finished, data) {
+		var creds = user.apis.digitalocean;
+  	var DO = new DigitalOceanAPI(creds.clientId, creds.apiKey);
+  	DO = Async.wrap(DO, ['eventGet']);
+
+  	data.eventId = eventId;
+  	data.user = user;
+
+  	var result = DO.eventGet(eventId);
+
+		var eventDesc;
+		switch (result.event_type_id) {
+			case 1: eventDesc = 'Creating Droplet...'; break;
+			case 10: eventDesc = 'Destroying Droplet...'; break;
+		}
+		result.event_desc = eventDesc;
+
+		servers.update({'digitalocean.id': result.droplet_id}, {$set: {
+			event: result
+		}});
+
+  	if (result.action_status) {
+  		if (finished)
+  			finished(result, data);
+  	} else {
+  		if (update)
+  			update(result, data);
+			Meteor.setTimeout(function() {
+				DO_eventCheck(eventId, user, update, finished, data);
+			}, 1000);
+  	}
+	}
+
 } /* isServer */
