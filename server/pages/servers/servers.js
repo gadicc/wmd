@@ -164,6 +164,48 @@ if (Meteor.isServer) {
 				}, {});
 
 			return {};
+		},
+
+		DO_installClient: function(serverId) {
+			var user = Meteor.users.findOne(this.userId);
+			var server = servers.findOne(serverId);
+			var Connection = new Meteor.require('ssh2');
+
+			var log = new slog('Install client on ' + server.username);
+			var Fiber = Meteor.require('fibers');
+			log.addLine('Initiating SSH connection to '
+				+ server.username + ' (root@' 
+				+ server.digitalocean.ip_address + ')...\n');
+
+			log.addLine = Meteor.bindEnvironment(log.addLine, null, log);
+			log.close = Meteor.bindEnvironment(log.close, null, log);
+
+			var c = new Connection();
+			c.on('ready', function() {
+				log.addLine('Connected, executing script...\n\n');
+				c.exec('ls', function(err, stream) {
+					if (err) throw err;
+					stream.on('data', log.addLine);
+					//stream.on('end', log.close);
+					//stream.on('close', log.close);
+					//stream.on('exit', log.close);
+				});
+			});
+
+			//c.on('end', log.close);
+			c.on('close', log.close);
+			c.on('error', function(err) {
+  			console.log('Connection :: error :: ' + err);
+			});
+
+			//console.log({
+			c.connect({
+				username: 'root',
+				host: server.digitalocean.ip_address,
+				privateKey: user.sshKey.privkey
+			});
+
+			return log.logId;
 		}
 
 	}); /* Meteor.methods */

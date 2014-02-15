@@ -63,8 +63,7 @@ if (Meteor.isServer) {
 	};
 
 	slog.prototype.addLine = function(line) {
-		if (this.closed)
-			throw new Error('Tried to add a new line to a closed slog');
+		if (!_.isString(line)) line = line.toString();
 		logLines.insert({
 			i: this.logId,
 			l: line
@@ -72,14 +71,20 @@ if (Meteor.isServer) {
 	};
 
 	slog.prototype.close = function() {
-		this.closed = true;
-		var lines = logLines.find({i: this.logId}).fetch();
-		logs.update(this.logId, { $set: {
-			content: _.pluck(lines, 'l').join('\n')
-		}});
-		logLines.remove({i: this.logId});
+		// Delay, since callbacks can run out of order
+		Meteor.setTimeout(function() {
+			console.log('actual close');
+			this.closed = true;
+			var lines = logLines.find({i: this.logId}).fetch();
+			logs.update(this.logId, { $set: {
+				content: _.pluck(lines, 'l').join('\n')
+					+ '\nLog finished at ' + new Date().toString() + '\n'
+			}});
+			logLines.remove({i: this.logId});
+		}, 8000);
 	}
 
+	/*
 	var myLog = new slog('test');
 	var i = 0;
 	var interval = Meteor.setInterval(function() {
@@ -90,4 +95,5 @@ if (Meteor.isServer) {
 		}
 		myLog.addLine(new Date().toString());
 	}, 500);
+	*/
 }
