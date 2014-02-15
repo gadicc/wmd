@@ -1,0 +1,29 @@
+<template name="user">
+	{{#with user}}
+	<h1>{{profile.name}}</h1>
+	<p>User settings below.</p>
+
+	<h2>Digital Ocean</h2>
+	<a href="https://cloud.digitalocean.com/generate_api_key">https://cloud.digitalocean.com/generate_api_key</a>
+	<form id="digitalocean">
+		<p>
+			Client ID: <input type="text" name="clientId"
+				value="{{apis.digitalocean.clientId}}" size=40><br />
+			API Key: <input type="text" name="apiKey"
+				value="{{apis.digitalocean.apiKey}}" size=40>
+		</p>
+
+		<p>If you have added your own SSH key to Digital Ocean,
+		you can add it's ID here.  Newly created servers will
+		include your key.  This is convenient, but not recommended.
+		In the SSH Keys Console on Digital Ocean, inspect the edit
+		icon, then look at the &lt;form&gt; HTML and pick out the
+		numer ID (from action="/ssh_keys/ID).</p>
+
+		<p>Digital Ocean SSH key ID: <input type="text" name="sshKeyId"
+			value="{{apis.digitalocean.sshKeyId}}" size=4 /></p>
+
+		<input type="submit">
+	</form>
+	{{/with}}
+</template>

@@ -1,0 +1,53 @@
+<template name="servers">
+
+	<h1>All Servers</h1>
+
+	{{#each servers}}
+
+		<h2>{{name}}</h2>
+		{{#each servers}}
+			<table border=1 cellpading=5 cellspacing=5>
+				<tr>
+					<td> &nbsp; <a href="/servers/{{username}}">{{username}}</a> &nbsp; </td>
+				</tr><tr>
+				  <td><button class="destroy" data-id="{{_id}}">destroy</button>
+				</tr>
+			</table>
+		{{/each}}
+
+
+	{{/each}}
+
+	<h2>Create New</h2>
+
+	<p>This is a manual server creation, and is usually not
+	necessary.  New servers are created on demand, automatically.</p>
+
+	{{#with iaasData.digitalocean}}
+
+		<form id="digitalocean">
+			<select name="type">
+				<option value="db">Database</option>
+				<option value="meteor" selected>Meteor</option>
+				<option value="nginx">Nginx</option>
+			</select>
+			<select name="regionId">
+				{{#each regions}}
+					<option value="{{id}}">{{name}} ({{slug}})</option>
+				{{/each}}
+			</select>
+			<select name="sizeId">
+				{{#each sizes}}
+					<option value="{{id}}">{{name}}</option>
+				{{/each}}
+			</select>
+			<input type="submit" value="Create" />
+		</form>
+
+	{{else}}
+
+		<p>Loading Digital Ocean regions and sizes...</p>
+
+	{{/with}}
+
+</template>

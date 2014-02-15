@@ -1,0 +1,29 @@
+<template name="serverInfo">
+	<h1>{{name}}</h1>
+
+	{{#with serverStats}}
+	{{#isolate}}<p>Last updated: {{lastUpdate}}</p>{{/isolate}}
+
+		<h2>Server Info</h2>
+		{{#constant}}
+			<canvas id="chart" width="400" height="100"></canvas>
+		{{/constant}}
+		{{#with os}}
+			<table>
+				<tr>
+					<td>CPU</td>
+					<td>{{sprintf '%2d%%' cpuUsage percent=true}}</td>
+				</tr><tr>
+					<td>RAM</td>
+					<td>{{sprintf '%2d%%' memUsage percent=true}}</td>
+				</tr>
+			</table>
+		{{/with}}
+		<table>
+			<tr><th>%CPU</th><th>%MEM</th><th>Command</th></tr>
+			{{#each procs}}
+				<tr><td>{{pcpu}}</td><td>{{pmem}}</td><td>{{cmd}}</td></tr>
+			{{/each}}
+		</table>
+	{{/with}}
+</template>

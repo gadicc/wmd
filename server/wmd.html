@@ -1,0 +1,24 @@
+<head>
+  <title>wmd</title>
+</head>
+
+<body>
+</body>
+
+<template name="layout">
+	<p>
+		<a href="/user">user</a> |
+		<a href="/apps">apps</a> |
+		<a href="/servers">servers</a>
+		(<a href="/servers/devServer">devServer</a>) |
+		{{loginButtons}}
+	</p>
+
+	{{yield}}
+</template>
+
+<template name="loading">
+</template>
+
+<template name="home">
+</template>

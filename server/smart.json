@@ -1,0 +1,8 @@
+{
+  "packages": {
+    "iron-router": {},
+    "npm": {},
+    "reactive-objects": {},
+    "mongo-counter": {}
+  }
+}
