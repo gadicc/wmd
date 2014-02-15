@@ -3,6 +3,7 @@
     "iron-router": {},
     "npm": {},
     "reactive-objects": {},
-    "mongo-counter": {}
+    "mongo-counter": {},
+    "streams": {}
   }
 }

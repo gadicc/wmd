@@ -14,3 +14,4 @@ npm
 d3
 reactive-objects
 mongo-counter
+streams

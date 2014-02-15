@@ -1,4 +1,5 @@
 {
 	"digitalocean-api": "0.1.1",
-	"ssh-keypair": "1.0.1"
+	"ssh-keypair": "1.0.1",
+	"ssh2": "0.2.17"
 }

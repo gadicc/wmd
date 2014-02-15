@@ -5,7 +5,8 @@
       "iron-router": {},
       "npm": {},
       "reactive-objects": {},
-      "mongo-counter": {}
+      "mongo-counter": {},
+      "streams": {}
     },
     "packages": {
       "iron-router": {
@@ -27,6 +28,11 @@
         "git": "https://github.com/awwx/meteor-mongo-counter.git",
         "tag": "v1.1.0",
         "commit": "9a0710543cec7c192e38d5acc54cf3b0a9fbcb20"
+      },
+      "streams": {
+        "git": "https://github.com/arunoda/meteor-streams.git",
+        "tag": "v0.1.17",
+        "commit": "9fcbbc9b7bf542827babc92089c19e730892a22f"
       }
     }
   }
