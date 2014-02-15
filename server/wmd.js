@@ -2,7 +2,11 @@ if (Meteor.isClient) {
 	Router.configure({
 	  layoutTemplate: 'layout',
 	  loadingTemplate: 'loading',
-	  waitOn: subAll
+	  waitOn: subAll,
+    after: function() {
+      $('li.active').removeClass('active');
+      $('a[href="'+this.path+'"]').parent().addClass('active');
+    }
 	});
 
 	Router.map(function() {

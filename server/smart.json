@@ -4,6 +4,7 @@
     "npm": {},
     "reactive-objects": {},
     "mongo-counter": {},
-    "streams": {}
+    "streams": {},
+    "bootstrap-3": {}
   }
 }

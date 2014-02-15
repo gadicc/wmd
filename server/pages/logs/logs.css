@@ -1,0 +1,10 @@
+#showLog {
+	background: black;
+	color: #aaa;
+	white-space: pre;
+	height: 400px;
+	overflow: auto;
+	border: 1px solid #aaa;
+	border-radius: 5px;
+	padding: 10px;
+}

@@ -6,7 +6,6 @@
 standard-app-packages
 insecure
 preserve-inputs
-accounts-ui
 accounts-github
 iron-router
 accounts-password
@@ -15,3 +14,5 @@ d3
 reactive-objects
 mongo-counter
 streams
+bootstrap-3
+accounts-ui

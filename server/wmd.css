@@ -1,1 +1,7 @@
-/* CSS declarations go here */
+#login-buttons { position: relative; top: 15px; }
+
+/* Move down content because we have a fixed navbar that is 50px tall */
+body {
+  padding-top: 50px;
+  padding-bottom: 20px;
+}

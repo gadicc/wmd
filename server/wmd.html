@@ -1,20 +1,43 @@
 <head>
-  <title>wmd</title>
+  <title>Wastelands Meteor Deployer</title>
 </head>
 
 <body>
 </body>
 
 <template name="layout">
-	<p>
-		<a href="/user">user</a> |
-		<a href="/apps">apps</a> |
-		<a href="/servers">servers</a>
-		(<a href="/servers/devServer">devServer</a>) |
-		{{loginButtons}}
-	</p>
+   <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">[WMD]</a>
+        </div>
+        <div class="collapse navbar-collapse">
+		  {{#constant}}
+          <ul class="nav navbar-nav">
+            <!-- <li class="active"><a href="#">Home</a></li> -->
+            <li><a href="/user">User</a></li>
+            <li><a href="/apps">Apps</a></li>
+            <li><a href="/servers">Servers</a></li>
+			<li><a href="/servers/devServer">(devServer)</a></li>
+			<li><a href="/logs">Logs</a></li>
+          </ul>
+		  {{/constant}}
+		   <ul class="nav navbar-nav navbar-right">
+	  		 <li>{{loginButtons align="right"}}</li>	
+		   </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
 
-	{{yield}}
+    <div class="container">
+		{{yield}}
+	</div>
 </template>
 
 <template name="loading">

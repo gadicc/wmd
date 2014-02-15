@@ -1,0 +1,24 @@
+<template name="logs">
+	<h1>Recent Logs</h1>
+
+	<ul>
+	{{#each logs}}
+		<li><a href="/logs/{{_id}}">{{title}}</a></li>
+	{{/each}}
+	</ul>
+</template>
+
+<template name="showLog">
+	{{#with log}}
+		<h1>{{title}}</h1>
+		<p>{{ctime}}<p>
+
+		<div id="showLogWrapper">
+			<div id="showLog">{{content}}{{#each lines}}{{> showLogLine}}{{/each}}</div>
+		</div>
+	{{/with}}
+</template>
+
+<template name="showLogLine">
+<div>{{l}}</div>
+</template>
