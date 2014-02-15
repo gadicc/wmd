@@ -2,8 +2,12 @@
 
 "Deploy Meteor with Meteor".  A web interface to bring up new cloud
 servers, handle deployments (via github), load-balance,
-scale-on-demand, etc.  A work in progress.  PLEASE READ "IMPORTANT
-NOTES", BELOW.
+scale-on-demand, etc.  A work in progress.
+
+Meant to handle private code.  You run your own WMP server for all
+your own projects.  This is not intended to be cloud-hosted and offer
+deployment services to others (which is against the license).
+PLEASE READ "IMPORTANT NOTES", BELOW.
 
 Copyright (c) 2014 Gadi Cohen, see license below.
 
@@ -31,16 +35,12 @@ Open browser, (setup and) login with Github, and explore.
 
 ## IMPORTANT NOTES
 
-Meant to handle private code.  You run your own WMP server for all
-your own projects.  This is not intended to be cloud-hosted and offer
-deployment services to others (which is against the license, below).
-
-On that note, it's possible I may abandon this project entirely once
-Galaxy is launched.
-
 NB: This is a work in progress.  You should only be using this in
 development on your home PC.  Few security checks are in place.  Error
 handling is limited.
+
+It's entirely possible I may abandon this project entirely once
+Galaxy is launched.
 
 DISCLAIMER: Use at your own risk.  You are giving the app full access
 to your entire github codebase, and the ability to deploy new cloud
