@@ -226,7 +226,9 @@ if (Meteor.isServer) {
 					//stream.on('end', ...);
 					//stream.on('close', ...);
 					stream.on('exit', function(code, signal) {
-						log.addLine('Stream :: exit :: code: ' + code + ', signal: ' + signal);
+						if (code)
+							log.addLine('Stream :: exit :: code: '
+								+ code + ', signal: ' + signal);
 						c.end();
 					});
 				});
