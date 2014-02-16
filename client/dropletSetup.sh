@@ -51,12 +51,15 @@ runlevel=$(set -- $(runlevel); eval "echo \$$#" )
 start()
 {
 	echo -n $"Starting $prog: "
-	$FOREVER $FOREVER_OPTS
+	$FOREVER $FOREVER_OPTS >& /dev/null
 	RETVAL=$?
 	PID=`ps ux | grep forever/bin/monitor | grep -v " grep " | awk '{print $2}'`
 	if [ $RETVAL -eq 0 ] ; then
 		touch $lockfile
 		echo $PID > $PID_FILE
+		success
+	else
+		failure
 	fi
 	echo
 	return $RETVAL
@@ -65,9 +68,10 @@ start()
 stop()
 {
 	echo -n $"Stopping $prog: "
-	killproc -p $PID_FILE $FOREVER
+	# killproc -p $PID_FILE $FOREVER
+	$FOREVER stop $SCRIPT >& /dev/null
 	RETVAL=$?
-	[ $RETVAL -eq 0 ] && rm -f $lockfile
+	[ $RETVAL -eq 0 ] && rm -f $lockfile && success || failure
 	echo
 }
 
@@ -120,4 +124,5 @@ echo Installing dependencies for wmd-client.js...
 npm install
 
 chmod a+x wmd-client.js
+service wmd-client stop
 service wmd-client start

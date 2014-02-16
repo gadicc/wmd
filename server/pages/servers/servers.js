@@ -223,16 +223,19 @@ if (Meteor.isServer) {
 				c.exec(script, function(err, stream) {
 					if (err) throw err;
 					stream.on('data', log.addLine);
-					//stream.on('end', log.close);
-					//stream.on('close', log.close);
-					//stream.on('exit', log.close);
+					//stream.on('end', ...);
+					//stream.on('close', ...);
+					stream.on('exit', function(code, signal) {
+						log.addLine('Stream :: exit :: code: ' + code + ', signal: ' + signal);
+						c.end();
+					});
 				});
 			});
 
 			c.on('end', log.close);
 			c.on('close', log.close);
 			c.on('error', function(err) {
-  			console.log('Connection :: error :: ' + err);
+  			log.addLine('Connection :: error :: ' + err);
 			});
 
 			//console.log({
