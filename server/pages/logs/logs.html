@@ -17,8 +17,13 @@
 			<div id="showLog">{{content}}{{#each lines}}{{> showLogLine}}{{/each}}</div>
 		</div>
 	{{/with}}
+
+	<br />
+	<p>
+		<button onclick="window.history.back()">Go Back</button>
+	</p>
 </template>
 
 <template name="showLogLine">
-<div>{{l}}</div>
+<span>{{l}}</span>
 </template>

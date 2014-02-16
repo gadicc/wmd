@@ -1,4 +1,6 @@
 if (Meteor.isClient) {
+	var handle = null;
+
 	Router.map(function() {
 		this.route('serverInfo', {
 			path: 'servers/:server',
@@ -9,10 +11,27 @@ if (Meteor.isClient) {
 						{username: this.params.server}
 					]
 				});
+				this.params.serverId = server._id;
 				return {
 					name: server.username,
 					serverStats: serverStats.findOne(server._id)
 				}
+			},
+			action: function() {
+				if (handle) handle.stop()
+				handle = serverStats.find({_id: this.params.serverId}).observe({
+					added: function(doc) {
+					},
+					changed: function(doc) {
+						if (chart) {
+							data.cpu.append(doc.lastUpdate.getTime(), doc.os.cpuUsage);
+							data.mem.append(doc.lastUpdate.getTime(),
+								(doc.os.totalmem - doc.os.freemem) / doc.os.totalmem);
+						}
+					}
+				});
+
+				this.render();
 			}
 		});
 	});
@@ -24,7 +43,11 @@ if (Meteor.isClient) {
 	});
 
 	var chart = null, data = null;
-	Template.serverInfo.rendered = _.once(function() {
+	Template.serverInfo.rendered = function() {
+		var $canvas = $('#chart');
+		if ($canvas.data('rendered'))
+			return;
+		$canvas.data('rendered', true);
 		data = {
 			cpu: new TimeSeries(),
 			mem: new TimeSeries()
@@ -37,18 +60,6 @@ if (Meteor.isClient) {
 		});
 		chart.addTimeSeries(data.mem, { strokeStyle: 'rgba(255, 255, 0, 1)', fillStyle: 'rgba(255, 255, 0, 0.2)', lineWidth: 4 });
 		chart.addTimeSeries(data.cpu, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 4 });
-		chart.streamTo($('#chart')[0], 1000 /* should be serve updateInterval */);
-	});
-
-	serverStats.find().observe({
-		added: function(doc) {
-		},
-		changed: function(doc) {
-			if (chart) {
-				data.cpu.append(doc.lastUpdate.getTime(), doc.os.cpuUsage);
-				data.mem.append(doc.lastUpdate.getTime(),
-					(doc.os.totalmem - doc.os.freemem) / doc.os.totalmem);
-			}
-		}
-	});
+		chart.streamTo($canvas[0], 1000 /* should be serve updateInterval */);
+	};
 }

@@ -1,12 +1,10 @@
+#!/usr/bin/env node
 var child_process = require('child_process');
 var DDPClient = require("ddp");
 var os = require('os');
 var osUtils = require('os-utils');
 
-var devServer = require('./devserver.json');
-var username = devServer.username;
-var password = devServer.password;
-
+var credentials = require('./credentials.json');
 
 // http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
 function isNumber(n) {
@@ -69,11 +67,10 @@ var psRE = '^';
 for (var i=0; i < psInfo.length-1; i++)
 	psRE += '([^ ]+) +';
 psRE = new RegExp(psRE + '(.+)$', 'mg');
-console.log(psRE);
 
 var ddpclient = new DDPClient({
-  host: "localhost", 
-  port: 7000,
+  host: credentials.host, 
+  port: credentials.port,
   auto_reconnect: true,
   auto_reconnect_timer: 500,
   use_ejson: true
@@ -85,14 +82,17 @@ ddpclient.connect(function(error) {
     console.log('DDP connection error!');
     return;
   }
-  ddpclient.loginWithUsername(username,password,function(error) {
+  ddpclient.loginWithUsername(
+  	credentials.username,
+  	credentials.password,
+  	function(error) {
       if (error) {
       	console.log('Authentication failed');
       	console.log(error);
       	process.exit();
       }
-      console.log('Logged in as ' + username);
-  });
+      console.log('Logged in as ' + credentials.username);
+  	});
   console.log('Connected to DDP server...');
 });
 

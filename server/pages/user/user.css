@@ -1,0 +1,8 @@
+#digitalocean { display: inline-block; }
+#digitalocean div.form-group div { display: inline-block; }
+#digitalocean label { width: 65px; text-align: left; }
+#digitalocean .form-group {
+	margin-right: 0;
+	margin-left: 0;
+}
+#digitalocean input.form-control { width: 255px; font-family: courier;}

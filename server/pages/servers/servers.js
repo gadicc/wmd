@@ -28,6 +28,12 @@ if (Meteor.isClient) {
 					if (error) alert(error);
 				});
 			}
+		},
+		'click .setup': function(event, tpl) {
+			var serverId = $(event.target).data('id');
+			Meteor.call('DO_installClient', serverId, function(err, data) {
+				Router.go('/logs/' + data);
+			});
 		}
 	});
 
@@ -170,9 +176,9 @@ if (Meteor.isServer) {
 			var user = Meteor.users.findOne(this.userId);
 			var server = servers.findOne(serverId);
 			var Connection = new Meteor.require('ssh2');
+			var heredoc = new Meteor.require('heredoc');
 
 			var log = new slog('Install client on ' + server.username);
-			var Fiber = Meteor.require('fibers');
 			log.addLine('Initiating SSH connection to '
 				+ server.username + ' (root@' 
 				+ server.digitalocean.ip_address + ')...\n');
@@ -180,10 +186,41 @@ if (Meteor.isServer) {
 			log.addLine = Meteor.bindEnvironment(log.addLine, null, log);
 			log.close = Meteor.bindEnvironment(log.close, null, log);
 
+			/*
+			var script = heredoc.strip(function() {/*
+				cat > install.sh << __EOF__
+				#!/bin/sh
+				echo hello
+				ls
+				__EOF__
+				chmod a+x install.sh
+				./install.sh
+			*/    //});
+
+			var url = Meteor.require('url');
+			var rootUrl = url.parse(process.env.ROOT_URL);
+			if (rootUrl.hostname == 'localhost'
+					&& config.get('dyndnsHost'))
+				rootUrl.hostname = config.get('dyndnsHost');
+
+			var script = 'mkdir wmd-client ; cd wmd-client\n';
+			for (file in installScripts)
+				script += 'cat > ' + file + ' <<"__WMD_EOF__"\n'
+					+ installScripts[file] + '\n__WMD_EOF__\n';
+			script += 'cat > credentials.json <<"__WMD_EOF__"\n'
+			  + JSON.stringify({
+			  	username: server.username,
+			  	password: server.password,
+			  	host: rootUrl.hostname,
+			  	port: rootUrl.port
+			  }) + '\n__WMD_EOF__\n'
+				+ 'chmod a+x dropletSetup.sh\n'
+				+ './dropletSetup.sh';
+
 			var c = new Connection();
 			c.on('ready', function() {
 				log.addLine('Connected, executing script...\n\n');
-				c.exec('ls', function(err, stream) {
+				c.exec(script, function(err, stream) {
 					if (err) throw err;
 					stream.on('data', log.addLine);
 					//stream.on('end', log.close);
@@ -192,7 +229,7 @@ if (Meteor.isServer) {
 				});
 			});
 
-			//c.on('end', log.close);
+			c.on('end', log.close);
 			c.on('close', log.close);
 			c.on('error', function(err) {
   			console.log('Connection :: error :: ' + err);
@@ -209,6 +246,10 @@ if (Meteor.isServer) {
 		}
 
 	}); /* Meteor.methods */
+
+	var DO_runScript = function(serverId, userId, script, title) {
+
+	}
 
 	/*
 	 * Follow event progress, requires: eventId, user
@@ -247,5 +288,42 @@ if (Meteor.isServer) {
 			}, 1000);
   	}
 	}
+
+	var glob = Meteor.require('glob');
+	var fs = Meteor.require('fs');
+
+	var installScripts = {};
+	var path = '../../../../../../client/';
+	var loadScript = function(file) {
+		fs.readFile(path + file, 'utf8', function(err, data) {
+			if (err) throw err;
+			installScripts[file] = data;
+		});		
+	}
+	glob('{*.js,*.sh,*.json}', { cwd: path }, function(err, files) {
+		if (err) throw err;
+		_.each(files, function(file) {
+			if (file == "credentials.json")
+				return;
+			loadScript(file);
+		});
+	});
+
+	var Inotify = Meteor.require('inotify').Inotify;
+	var inotify = new Inotify();
+	var watch	= inotify.addWatch({
+		path: path,
+		watch_for: Inotify.IN_MODIFY | Inotify.IN_CREATE
+			| Inotify.IN_CLOSE_WRITE | Inotify.IN_MOVED_TO,
+		callback: function(event) {
+			if (!event.name.match(/\.js$|\.sh$|\.json$/)
+					|| event.name == 'credentials.json')
+				return;
+			console.log('[wmd] ' + event.name + ' modified, refreshing cache...');
+			loadScript(event.name);
+		}
+	});
+
+	config.add('dyndnsHost', null);
 
 } /* isServer */

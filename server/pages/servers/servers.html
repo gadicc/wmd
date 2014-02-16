@@ -6,16 +6,16 @@
 
 		<h2>{{name}}</h2>
 		{{#each servers}}
-			<table border=1 cellpading=5 cellspacing=5>
+			<table class="table table-bordered" style="width: auto">
 				<tr>
 					<td> &nbsp; <a href="/servers/{{username}}">{{username}}</a> &nbsp; </td>
 				</tr><tr>
 					<td>IP address: {{digitalocean.ip_address}}</td>
 				</tr><tr>
 				  <td>
-				  	<button class="destroy" data-id="{{_id}}">destroy</button>
 				  	{{#if event.action_status}}
-				  		{{event.action_status}}
+					  	<button class="destroy" data-id="{{_id}}">Destroy</button>
+					  	<button class="setup" data-id="{{_id}}">Setup</button>
 				  	{{else}}
 				  		{{event.event_desc}}
 				  		{{event.percentage}}%

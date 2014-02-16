@@ -46,7 +46,7 @@ if (Meteor.isServer) {
 	Meteor.publish('logLines', function(logId) {
 		return [
 			logLines.find({i: logId}, {
-				fields: { i: 0 }
+				fields: { i: 0, c: 0 }
 			}),
 
 			logs.find({_id: logId})
@@ -63,25 +63,32 @@ if (Meteor.isServer) {
 	};
 
 	slog.prototype.addLine = function(line) {
+		if (this.closed)
+			throw new Error('slog.addLine on ' + this.logId +
+				' but log already closed: ' + line);
+
 		if (!_.isString(line)) line = line.toString();
 		logLines.insert({
+			//c: incrementCounter('log'+this.logId),
+			c: new Date().getTime(),
 			i: this.logId,
 			l: line
 		});
 	};
 
-	slog.prototype.close = function() {
-		// Delay, since callbacks can run out of order
-		Meteor.setTimeout(function() {
-			console.log('actual close');
-			this.closed = true;
-			var lines = logLines.find({i: this.logId}).fetch();
-			logs.update(this.logId, { $set: {
-				content: _.pluck(lines, 'l').join('\n')
-					+ '\nLog finished at ' + new Date().toString() + '\n'
-			}});
-			logLines.remove({i: this.logId});
-		}, 8000);
+	slog.prototype.close = function(line) {
+		// Allow multiple close calls, useful for stream callbacks
+		if (this.closed) return;
+
+		this.closed = true;
+		var lines = logLines.find({i: this.logId},
+			{ sort: { c: 1 } }).fetch();
+		logs.update(this.logId, { $set: {
+			content: _.pluck(lines, 'l').join('')
+				+ '\n' + (line ? (line + '\n') : '')
+				+ 'Log finished at ' + new Date().toString() + '\n'
+		}});
+		logLines.remove({i: this.logId});
 	}
 
 	/*

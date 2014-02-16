@@ -1,0 +1,10 @@
+{
+  "name": "wmd-client",
+  "version": "0.0.1",
+  "author": "Gadi Cohen <dragon@wastelands.net>",
+  "description": "wmd-client for Meteor wmd-server",
+  "dependencies" : {
+    "ddp"      :  "*",
+    "os-utils" :  "*"
+  }
+}

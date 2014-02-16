@@ -33,6 +33,10 @@ $ meteor
 
 Open browser, (setup and) login with Github, and explore.
 
+If you're behind a NAT, make sure your Meteor port is properly
+forwarded, and, in JavaScript console, run `config.set('dyndnsHost', 'YOURHOST.dyndns.org')`;  It will be used as the hostname for ddp
+connections from cloud servers if ROOT_URL contains `localhost`.
+
 ## IMPORTANT NOTES
 
 NB: This is a work in progress.  You should only be using this in

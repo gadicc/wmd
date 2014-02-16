@@ -4,14 +4,24 @@
 	<p>User settings below.</p>
 
 	<h2>Digital Ocean</h2>
-	<a href="https://cloud.digitalocean.com/generate_api_key">https://cloud.digitalocean.com/generate_api_key</a>
-	<form id="digitalocean">
-		<p>
-			Client ID: <input type="text" name="clientId"
-				value="{{apis.digitalocean.clientId}}" size=40><br />
-			API Key: <input type="text" name="apiKey"
-				value="{{apis.digitalocean.apiKey}}" size=40>
-		</p>
+	<p><a href="https://cloud.digitalocean.com/generate_api_key">https://cloud.digitalocean.com/generate_api_key</a></p>
+
+	<form class="form-horizontal" role="form" id="digitalocean">
+	  <div class="form-group">
+	    <label for="inputClientID" class="control-label">Client ID</label>
+	    <div>
+	      <input type="text" class="form-control" id="inputClientID"
+	      placeholder="Client ID" name="clientId"
+	      value="{{apis.digitalocean.clientId}}">
+	    </div>
+	  </div>
+	  <div class="form-group">
+	    <label for="inputApiKey" class="control-label">API Key</label>
+	    <div>
+	      <input type="text" class="form-control" id="inputApiKey" placeholder="API Key" name="apiKey"
+	      value="{{apis.digitalocean.apiKey}}">
+	    </div>
+	  </div>
 
 		<p>If you have added your own SSH key to Digital Ocean,
 		you can add it's ID here.  Newly created servers will
@@ -23,6 +33,18 @@
 
 		<p>Digital Ocean SSH key ID: <input type="text" name="sshKeyId"
 			value="{{apis.digitalocean.sshKeyId}}" size=4 /></p>
+
+		<p><b>Tip:</b> If you're creating and destroying lots of droplets,
+		you'll probably run into annoying REMOTE HOST IDENTIFICATION from
+		ssh, when new droplets get old IPs.
+		To disable, add rules for the relevant IP ranges in
+		<code>~/.ssh/config</code>:</p>
+
+<pre>
+Host 192.241.235.*  
+    StrictHostKeyChecking no
+    UserKnownHostsFile /dev/null
+</pre>
 
 		<input type="submit">
 	</form>
