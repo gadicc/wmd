@@ -78,10 +78,12 @@ var ddpclient = new DDPClient({
 });
 
 ddpclient.connect(function(error) {
-	  if (error) {
+	if (error) {
     console.log('DDP connection error!');
     return;
   }
+  console.log('Connected to DDP server...');
+
   ddpclient.loginWithUsername(
   	credentials.username,
   	credentials.password,
@@ -93,7 +95,32 @@ ddpclient.connect(function(error) {
       }
       console.log('Logged in as ' + credentials.username);
   	});
-  console.log('Connected to DDP server...');
+
+  ddpclient.subscribe('commands', [], function() {
+		//console.log('commands complete:');
+		//console.log(ddpclient.collections.commands);
+	});
+});
+
+// ddp message: {"msg":"added","collection":"commands","id":"GFJrxCLD4p7L5Enzo","fields":{"serverId":"mK6KLKE4zDNSccLP3","status":"new","command":"moo","options":{"a":1}}}
+ddpclient.on('message', function(msg) {
+	var data = JSON.parse(msg);
+	if (!(data.msg == 'added' && data.collection == 'commands'))
+		return;
+
+	ddpclient.call('/commands/update', [
+		{ _id: data.id },
+		{ $set: { status: 'received' } }
+	], function(err, result) {
+		if (err) throw (err);
+	});
+
+	var createdAt = new Date(data.fields.createdAt.$date);
+	execCommand(data.fields.command, data.fields.options);
 });
 
 ps = child_process.exec(cmd, psFunc);
+
+function execCommand(cmd, options) {
+	console.log('cmd(' + JSON.stringify(options) + ')');
+}
