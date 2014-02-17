@@ -11,7 +11,7 @@ Extension.prototype.addHook = function(hookName, api, func, options) {
     });
 }
 
-DOext = new Extension({
+ext = new Extension({
     name: "digitalocean",
     version: "0.1.0",
     author: "Gadi Cohen <dragon@wastelands.net>",
