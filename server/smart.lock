@@ -7,7 +7,8 @@
       "reactive-objects": {},
       "mongo-counter": {},
       "streams": {},
-      "bootstrap-3": {}
+      "bootstrap-3": {},
+      "extensions": {}
     },
     "packages": {
       "iron-router": {
@@ -39,6 +40,11 @@
         "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
         "tag": "v3.1.0-1",
         "commit": "329dccb08bfc18c635676dea600ac9953162cda9"
+      },
+      "extensions": {
+        "git": "https://github.com/gadicohen/meteor-extensions.git",
+        "tag": "v0.0.7",
+        "commit": "fe931b4efdffeab8dcad5e9668812cd631cf3a58"
       }
     }
   }

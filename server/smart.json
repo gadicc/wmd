@@ -5,6 +5,7 @@
     "reactive-objects": {},
     "mongo-counter": {},
     "streams": {},
-    "bootstrap-3": {}
+    "bootstrap-3": {},
+    "extensions": {}
   }
 }

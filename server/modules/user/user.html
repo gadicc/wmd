@@ -1,0 +1,8 @@
+<template name="user">
+	{{#with user}}
+		<h1>{{profile.name}}</h1>
+		<p>User settings below.</p>
+
+		{{> user_digitalocean}}
+	{{/with}}
+</template>
