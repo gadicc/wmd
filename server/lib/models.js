@@ -3,6 +3,7 @@ apps = new Meteor.Collection('apps');
 servers = new Meteor.Collection('servers');
 serverStats = new Meteor.Collection('serverStats');
 databases = new Meteor.Collection('databases');
+wmdRepos = new Meteor.Collection('repos');
 
 if (Meteor.isClient) {
 	subAll = Meteor.subscribe('all');
@@ -23,6 +24,10 @@ if (Meteor.isServer) {
 			return userId == doc._id
 				&& fieldNames.length == 1 && fieldNames[0] == 'apis';
 		}
+	});
+
+	Meteor.publish('wmdRepos', function() {
+		return wmdRepos.find({userId: this.userId});
 	});
 
 	/*

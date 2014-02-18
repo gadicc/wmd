@@ -19,3 +19,4 @@ accounts-ui
 config
 extensions
 wmd-digitalocean
+wmd-github

@@ -86,6 +86,7 @@ if (Meteor.isServer) {
 
 			var server = newServer(namePrefix, false, {
 				type: type,
+				iaas: 'digitalocean',
 				requested: {
 					region: region,
 					size: size,

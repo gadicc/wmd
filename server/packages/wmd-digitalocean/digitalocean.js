@@ -17,3 +17,5 @@ ext = new Extension({
     author: "Gadi Cohen <dragon@wastelands.net>",
     description: "Digital Ocean support for WMD"
 });
+
+DigitalOceanAPI = Meteor.require('digitalocean-api');

@@ -1,3 +1,29 @@
 <template name="apps">
 	<h1>All Apps</h1>
+
+	<h2>Add App</h2>
+	{{> appAdd}}
+</template>
+
+<template name="appAdd">
+	<form id="appAdd">
+
+		<p>
+			<select id="appAdd_repo">
+				{{#each repos}}
+					<option value="{{repo}}">{{repo}}</option>
+				{{/each}}
+			</select>
+			<select name="appAdd_branch">
+				{{#each branches}}
+					<option value="{{this}}">{{this}}</option>
+				{{/each}}
+			</select>
+		</p>
+
+		<p>
+			<input type="submit">
+		</p>
+
+	</form>
 </template>
