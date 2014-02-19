@@ -4,7 +4,10 @@ if (Meteor.isClient) {
 			data: function() {
 				return {
 					servers: [
-						{ name: 'Meteor Servers', servers: servers.find({type: 'meteor'}) }
+						{ name: 'Combo Servers', servers: servers.find({type: 'combo'}) },
+						{ name: 'Meteor Servers', servers: servers.find({type: 'meteor'}) },
+						{ name: 'Mongo Servers', servers: servers.find({type: 'mongo'}) },
+						{ name: 'Nginx Servers', servers: servers.find({type: 'nginx'}) }
 					],
 					iaasData: iaasData
 				}

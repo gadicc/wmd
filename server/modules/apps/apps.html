@@ -26,6 +26,15 @@
 		</p>
 
 		<p>
+			Force Target:
+			<select id="appId_server">
+				{{#each servers}}
+					<option value="{{_id}}">{{name}}</option>
+				{{/each}}
+			</select>
+		</p>
+
+		<p>
 			<input type="submit">
 		</p>
 

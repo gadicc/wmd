@@ -51,5 +51,7 @@ if (Meteor.isServer) {
 				pubkey: response.result.pubkey
 			});
 		}
-	});
-}
+	}); /* Methods */
+
+	Extensions.registerHookType('ssh.keygen', '0.1.0');
+} /* isServer */

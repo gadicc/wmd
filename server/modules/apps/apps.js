@@ -76,7 +76,11 @@ if (Meteor.isServer) {
 
 			var appData = {
 				name: name,
-				repoId: repoId
+				repoId: repoId,
+				minInstances: undefined,
+				maxInstances: undefined,
+				currentInstances: 0,
+				desiredInstances: 1
 			}
 			
 			if (!Extensions.runPlugin('addApp', repo.service,

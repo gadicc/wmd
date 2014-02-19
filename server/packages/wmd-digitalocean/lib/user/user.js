@@ -21,7 +21,7 @@ if (Meteor.isServer) {
 		DO = Async.wrap(DO, ['sshKeyAdd']);
 
 		var result = DO.sshKeyAdd(data.name, data.pubkey);
-		Meteor.users.update(this.userId, { $set: {
+		Meteor.users.update(data.user._id, { $set: {
 			'sshKey.doId': result.id
 		}});
 	});
