@@ -1,7 +1,7 @@
 if (Meteor.isClient) {
 	Deps.autorun(function() {
 		if (Meteor.userId()) {
-			Meteor.call('wmd.github.updateRepos');
+			//Meteor.call('wmd.github.updateRepos');
 		}
 	});
 }
@@ -31,6 +31,7 @@ if (Meteor.isServer) {
 	var updatingUserRepos = {};
 
 	Meteor.methods({
+
 		'wmd.github.updateRepos': function() {
 
 			// ensure we are only being run once at a time per user
@@ -158,5 +159,13 @@ if (Meteor.isServer) {
 
 			delete(updatingUserRepos[this.userId]);
 		} /* Method wmd.github.updateRepos */
+
+	}); /* Meteor methods */
+
+	ext.registerPlugin('addApp', 'github', '0.1.0', function(data) {
+		var repo = ghRepos.findOne(data.repo.serviceId);
+		var branch = data.branch;
+		
+		return true;
 	});
 }

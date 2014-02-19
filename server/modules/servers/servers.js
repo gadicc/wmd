@@ -235,8 +235,8 @@ if (Meteor.isServer) {
 				});
 			});
 
-			c.on('end', log.close);
-			c.on('close', log.close);
+			c.on('end', function() { DO_setupEnd(log); });
+			c.on('close', function() { DO_setupEnd(log); });
 			c.on('error', function(err) {
   			log.addLine('Connection :: error :: ' + err);
 			});
@@ -252,6 +252,10 @@ if (Meteor.isServer) {
 		}
 
 	}); /* Meteor.methods */
+
+	var DO_setupEnd = function(log) {
+		log.close();
+	}
 
 	var DO_runScript = function(serverId, userId, script, title) {
 
