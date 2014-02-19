@@ -6,6 +6,8 @@
     "mongo-counter": {},
     "streams": {},
     "bootstrap-3": {},
-    "extensions": {}
+    "extensions": {
+    	"path": "/home/dragon/www/smart/meteor-extensions"
+    }
   }
 }

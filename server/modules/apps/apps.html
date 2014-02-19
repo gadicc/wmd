@@ -9,12 +9,12 @@
 	<form id="appAdd">
 
 		<p>
-			<select id="appAdd_repo">
+			<select id="appAdd_repoId">
 				{{#each repos}}
-					<option value="{{repo}}">{{repo}}</option>
+					<option value="{{_id}}">{{repo}}</option>
 				{{/each}}
 			</select>
-			<select name="appAdd_branch">
+			<select id="appAdd_branch">
 				{{#each branches}}
 					<option value="{{this}}">{{this}}</option>
 				{{/each}}
@@ -22,8 +22,18 @@
 		</p>
 
 		<p>
+			Name: <input type="text" id="appAdd_name" size=40 />
+		</p>
+
+		<p>
 			<input type="submit">
 		</p>
+
+		<p>OR (coming soon, maybe):</p>
+
+		<p>Local path: <input type="text"></p>
+
+		<p>(Requires manual redeploy)</p>
 
 	</form>
 </template>
