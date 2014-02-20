@@ -1,5 +1,5 @@
-clients = new Meteor.Collection('clients');
-apps = new Meteor.Collection('apps');
+//clients = new Meteor.Collection('clients');
+Apps = new Meteor.Collection('Apps');
 servers = new Meteor.Collection('servers');
 serverStats = new Meteor.Collection('serverStats');
 databases = new Meteor.Collection('databases');
@@ -12,7 +12,7 @@ if (Meteor.isClient) {
 if (Meteor.isServer) {
 	Meteor.publish('all', function() {
 		// prototyping, TODO, proper pub/subs
-		var cols = ['clients', 'servers', 'serverStats', 'databases'];
+		var cols = ['Apps', 'servers', 'serverStats', 'databases'];
 		cols = cols.map(function(col) { return root[col].find() });
 		cols.push(Meteor.users.find({_id: this.userId},
 			{fields: {apis: 1, 'sshKey.doId': 1}}));

@@ -12,12 +12,14 @@ if (Meteor.isClient) {
 						// should excluse if all branches are deployed
 						//appId: { $exists: false }
 					}, {
-						sort: { repo: 1 }
+						sort: { name: 1 }
 					});
 
 				var dServers = servers.find({
 					$or: [ { type: 'meteor' }, { type: 'combo'} ]
 				});
+
+				console.log(dServers.fetch());
 
 				return { repos: repos, servers: dServers };
 			}
@@ -62,34 +64,53 @@ if (Meteor.isClient) {
 			event.preventDefault();
 			var repoId = $(tpl.find('#appAdd_repoId')).val();
 			var branch = $(tpl.find('#appAdd_branch')).val();
-			Meteor.call('appAdd', name, repoId, branch, deployData);
+			var deployOptions = {
+				servers: {
+					forcedOn: [ $(tpl.find('#appAdd_server')).val() ]
+				}
+			}
+			Meteor.call('appAdd', name, repoId, branch, deployOptions);
 		}
 	});
 }
 
 if (Meteor.isServer) {
+
+
 	Meteor.methods({
-		'appAdd': function(name, repoId, branch, deployData) {
+		'appAdd': function(name, repoId, branch, deployOptions) {
 			var repo = wmdRepos.findOne(repoId);
 			if (!repo)
 				throw new Meteor.Error(404, 'Not such repo');
 
 			var appData = {
-				name: name,
+				name: name || repo.name + '#' + branch,
+				source: 'repo',
 				repoId: repoId,
-				minInstances: undefined,
-				maxInstances: undefined,
-				currentInstances: 0,
-				desiredInstances: 1
+				appId: 1000 + incrementCounter('apps'),
+				instances: {
+					min: undefined,
+					max: undefined,
+					running: 0,
+					desired: 1
+				},
+				servers: {
+					forcedOn: deployOptions.servers.forcedOn,
+					deployedOn: [],
+					runningOn: [],
+					desiredOn: [],
+				}
 			}
 			
+			// ext.registerPlugin('addApp', 'github', '0.1.0', callback)
+			// Can modify appData if desired before db insert
 			if (!Extensions.runPlugin('addApp', repo.service,
 					{ repo: repo, branch: branch, appData: appData })) {
 				console.log('[addApp] No ' + repo.service
 					+ ' plugin (or no return value)');
 			}
 
-			console.log('storing');
+			Apps.insert(appData);
 		}
 	});
 }

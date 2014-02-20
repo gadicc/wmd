@@ -103,4 +103,35 @@ if (Meteor.isServer) {
 		myLog.addLine(new Date().toString());
 	}, 500);
 	*/
+
+	// TODO, check source, contents, etc before insert
+	Meteor.methods({
+		'cslogs.new': function(title, data) {
+			console.log(this.userId);
+			console.log(this);
+			data.fromServer = this.userId;
+			var logId = logs.insert(data);
+			console.log('New remote log: ' + logId);
+			console.log(data);
+			console.log('--');
+			return logId;
+		},
+		'cslogs.addLine': function(logId, line) {
+			logLines.insert({
+				//c: incrementCounter('log'+this.logId),
+				c: new Date().getTime(),
+				i: logId,
+				l: line
+			});
+		},
+		'cslogs.close': function(logId, line) {
+			var lines = logLines.find({i: logId},
+				{ sort: { c: 1 } }).fetch();
+			logs.update(logId, { $set: {
+				content: _.pluck(lines, 'l').join('')
+					+ '\n' + (line ? (line + '\n') : '')
+					+ 'Log finished at ' + new Date().toString() + '\n'
+			}});
+		}		
+	});
 }

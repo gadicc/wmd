@@ -4,7 +4,9 @@
   "author": "Gadi Cohen <dragon@wastelands.net>",
   "description": "wmd-client for Meteor wmd-server",
   "dependencies" : {
-    "ddp"      :  "*",
-    "os-utils" :  "*"
+    "ddp"        : "*",
+    "os-utils"   : "*",
+    "underscore" : "*",
+    "shortid"    : "*"
   }
 }

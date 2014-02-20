@@ -1,7 +1,7 @@
 if (Meteor.isClient) {
 	Deps.autorun(function() {
 		if (Meteor.userId()) {
-			//Meteor.call('wmd.github.updateRepos');
+			Meteor.call('wmd.github.updateRepos');
 		}
 	});
 }
@@ -133,7 +133,7 @@ if (Meteor.isServer) {
 					}
 
 					wmdRepos.upsert({
-						userId: self.userId, repo: repo.name
+						userId: self.userId, name: repo.name
 					}, { $set: {
 						service: 'github',
 						serviceId: myRepo._id,

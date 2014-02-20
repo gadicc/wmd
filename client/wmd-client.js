@@ -5,6 +5,7 @@ var os = require('os');
 var osUtils = require('os-utils');
 
 var credentials = require('./credentials.json');
+var cslog = require('./cslog.js');
 
 // http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
 function isNumber(n) {
@@ -96,7 +97,7 @@ ddpclient.connect(function(error) {
       console.log('Logged in as ' + credentials.username);
   	});
 
-  ddpclient.subscribe('commands', [], function() {
+  	ddpclient.subscribe('commands', [], function() {
 		//console.log('commands complete:');
 		//console.log(ddpclient.collections.commands);
 	});
@@ -121,6 +122,28 @@ ddpclient.on('message', function(msg) {
 
 ps = child_process.exec(cmd, psFunc);
 
+commands = {
+	'spawnAndLog': function(options) {
+		spawnAndLog(options.cmd, options.arg, options.options);
+	}
+};
+
 function execCommand(cmd, options) {
 	console.log('cmd(' + JSON.stringify(options) + ')');
+	if (commands[cmd])
+		commands[cmd](options);
+}
+
+var spawnAndLog = function(cmd, args, options) {
+	var child = child_process.spawn(cmd, args, options);
+	var log = new cslog(ddpclient, cmd + (args ? ' ' + args + args.join(' ') : ''));
+
+	child.stdout.on('data', function(data) {
+		log.addLine(data);
+	});
+	child.on('close', function(code) {
+		log.close('child process exited with code ' + code);
+	});
+
+	return child;
 }

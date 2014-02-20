@@ -11,7 +11,7 @@
 		<p>
 			<select id="appAdd_repoId">
 				{{#each repos}}
-					<option value="{{_id}}">{{repo}}</option>
+					<option value="{{_id}}">{{name}}</option>
 				{{/each}}
 			</select>
 			<select id="appAdd_branch">
@@ -27,9 +27,9 @@
 
 		<p>
 			Force Target:
-			<select id="appId_server">
+			<select id="appAdd_server">
 				{{#each servers}}
-					<option value="{{_id}}">{{name}}</option>
+					<option value="{{_id}}">{{username}}</option>
 				{{/each}}
 			</select>
 		</p>

@@ -1,7 +1,7 @@
 #/bin/bash
 
-echo Installing rsync...
-yum install -y rsync
+echo Installing rsync, wget, git...
+yum install -y rsync wget git...
 
 echo Adding EPEL...
 rpm -Uvh http://download-i2.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
@@ -9,6 +9,10 @@ rpm -Uvh http://download-i2.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.n
 echo Installing nodejs and npm...
 yum install -y nodejs --enablerepo=epel
 yum install -y npm --enablerepo=epel
+
+echo Install Meteor install script & meteorite
+mv launch-meteor.sh /usr/local/bin
+npm install -g meteorite
 
 echo Installing forver...
 npm install -g forever
