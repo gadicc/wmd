@@ -108,6 +108,7 @@ ddpclient.on('message', function(msg) {
 	var data = JSON.parse(msg);
 	if (!(data.msg == 'added' && data.collection == 'commands'))
 		return;
+	console.log(data);
 
 	ddpclient.call('/commands/update', [
 		{ _id: data.id },
@@ -123,13 +124,17 @@ ddpclient.on('message', function(msg) {
 ps = child_process.exec(cmd, psFunc);
 
 commands = {
-	'spawnAndLog': function(options) {
-		spawnAndLog(options.cmd, options.arg, options.options);
+	'spawnAndLog': function(args) {
+		// useful during dev
+		// spawnAndLog(args.cmd, args.args, args.options);
+	},
+	'appInstall': function(args) {
+		spawnAndLog('./appInstall.sh');
 	}
 };
 
 function execCommand(cmd, options) {
-	console.log('cmd(' + JSON.stringify(options) + ')');
+	console.log('Exec: ' + cmd + '(' + JSON.stringify(options) + ')');
 	if (commands[cmd])
 		commands[cmd](options);
 }

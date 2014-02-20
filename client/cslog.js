@@ -2,12 +2,12 @@
 // of collection calls
 
 var _ = require('underscore');
-var shortId = require('shortid');
+var shortid = require('shortid');
 
 var cslog = function(ddpclient, title, data) {
 	var self = this;
 	self.ddpclient = ddpclient;
-	self.localId = shortId.generate();
+	self.localId = shortid.generate();  // TODO, better.
 
 	if (!data) data = {};
 	_.extend(data, {

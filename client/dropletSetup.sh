@@ -121,6 +121,8 @@ esac
 exit $RETVAL
 __END__
 
+chmod a+x *.sh
+
 chmod a+x /etc/init.d/wmd-client
 chkconfig --add wmd-client
 
