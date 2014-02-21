@@ -45,11 +45,11 @@ if (Meteor.isServer) {
 	});
 	Meteor.publish('logLines', function(logId) {
 		return [
+			logs.find({_id: logId}),
+
 			logLines.find({i: logId}, {
 				fields: { i: 0, c: 0 }
-			}),
-
-			logs.find({_id: logId})
+			})
 		];
 	})
 
@@ -107,13 +107,9 @@ if (Meteor.isServer) {
 	// TODO, check source, contents, etc before insert
 	Meteor.methods({
 		'cslogs.new': function(title, data) {
-			console.log(this.userId);
-			console.log(this);
 			data.fromServer = this.userId;
 			var logId = logs.insert(data);
-			console.log('New remote log: ' + logId);
-			console.log(data);
-			console.log('--');
+			console.log('New remote log: ' + logId, data);
 			return logId;
 		},
 		'cslogs.addLine': function(logId, line) {
@@ -132,6 +128,7 @@ if (Meteor.isServer) {
 					+ '\n' + (line ? (line + '\n') : '')
 					+ 'Log finished at ' + new Date().toString() + '\n'
 			}});
+			logLines.remove({i: logId});
 		}		
 	});
 }

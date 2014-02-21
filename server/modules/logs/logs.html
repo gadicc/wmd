@@ -14,7 +14,7 @@
 		<p>{{ctime}}<p>
 
 		<div id="showLogWrapper">
-			<div id="showLog">{{content}}{{#each lines}}{{> showLogLine}}{{/each}}</div>
+			<div id="showLog">{{#if content}}{{content}}{{else}}{{#each lines}}{{> showLogLine}}{{/each}}{{/if}}</div>
 		</div>
 	{{/with}}
 

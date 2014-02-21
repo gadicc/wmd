@@ -50,17 +50,22 @@ cslog.prototype.close = function(line) {
 	// Allow multiple close calls, useful for stream callbacks
 	if (this.closed) return;
 
-	this.addLine(line);
-	if (this.logId)
+	if (this.logId) {
 		this.closed = true;
-	else
+		this.ddpclient.call('cslogs.close', [this.logId, line],
+			function(err, data) {
+				if (err) throw err;
+			});
+	} else
 		this.queueClosed = line;
 }
 
 cslog.prototype.setLogId = function(logId) {
 	this.logId = logId;
-	if (this.queue)
+	if (this.queue) {
 		this.addLine(this.queue.join(''));
+		delete(this.queue)
+	}
 	if (this.queueClosed)
 		this.close(this.queueClosed);
 }

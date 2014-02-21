@@ -108,7 +108,7 @@ ddpclient.on('message', function(msg) {
 	var data = JSON.parse(msg);
 	if (!(data.msg == 'added' && data.collection == 'commands'))
 		return;
-	console.log(data);
+	//console.log(data);
 
 	ddpclient.call('/commands/update', [
 		{ _id: data.id },
@@ -146,8 +146,12 @@ var spawnAndLog = function(cmd, args, options) {
 	child.stdout.on('data', function(data) {
 		log.addLine(data);
 	});
+
 	child.on('close', function(code) {
-		log.close('child process exited with code ' + code);
+		if (code) // i.e. non zero
+			log.close('child process exited with code ' + code);
+		else
+			log.close();
 	});
 
 	return child;
