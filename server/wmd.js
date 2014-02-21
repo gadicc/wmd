@@ -45,15 +45,18 @@ if (Meteor.isServer) {
 	  	Meteor.users.update(userId, { $set: {
 	  		username: name, server: true, nid: nid
 	  	}});
-	  }
+	}
 
   	ServerStats.insert({_id: userId, username: name, nid: nid });
 
-  	data._id = userId; data.nid = nid;
+  	data._id = userId;
+  	data.nid = nid;
+	data.createdAt = new Date();
   	_.extend(data, optional);
+  	
   	Servers.insert(data);
 
-	  return data;
+	return data;
   }
 
   if (Servers.find().count() == 0) {

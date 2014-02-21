@@ -15,6 +15,16 @@ if (Meteor.isClient) {
 		});
 	});
 
+	Template.servers.helpers({
+		'hours': function() {
+			return Math.floor((new Date() - this.createdAt) / 1000 / 60 / 60);
+		},
+		'totalCost': function() {
+			var floorHours = Math.floor((new Date() - this.createdAt) / 1000 / 60 / 60);
+			return (this.costPerHour * floorHours).toFixed(2);
+		}
+	});
+
 	Template.servers.events({
 		'submit #digitalocean': function(event, tpl) {
 			event.preventDefault();
@@ -100,8 +110,13 @@ if (Meteor.isServer) {
 			var droplet = DO.dropletNew(server.username,
 				sizeId, imageId, regionId, optionals);
 
+			// For safety, keep exact/historical spec/price data
+			droplet.sizeData
+				= _.findWhere(iaasData.digitalocean.sizes, { id: sizeId });
+
 			Servers.update(server._id, { $set: {
-				digitalocean: droplet
+				digitalocean: droplet,
+				costPerHour: drop.sizeData.cost_per_hour
 			}});
 
 			if (!droplet) {
