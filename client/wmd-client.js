@@ -7,6 +7,13 @@ var osUtils = require('os-utils');
 var credentials = require('./credentials.json');
 var cslog = require('./cslog.js');
 
+console.log('wmd-client starting...');
+
+// forever not using --sourceDir for CWD?
+if (process.cwd() == '/')
+	process.chdir('/root/wmd-client');
+console.log('CWD: ' + process.cwd());
+
 // http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
 function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
@@ -129,7 +136,8 @@ commands = {
 		// spawnAndLog(args.cmd, args.args, args.options);
 	},
 	'appInstall': function(args) {
-		spawnAndLog('./appInstall.sh');
+		console.log(args);
+		spawnAndLog('./appInstall.sh', args && args.args, args && args.options);
 	}
 };
 
@@ -139,8 +147,8 @@ function execCommand(cmd, options) {
 		commands[cmd](options);
 }
 
-var spawnAndLog = function(cmd, args, options) {
-	var child = child_process.spawn(cmd, args, options);
+var spawnAndLog = function(cmd, args, options, closeFunc) {
+	var child = child_process.spawn(cmd, args || [], options);
 	var log = new cslog(ddpclient, cmd + (args ? ' ' + args + args.join(' ') : ''));
 
 	child.stdout.on('data', function(data) {
@@ -152,6 +160,13 @@ var spawnAndLog = function(cmd, args, options) {
 			log.close('child process exited with code ' + code);
 		else
 			log.close();
+
+		if (closeFunc)
+			closeFunc.call({ cmd: cmd, args: args, options: options }, code);
+	});
+
+	child.on('error', function(error) {
+		log.addLine('Error spawning "' + cmd + '"\n' + error.toString());
 	});
 
 	return child;

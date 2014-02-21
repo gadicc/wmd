@@ -10,13 +10,24 @@ echo Installing nodejs and npm...
 yum install -y nodejs --enablerepo=epel
 yum install -y npm --enablerepo=epel
 
-echo Install Meteor install script & meteorite
+echo Install Meteor install script
 mv launch-meteor.sh /usr/local/bin
-npm install -g meteorite
+
+echo Installing meteorite...
+npm list -g meteorite | grep -q empty
+if [ $? -eq 0 ] ; then
+	npm install -g meteorite
+else
+	echo Already Intalled
+fi
 
 echo Installing forver...
-npm install -g forever
-mkdir /var/run/forever
+npm list -g forever | grep -q empty
+if [ $? -eq 0 ] ; then
+	npm install -g forever
+else
+	echo Already Intalled
+fi
 
 echo "Setting up init script (/etc/init.d/wmd-client)..."
 cat > /etc/init.d/wmd-client <<'__END__'
@@ -122,13 +133,14 @@ exit $RETVAL
 __END__
 
 chmod a+x *.sh
-
 chmod a+x /etc/init.d/wmd-client
+mkdir /var/run/forever
 chkconfig --add wmd-client
 
 echo Installing dependencies for wmd-client.js...
 npm install
 
+echo Starting wmd-client...
 chmod a+x wmd-client.js
 service wmd-client stop
 service wmd-client start

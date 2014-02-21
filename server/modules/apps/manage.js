@@ -36,8 +36,12 @@ if (Meteor.isServer) {
 
 	var appInstall = function(app, serverId) {
 		console.log('starting setup');
-		sendCommand(serverId, 'appSetup', {
-			app: app
+		sendCommand(serverId, 'appInstall', {
+			options: {
+				env: {
+					'MOO': 1
+				}
+			}
 		});
 	}
 
