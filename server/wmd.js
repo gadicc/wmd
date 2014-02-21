@@ -47,16 +47,16 @@ if (Meteor.isServer) {
 	  	}});
 	  }
 
-  	serverStats.insert({_id: userId, username: name, nid: nid });
+  	ServerStats.insert({_id: userId, username: name, nid: nid });
 
   	data._id = userId; data.nid = nid;
   	_.extend(data, optional);
-  	servers.insert(data);
+  	Servers.insert(data);
 
 	  return data;
   }
 
-  if (servers.find().count() == 0) {
+  if (Servers.find().count() == 0) {
   	var password = newServer('devServer', true).password;
   	console.log('Creating "devServer" user with password "'+password+'".');
   	fs.writeFile('../../../../../../client/devserver.json', JSON.stringify({
@@ -68,7 +68,7 @@ if (Meteor.isServer) {
   	'updateStats': function(os, procs) {
   		if (!this.userId)
   			return {};
-  		serverStats.update(this.userId, { $set: {
+  		ServerStats.update(this.userId, { $set: {
   			os: os,
   			procs: procs,
   			lastUpdate: new Date()
@@ -79,8 +79,8 @@ if (Meteor.isServer) {
 
 	  removeServer: function(id) {
 	  	Meteor.users.remove(id);
-	  	servers.remove(id);
-	  	serverStats.remove(id);
+	  	Servers.remove(id);
+	  	ServerStats.remove(id);
 	  }
 
   })

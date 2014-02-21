@@ -15,13 +15,13 @@ if (Meteor.isClient) {
 						sort: { name: 1 }
 					});
 
-				var dServers = servers.find({
+				var servers = Servers.find({
 					$or: [ { type: 'meteor' }, { type: 'combo'} ]
 				});
 
-				console.log(dServers.fetch());
+				console.log(servers.fetch());
 
-				return { repos: repos, servers: dServers };
+				return { repos: repos, servers: servers };
 			}
 		});
 	});

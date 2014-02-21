@@ -27,15 +27,18 @@ if (Meteor.isServer) {
 		// check if all desireds are deployed (and run setup)
 		_.each(app.servers.desiredOn, function(desiredId) {
 			if (!_.contains(app.servers.deployedOn, desiredId))
-				if (appSetup(app)) // on Success
+				if (appInstall(app, desiredId)) // on Success
 					app.servers.deployedTo.push(desiredId);
 		});
 
 		// update if changed
 	}
 
-	var appSetup = function(app) {
+	var appInstall = function(app, serverId) {
 		console.log('starting setup');
+		sendCommand(serverId, 'appSetup', {
+			app: app
+		});
 	}
 
 	Apps.find().observe({

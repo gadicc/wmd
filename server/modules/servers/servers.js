@@ -4,10 +4,10 @@ if (Meteor.isClient) {
 			data: function() {
 				return {
 					servers: [
-						{ name: 'Combo Servers', servers: servers.find({type: 'combo'}) },
-						{ name: 'Meteor Servers', servers: servers.find({type: 'meteor'}) },
-						{ name: 'Mongo Servers', servers: servers.find({type: 'mongo'}) },
-						{ name: 'Nginx Servers', servers: servers.find({type: 'nginx'}) }
+						{ name: 'Combo Servers', servers: Servers.find({type: 'combo'}) },
+						{ name: 'Meteor Servers', servers: Servers.find({type: 'meteor'}) },
+						{ name: 'Mongo Servers', servers: Servers.find({type: 'mongo'}) },
+						{ name: 'Nginx Servers', servers: Servers.find({type: 'nginx'}) }
 					],
 					iaasData: iaasData
 				}
@@ -100,7 +100,7 @@ if (Meteor.isServer) {
 			var droplet = DO.dropletNew(server.username,
 				sizeId, imageId, regionId, optionals);
 
-			servers.update(server._id, { $set: {
+			Servers.update(server._id, { $set: {
 				digitalocean: droplet
 			}});
 
@@ -116,7 +116,7 @@ if (Meteor.isServer) {
   				DO = Async.wrap(DO, ['dropletGet']);
 
   				var droplet = DO.dropletGet(result.droplet_id);
-					servers.update(server._id, { $set: {
+					Servers.update(server._id, { $set: {
 						digitalocean: droplet
 					}});
 				}, {});
@@ -146,13 +146,13 @@ if (Meteor.isServer) {
 	  	var DO = new DigitalOceanAPI(creds.clientId, creds.apiKey);
 	  	DO = Async.wrap(DO, ['dropletDestroy']);
 
-			var server = servers.findOne(serverId);
+			var server = Servers.findOne(serverId);
 
 			if (!server.digitalocean) {
 				// Failure in creating, just delete stale entry
 				Meteor.users.remove(serverId);
-				servers.remove(serverId);
-				serverStats.remove(serverId);
+				Servers.remove(serverId);
+				ServerStats.remove(serverId);
 				return;
 			}
 
@@ -169,8 +169,8 @@ if (Meteor.isServer) {
 			DO_eventCheck(eventId, user, null,
 				function(result, data) {
 					Meteor.users.remove(serverId);
-					servers.remove(serverId);
-					serverStats.remove(serverId);
+					Servers.remove(serverId);
+					ServerStats.remove(serverId);
 				}, {});
 
 			return {};
@@ -178,7 +178,7 @@ if (Meteor.isServer) {
 
 		DO_installClient: function(serverId) {
 			var user = Meteor.users.findOne(this.userId);
-			var server = servers.findOne(serverId);
+			var server = Servers.findOne(serverId);
 			var Connection = new Meteor.require('ssh2');
 			var heredoc = new Meteor.require('heredoc');
 
@@ -286,7 +286,7 @@ if (Meteor.isServer) {
 		}
 		result.event_desc = eventDesc;
 
-		servers.update({'digitalocean.id': result.droplet_id}, {$set: {
+		Servers.update({'digitalocean.id': result.droplet_id}, {$set: {
 			event: result
 		}});
 

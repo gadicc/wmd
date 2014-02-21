@@ -5,7 +5,7 @@ if (Meteor.isClient) {
 		this.route('serverInfo', {
 			path: 'servers/:server',
 			data: function() {
-				var server = servers.findOne({
+				var server = Servers.findOne({
 					$or: [
 						{_id: this.params.server},
 						{username: this.params.server}
@@ -14,12 +14,12 @@ if (Meteor.isClient) {
 				this.params.serverId = server._id;
 				return {
 					name: server.username,
-					serverStats: serverStats.findOne(server._id)
+					serverStats: ServerStats.findOne(server._id)
 				}
 			},
 			action: function() {
 				if (handle) handle.stop()
-				handle = serverStats.find({_id: this.params.serverId}).observe({
+				handle = ServerStats.find({_id: this.params.serverId}).observe({
 					added: function(doc) {
 					},
 					changed: function(doc) {
