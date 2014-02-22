@@ -3,6 +3,7 @@ var child_process = require('child_process');
 var DDPClient = require("ddp");
 var os = require('os');
 var osUtils = require('os-utils');
+var _ = require('underscore');
 
 var credentials = require('./credentials.json');
 var cslog = require('./cslog.js');
@@ -113,11 +114,11 @@ ddpclient.connect(function(error) {
 // ddp message: {"msg":"added","collection":"commands","id":"GFJrxCLD4p7L5Enzo","fields":{"serverId":"mK6KLKE4zDNSccLP3","status":"new","command":"moo","options":{"a":1}}}
 ddpclient.on('message', function(msg) {
 	var data = JSON.parse(msg);
-	if (!(data.msg == 'added' && data.collection == 'commands'))
-		return;
 	//console.log(data);
+	if (!(data.msg == 'added' && data.collection == 'Commands'))
+		return;
 
-	ddpclient.call('/commands/update', [
+	ddpclient.call('/Commands/update', [
 		{ _id: data.id },
 		{ $set: { status: 'received' } }
 	], function(err, result) {
@@ -125,44 +126,60 @@ ddpclient.on('message', function(msg) {
 	});
 
 	var createdAt = new Date(data.fields.createdAt.$date);
-	execCommand(data.fields.command, data.fields.options);
+	execCommand(data.id, data.fields.command, data.fields.options);
 });
 
 ps = child_process.exec(cmd, psFunc);
 
 commands = {
-	'spawnAndLog': function(args) {
+	'spawnAndLog': function(args, done) {
 		// useful during dev
-		// spawnAndLog(args.cmd, args.args, args.options);
+		// spawnAndLog(args.cmd, args.args, args.options, done);
 	},
-	'appInstall': function(args) {
+	'appInstall': function(args, done) {
 		console.log(args);
-		spawnAndLog('./appInstall.sh', args && args.args, args && args.options);
+		spawnAndLog('./appInstall.sh', args && args.args,
+			args && args.options, done);
 	}
 };
 
-function execCommand(cmd, options) {
-	console.log('Exec: ' + cmd + '(' + JSON.stringify(options) + ')');
-	if (commands[cmd])
-		commands[cmd](options);
+function execDone(err, result) {
+	console.log('execDone', this.commandId, err, result);
+	ddpclient.call('cmdResult', [this.commandId, result], function(error, result) {
+		console.log(error);
+		//if (error) throw error;
+	});
 }
 
-var spawnAndLog = function(cmd, args, options, closeFunc) {
+function execCommand(id, cmd, options) {
+	console.log('Exec: ' + cmd + '(' + JSON.stringify(options) + ')');
+	if (commands[cmd])
+		commands[cmd](options, _.bind(execDone, { commandId: id }));
+}
+
+var spawnAndLog = function(cmd, args, options, done) {
+	// Preserve PATH
+	if (options.env && !options.env.PATH)
+		options.env.PATH = process.env.PATH;
+
 	var child = child_process.spawn(cmd, args || [], options);
 	var log = new cslog(ddpclient, cmd + (args ? ' ' + args + args.join(' ') : ''));
 
 	child.stdout.on('data', function(data) {
 		log.addLine(data);
 	});
+	child.stderr.on('data', function(data) {
+		log.addLine(data);
+	});
 
 	child.on('close', function(code) {
-		if (code) // i.e. non zero
+		if (code) { // i.e. non zero
 			log.close('child process exited with code ' + code);
-		else
+			if (done) done(null, { status: 'failed', code: code });
+		} else {
 			log.close();
-
-		if (closeFunc)
-			closeFunc.call({ cmd: cmd, args: args, options: options }, code);
+			if (done) done(null, { status: 'success', code: code });
+		}
 	});
 
 	child.on('error', function(error) {

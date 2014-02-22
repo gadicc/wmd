@@ -22,7 +22,7 @@ and then rsync is used to send just the changes to all relevant servers.
 
 ## Features (coming soon)
 
-* Multitenancy
+* Multi-tenancy
 * Rules for when to spawn new servers, move Meteor to other servers, grow
 servers, etc.  During a move, the old process stays up until the new one
 is removed, for zero downtime.
@@ -46,7 +46,15 @@ connections from cloud servers if ROOT_URL contains `localhost`.
 
 NB: This is a work in progress.  You should only be using this in
 development on your home PC.  Few security checks are in place.  Error
-handling is limited.
+handling is limited.  Currently, any user can login and manage your
+apps and servers :)
+
+Super NB: For anything important (i.e., nothing you should be doing
+now), use with force-ssl.  Github OAUTH tokens are sent over the wire
+to your deployed servers.  Unless everything is over SSL, when you
+finish playing, you should go to https://github.com/settings/applications,
+select WMD, and click on 'Revoke all user tokens'.  (Your client
+secret is ok).
 
 It's entirely possible I may abandon this project entirely once
 Galaxy is launched.
@@ -86,6 +94,14 @@ needed to develop this app :)
 
 ## FAQ
 
+* **Why just Digital Ocena and GitHub?**
+
+WMD was developed internally for our own use, and this is what we
+use.  However, later we decided to make the design more modular,
+the above are now both individually packaged plugins, and it should
+be able to make a plugin for almost anything (Amazon, BitBucket,
+etc).
+
 * **Why run in Meteor and send full source rather than bundling?**
 
 Quicker redeploy times.  A bundle on our big project takes 27s
@@ -93,3 +109,20 @@ seconds to generate, and then still extract again (1s :)).  It's
 true Meteor has to minify/compile everything on startup, but after
 this, for redeploys, only changed files.  Overall that was much
 quicker for us.
+
+* **How are git deployments done?**
+
+Currently, a git pull is run on every server.  Long term, we'd
+prefer to git pull to the control server, and then in parallel,
+rsync (over SSH) to all the servers.  Think (hypothetically)
+200 servers in the same data center.  This should still remain
+an option for the case where control server is on dev's home
+PC, or servers are in multiple data centers.
+
+* **How does wmd-client authenticate itself?**
+
+Currently, servers are added as Meteor users.  This allowed
+rapid development by leveraging Meteor's SRP implementation
+and DDP authentication.  In the future, we'll use our own
+two-way authentication to ensure a fake server can't be setup,
+DNS hijacked, and as such, gain control of servers.

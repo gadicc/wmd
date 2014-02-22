@@ -7,8 +7,6 @@ if (Meteor.isClient) {
 }
 
 if (Meteor.isServer) {
-	var ghRepos = new Meteor.Collection('github_repos');
-
 	var isMeteorProject = function(github, repo, branches) {
 		var master = _.findWhere(branches, { name: 'master' });
 
@@ -33,7 +31,6 @@ if (Meteor.isServer) {
 	Meteor.methods({
 
 		'wmd.github.updateRepos': function() {
-
 			// ensure we are only being run once at a time per user
 			if (updatingUserRepos[this.userId])
 				return;
@@ -112,7 +109,8 @@ if (Meteor.isServer) {
 				} else {
 					myRepo = { _id: ghRepos.insert({
 						userId: self.userId,
-						repo: repo.name,
+						name: repo.name,
+						repo: repo,
 						etagBranches: branches.meta.etag
 					})};
 				}

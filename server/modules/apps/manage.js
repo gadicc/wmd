@@ -36,14 +36,40 @@ if (Meteor.isServer) {
 
 	var appInstall = function(app, serverId) {
 		console.log('starting setup');
-		sendCommand(serverId, 'appInstall', {
-			options: {
-				env: {
-					'MOO': 1
-				}
+
+		var data = {
+			env: {
+				'APPID': app.appId,
+				'APPNAME': app.name,
 			}
+		};
+
+		var source = app.source;
+
+		// move to seperate repo package
+		if (source == 'repo') {
+			data.repo = wmdRepos.findOne(app.repoId);
+			console.log(data.repo);
+			Extensions.runPlugin('appInstall',
+				data.repo.service, data, true);
+		}
+
+		console.log(data);
+
+		sendCommand(serverId, 'appInstall', {
+			options: { env: data.env }
+		}, function(error, result) {
+			if (result.code) // i.e. non-zero, failure
+				Apps.update(app._id, {
+					$push: { 'servers.failingOn': serverId }
+				});
+			else // install success
+				Apps.update(app._id, {
+					$push: { 'servers.deployedOn': serverId }
+				});
 		});
 	}
+	Extensions.registerPluginType('appInstall_cmd', '0.1.0');
 
 	Apps.find().observe({
 		added: appCheck, changed: appCheck

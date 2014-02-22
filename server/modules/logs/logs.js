@@ -6,9 +6,6 @@ if (Meteor.isClient) {
 		this.route('logs', {
 			before: function() {
 				this.subscribe('logs');
-			},
-			data: function() {
-				return { logs: logs.find() }
 			}
 		});
 
@@ -24,6 +21,10 @@ if (Meteor.isClient) {
 				}
 			}
 		});
+
+		Template.logs.logs = function() {
+			return logs.find();
+		}
 
 		Template.showLog.lines = function() {
 			return logLines.find();

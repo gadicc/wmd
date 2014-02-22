@@ -4,3 +4,7 @@ ext = new Extension({
     author: "Gadi Cohen <dragon@wastelands.net>",
     description: "Github support for WMD"
 });
+
+if (Meteor.isServer) {
+	ghRepos = new Meteor.Collection('github_repos');
+}
