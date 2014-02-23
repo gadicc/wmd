@@ -14,6 +14,11 @@ if (Meteor.isServer) {
 	 *    _id: 'AYLhiET3YcRC8FyTy' }
 	*/
 
+	/*
+	 * Note: the entire 'servers' section will probably become
+	 * part of an array/object of 'datacenters' in the future.
+	 */
+
 	var appCheck = function(appOrig) {
 		var app = _.clone(appOrig);
 		console.log(app);
@@ -27,8 +32,13 @@ if (Meteor.isServer) {
 		// check if all desireds are deployed (and run setup)
 		_.each(app.servers.desiredOn, function(desiredId) {
 			if (!_.contains(app.servers.deployedOn, desiredId))
-				if (appInstall(app, desiredId)) // on Success
-					app.servers.deployedTo.push(desiredId);
+				appInstall(app, desiredId);
+		});
+
+		// is the app running on all servers it's deployed to?
+		_.each(app.servers.deployedOn, function(deployedId) {
+			if (!_.contains(app.servers.runningOn, deployedId))
+				appStart(app, deployedId);
 		});
 
 		// update if changed
@@ -49,6 +59,7 @@ if (Meteor.isServer) {
 		// move to seperate repo package
 		if (source == 'repo') {
 			data.repo = wmdRepos.findOne(app.repoId);
+			data.env.BRANCH = app.branch;
 			console.log(data.repo);
 			Extensions.runPlugin('appInstall',
 				data.repo.service, data, true);
@@ -69,7 +80,41 @@ if (Meteor.isServer) {
 				});
 		});
 	}
-	Extensions.registerPluginType('appInstall_cmd', '0.1.0');
+	Extensions.registerPluginType('appInstall', '0.1.0');
+
+	var appStart = function(app, serverId) {
+		console.log('starting app');
+
+		var data = {
+			args: [],
+			options: {
+				silent: false, // for now, but we have our own log
+				uid: app.appId,
+				max: 3,
+				killTree: true,
+				minUptime: 2000,
+				spinSleepTime: 1000,
+				cwd: '/home/app' + app.appId + '/badges',  // XXX
+				env: {
+					USER: 'app' + app.appId,
+					HOME: '/home/app' + app.appId,
+					PATH: '/bin:/usr/bin:/usr/local/bin'
+				}
+			}
+		};
+
+		sendCommand(serverId, 'appStart', data, function(error, result) {
+			console.log(error, result);
+			if (result.code) // i.e. non-zero, failure
+				Apps.update(app._id, {
+					$push: { 'servers.failingOn': serverId }
+				});
+			else // start success
+				Apps.update(app._id, {
+					$push: { 'servers.runningOn': serverId }
+				});
+		});
+	}
 
 	Apps.find().observe({
 		added: appCheck, changed: appCheck

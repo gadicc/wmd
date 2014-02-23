@@ -1,8 +1,17 @@
 <template name="apps">
 	<h1>All Apps</h1>
+	{{> allApps}}
 
 	<h2>Add App</h2>
 	{{> appAdd}}
+</template>
+
+<template name="allApps">
+	{{#each apps}}
+		<table>
+			<tr><td>{{name}}</td></tr>
+		</table>
+	{{/each}}
 </template>
 
 <template name="appAdd">

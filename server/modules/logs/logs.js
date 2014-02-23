@@ -29,6 +29,15 @@ if (Meteor.isClient) {
 		Template.showLog.lines = function() {
 			return logLines.find();
 		}
+
+		var htmlEntities = function(str) {
+    		return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+		}
+
+		Template.showLogLine.ansi2html = function(line) {
+			return ansi2html.toHtml(htmlEntities(line));
+		}
+
 		Template.showLogLine.rendered = function() {
 			var div = $('#showLog');
 			div.scrollTop(div.prop('scrollHeight'));

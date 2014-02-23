@@ -19,9 +19,11 @@ if (Meteor.isClient) {
 					$or: [ { type: 'meteor' }, { type: 'combo'} ]
 				});
 
+				var apps = Apps.find();
+
 				console.log(servers.fetch());
 
-				return { repos: repos, servers: servers };
+				return { repos: repos, servers: servers, apps: apps };
 			}
 		});
 	});
@@ -85,6 +87,7 @@ if (Meteor.isServer) {
 
 			var appData = {
 				name: name || repo.name + '#' + branch,
+				branch: branch,
 				source: 'repo',
 				repoId: repoId,
 				appId: 1000 + incrementCounter('apps'),

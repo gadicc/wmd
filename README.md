@@ -13,12 +13,12 @@ Copyright (c) 2014 Gadi Cohen, see license below.
 
 ## Features (implemented)
 
-* Create new cloud servers on demand.  With Stats.
+* Create new cloud servers on demand.  With realtime stats.
 * Each Meteor process is run under forever-monitor, restarted
 automatically, with logs & stats on the Web UI.
-* Meteor is run directly, no bundling involved, for faster deploys.
-* Deployments are via git deploys.  The local repo is updated (rdiff),
-and then rsync is used to send just the changes to all relevant servers.
+* Meteor is run directly, no bundling involved, for faster deploys
+(see FAQ).
+* Deployments are via git deploys (see FAQ).
 
 ## Features (coming soon)
 
@@ -50,11 +50,12 @@ handling is limited.  Currently, any user can login and manage your
 apps and servers :)
 
 Super NB: For anything important (i.e., nothing you should be doing
-now), use with force-ssl.  Github OAUTH tokens are sent over the wire
+now), use with force-ssl.  Github OAuth tokens are sent over the wire
 to your deployed servers.  Unless everything is over SSL, when you
 finish playing, you should go to https://github.com/settings/applications,
 select WMD, and click on 'Revoke all user tokens'.  (Your client
-secret is ok).
+secret is ok).  OAuth tokens are not stored on any of your spawned
+servers.
 
 It's entirely possible I may abandon this project entirely once
 Galaxy is launched.
@@ -126,3 +127,18 @@ rapid development by leveraging Meteor's SRP implementation
 and DDP authentication.  In the future, we'll use our own
 two-way authentication to ensure a fake server can't be setup,
 DNS hijacked, and as such, gain control of servers.
+
+* **I think my database was compromised, what to do?**
+
+1. Revoke all Github user keys [here](https://github.com/settings/applications).
+1. Destroy all servers and dump the database (or give all servers new
+passwords in both the database and on your servers, gen new SSH key
+pair and replace in database and on all servers and on DigitalOcean
+control panel).
+1. Delete DigitalOcean OAuth pair on their Control Panel.
+1. Revoke all SSL certificates (not that it's
+[that effective](http://news.netcraft.com/archives/2013/05/13/how-certificate-revocation-doesnt-work-in-practice.html) and create new ones 
+for all your domains.
+
+In theory we could automate most of the above for this eventuality,
+or have regular rotations for extra security, or something.

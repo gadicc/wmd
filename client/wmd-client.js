@@ -4,6 +4,7 @@ var DDPClient = require("ddp");
 var os = require('os');
 var osUtils = require('os-utils');
 var _ = require('underscore');
+var forever = require('forever-monitor');
 
 var credentials = require('./credentials.json');
 var cslog = require('./cslog.js');
@@ -137,9 +138,20 @@ commands = {
 		// spawnAndLog(args.cmd, args.args, args.options, done);
 	},
 	'appInstall': function(args, done) {
-		console.log(args);
+		console.log('appInstall', args);
 		spawnAndLog('./appInstall.sh', args && args.args,
 			args && args.options, done);
+	},
+	'appStart': function(data, done) {
+		console.log('appStart', data);
+		foreverStart('mrt', data.args, data.options, done, {
+			error: function(error) {
+				console.log('error', error, data);
+			},
+			exit: function(forever) {
+				console.log('exit', forever, data);
+			}
+		});
 	}
 };
 
@@ -185,6 +197,38 @@ var spawnAndLog = function(cmd, args, options, done) {
 	child.on('error', function(error) {
 		log.addLine('Error spawning "' + cmd + '"\n' + error.toString());
 	});
+
+	return child;
+}
+
+var forevers = {};
+var foreverStart = function(cmd, args, options, done, callbacks) {
+	console.log('options', options);
+	var child = forever.start(_.union([cmd], args), options);
+	var log = new cslog(ddpclient, cmd + (args ? ' ' + args + args.join(' ') : ''));
+	var childId = new Date().getTime() + Math.random();
+	forevers[childId] = child;
+
+	child.on('stdout', function(data) {
+		log.addLine(data);
+	});
+	child.on('stderr', function(data) {
+		log.addLine(data);
+	});
+
+	child.on('start', function(process,data) {
+		log.addLine('Started successfully');
+		done(null, { status: 'started', childId: childId, log: 1 });
+	});
+
+	child.on('error', function(error) {
+		log.addLine('Error spawning "' + cmd + '"\n' + error.toString());
+		if (callbacks.error)
+			callbacks.error(error);
+	});
+
+	if (callbacks.exit)
+		child.on('exit', callbacks.exit);
 
 	return child;
 }

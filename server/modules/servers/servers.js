@@ -158,13 +158,13 @@ if (Meteor.isServer) {
 		DO_destroy: function(serverId) {
 			var user = Meteor.users.findOne(this.userId);
 			var creds = user.apis.digitalocean;
-	  	var DO = new DigitalOceanAPI(creds.clientId, creds.apiKey);
-	  	DO = Async.wrap(DO, ['dropletDestroy']);
+	  		var DO = new DigitalOceanAPI(creds.clientId, creds.apiKey);
+	  		DO = Async.wrap(DO, ['dropletDestroy']);
 
 			var server = Servers.findOne(serverId);
 
+			// Failure in creating, just delete stale entry
 			if (!server.digitalocean) {
-				// Failure in creating, just delete stale entry
 				Meteor.users.remove(serverId);
 				Servers.remove(serverId);
 				ServerStats.remove(serverId);
@@ -184,8 +184,13 @@ if (Meteor.isServer) {
 			DO_eventCheck(eventId, user, null,
 				function(result, data) {
 					Meteor.users.remove(serverId);
-					Servers.remove(serverId);
 					ServerStats.remove(serverId);
+
+					// Don't delete historical cost data
+					// Servers.remove(serverId);
+					Servers.update(serverId, { $set: {
+						destroyedAt: new Date()
+					}});
 				}, {});
 
 			return {};

@@ -5,6 +5,7 @@
 # * APPNAME, e.g. meteor-app#master
 # * USERCMD, e.g. git clone http://... 
 # * REPO, e.g. meteor-app
+# * BRANCH, e.g. master
 
 APP_UID=$APPID
 USER="app$APPID"
@@ -35,9 +36,9 @@ export
 mkdir $1
 cd $1
 git init
-git pull $2
+git pull $2 $3
 __END__
 
 chmod a+x /home/$USER/appInstall.sh
 
-su - $USER -c "./appInstall.sh $REPO $URL"
+su - $USER -c "./appInstall.sh $REPO $URL $BRANCH"
