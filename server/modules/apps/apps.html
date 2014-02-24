@@ -8,8 +8,18 @@
 
 <template name="allApps">
 	{{#each apps}}
-		<table>
-			<tr><td>{{name}}</td></tr>
+		<table class="table table-bordered" style="width: auto">
+			<tr>
+				<td> &nbsp; <a href="/apps/{{_id}}">{{name}}</a> &nbsp; </td>
+			</tr><tr>
+			  <td>
+			  	<button class="setup" data-id="{{_id}}">Setup</button>
+			  	<button class="update" data-id="{{_id}}">Update</button>
+			  	<button class="start" data-id="{{_id}}">Start</button>
+			  	<button class="stop" data-id="{{_id}}">Stop</button>
+			  	<button class="delete" data-id="{{_id}}">Delete</button>
+			  </td>
+			</tr>
 		</table>
 	{{/each}}
 </template>

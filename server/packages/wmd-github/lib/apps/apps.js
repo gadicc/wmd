@@ -7,7 +7,9 @@ if (Meteor.isClient) {
 }
 
 if (Meteor.isServer) {
-	var isMeteorProject = function(github, repo, branches) {
+	var path = Meteor.require('path');
+
+	var findMeteorDir = function(github, repo, branches) {
 		var master = _.findWhere(branches, { name: 'master' });
 
 		var req = github.gitdata.getTree({
@@ -20,7 +22,7 @@ if (Meteor.isServer) {
 		for (var i=0; i < req.tree.length; i++) {
 			if (req.tree[i].type == 'tree'
 					&& req.tree[i].path.match(/\/?.meteor$/))
-				return true;
+				return path.dirname(req.tree[i].path);
 		}
 
 		return false;
@@ -42,45 +44,103 @@ if (Meteor.isServer) {
 			var Github = Meteor.require('github');
 			var github = new Github({version: "3.0.0"});
 
-			//github.user = Async.wrap(github.user, ['get']);
+			github.user = Async.wrap(github.user, [
+				'getOrgs'
+			]);
 			github.gitdata = Async.wrap(github.gitdata, [
 				'getTree'
 			]);
 			github.repos = Async.wrap(github.repos, [
-				'getAll', 'getBranches', 'getContent'
+				'getAll', 'getFromOrg', 'getBranches', 'getContent'
 			]);
 
-		    github.authenticate({
-		        type: "oauth",
-		        token: user.services.github.accessToken
-		    });
+	    github.authenticate({
+	        type: "oauth",
+	        token: user.services.github.accessToken
+	    });
 
-		    var meta = ghRepos.findOne({userId: this.userId, repo: '_meta'});
+	    // where we store eTags for this user's github requests
+	    var meta = ghRepos.findOne({userId: this.userId, repo: '_meta'});
+
+	    var allRepos = [];
+
+	    /* --- User Repos --- */
 
 			var reposGetAll = github.repos.getAll({
+				type: 'all',
 				per_page: 100,
 				headers: {
-					'If-None-Match': meta && meta.etag || undefined
+					'If-None-Match': meta && meta.etags.reposGetAll || undefined
 				}
 			});
 
 			if (reposGetAll.meta.status == '304 Not Modified') {
 				console.log('no changes to user repos');
-				return;
+			} else {
+				if (meta) {
+					ghRepos.update(meta._id, { $set: {
+						'etags.reposGetAll': reposGetAll.meta.etag
+					}} );
+				} else {
+					meta = {
+						userId: this.userId,
+						repo: '_meta',
+						etags: {
+							reposGetAll: reposGetAll.meta.etag,
+							reposGetFromOrg: {}
+						}
+					};
+					meta._id = ghRepos.insert(meta);
+				}
+				allRepos = _.union(reposGetAll);
 			}
 
-			if (meta)
+			/* --- User orgs and org repos --- */
+
+			var userGetOrgs = github.user.getOrgs({
+				type: 'all',
+				per_page: 100,
+				headers: {
+					'If-None-Match': meta && meta.etags.userGetOrgs || undefined
+				}
+			});
+
+			if (userGetOrgs.meta.status == '304 Not Modified') {
+				console.log('no changes to list of orgs');
+				userGetOrgs = meta.userGetOrgs;
+			} else {
 				ghRepos.update(meta._id, { $set: {
-					etag: reposGetAll.meta.etag
-				}} );
-			else
-				ghRepos.insert({
-					userId: this.userId,
-					repo: '_meta',
-					etag: reposGetAll.meta.etag
+					'etags.userGetOrgs': userGetOrgs.meta.etag,
+					userGetOrgs: userGetOrgs
+				}});
+			}
+
+			// For each org, get their list of repos
+			_.each(userGetOrgs, function(org) {
+
+				var orgRepos = github.repos.getFromOrg({
+					org: org.login,
+					per_page: 100,
+					headers: {
+						'If-None-Match': meta && meta.etags.reposGetFromOrg[org.id] || undefined
+					}
 				});
 
-			_.each(reposGetAll, function(repo) {
+				if (orgRepos.meta.status == '304 Not Modified') {
+					console.log('no changes to repos of org ' + org.login);
+				} else {
+						var data = {};
+						data['etags.reposGetFromOrg.'+org.id]
+							= orgRepos.meta.etag;
+						ghRepos.update(meta._id, { $set: data });
+						allRepos = _.union(allRepos, orgRepos);
+				}
+
+			});
+
+			/* --- Iterate through all Repos --- */
+
+			_.each(allRepos, function(repo) {
 
 				console.log(repo.name);
 
@@ -98,8 +158,8 @@ if (Meteor.isServer) {
 				});
 
 				if (branches.meta.status == '304 Not Modified') {
-					console.log('no changes to branches');
-					return;
+					console.log('no changes to branches of ' + repo.name);
+					return; /* from _.each func */
 				}
 
 				if (myRepo) {
@@ -115,11 +175,12 @@ if (Meteor.isServer) {
 					})};
 				}
 
-				if (isMeteorProject(github, repo, branches)) {
+				var meteorDir = findMeteorDir(github, repo, branches);
+				if (meteorDir) {
 
 					ghRepos.update(myRepo._id, { $set: {
 						branches: branches,
-						isMeteorProject: true
+						meteorDir: meteorDir
 					}});
 
 					var branchArray = _.pluck(branches, 'name');
@@ -135,7 +196,8 @@ if (Meteor.isServer) {
 					}, { $set: {
 						service: 'github',
 						serviceId: myRepo._id,
-						branches: branchArray
+						branches: branchArray,
+						meteorDir: meteorDir
 					}});
 
 				} else {
@@ -155,6 +217,7 @@ if (Meteor.isServer) {
 
 			//console.log(reposGetAll);
 
+			// finished updating.
 			delete(updatingUserRepos[this.userId]);
 		} /* Method wmd.github.updateRepos */
 
