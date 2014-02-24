@@ -67,7 +67,8 @@ if (Meteor.isServer) {
 
 		console.log(data);
 
-		sendCommand(serverId, 'appInstall', {
+		sendCommand(serverId, 'spawnAndLog', {
+			cmd: './appInstall.sh',
 			options: { env: data.env }
 		}, function(error, result) {
 			if (result.code) // i.e. non-zero, failure
@@ -86,6 +87,7 @@ if (Meteor.isServer) {
 		console.log('starting app');
 
 		var data = {
+			cmd: 'mrt',
 			args: [],
 			options: {
 				silent: false, // for now, but we have our own log
@@ -94,7 +96,8 @@ if (Meteor.isServer) {
 				killTree: true,
 				minUptime: 2000,
 				spinSleepTime: 1000,
-				cwd: '/home/app' + app.appId + '/badges',  // XXX
+				cwd: '/home/app' + app.appId + '/' + app.repo + '/'
+					+ (app.meteorDir == '.' ? '' : app.meteorDir),
 				env: {
 					USER: 'app' + app.appId,
 					HOME: '/home/app' + app.appId,
@@ -103,7 +106,7 @@ if (Meteor.isServer) {
 			}
 		};
 
-		sendCommand(serverId, 'appStart', data, function(error, result) {
+		sendCommand(serverId, 'foreverStart', data, function(error, result) {
 			console.log(error, result);
 			if (result.code) // i.e. non-zero, failure
 				Apps.update(app._id, {

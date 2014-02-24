@@ -35,6 +35,16 @@ if (Meteor.isClient) {
 			'Default: ' + repoName + '#' + branch);
 	}
 
+	Template.allApps.events({
+		'click button': function(event, tpl) {
+			event.preventDefault();
+			var target = $(event.target);
+			var appId = target.closest('table').data('app-id');
+			var action = target.data('action');
+			Meteor.call('appAction', appId, action);
+		}
+	});
+
 	Template.appAdd.rendered = function() {
 		Session.set('selectedRepoId', $('#appAdd_repoId').val());
 		updateName();
@@ -90,6 +100,8 @@ if (Meteor.isServer) {
 				branch: branch,
 				source: 'repo',
 				repoId: repoId,
+				repo: repo.name,
+				meteorDir: repo.meteorDir,
 				appId: 1000 + incrementCounter('apps'),
 				instances: {
 					min: undefined,
@@ -114,6 +126,21 @@ if (Meteor.isServer) {
 			}
 
 			Apps.insert(appData);
+		},
+
+		'appAction': function(appId, action) {
+			var app = Apps.findOne(appId);
+			if (!app)
+				throw new Meteor.Error(404, 'No such app');
+
+			switch(action) {
+
+				case 'delete':
+				// TODO, safely stop all instances, delete from server
+				Apps.remove(appId);
+				break;
+
+			}
 		}
 	});
 }

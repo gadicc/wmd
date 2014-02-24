@@ -24,7 +24,7 @@ export
 # TODO, move github stuff elsewhere
 cat > /home/$USER/appInstall.sh <<'__END__'
 #!/bin/sh
-# appInstall.sh REPO URL
+# appInstall.sh REPO URL BRANCH
 # We don't do this in one step to preserve OAUTH token secrecy
 # https://github.com/blog/1270-easier-builds-and-deployments-using-git-over-https-and-oauth
 
@@ -37,6 +37,8 @@ mkdir $1
 cd $1
 git init
 git pull $2 $3
+git submodule init
+git submodule update
 __END__
 
 chmod a+x /home/$USER/appInstall.sh

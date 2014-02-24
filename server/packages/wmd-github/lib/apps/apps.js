@@ -180,7 +180,7 @@ if (Meteor.isServer) {
 
 					ghRepos.update(myRepo._id, { $set: {
 						branches: branches,
-						meteorDir: meteorDir
+						meteorDir: meteorDir == '.' ? '' : meteorDir
 					}});
 
 					var branchArray = _.pluck(branches, 'name');

@@ -133,16 +133,11 @@ ddpclient.on('message', function(msg) {
 ps = child_process.exec(cmd, psFunc);
 
 commands = {
-	'spawnAndLog': function(args, done) {
-		// useful during dev
-		// spawnAndLog(args.cmd, args.args, args.options, done);
+	'spawnAndLog': function(data, done) {
+		console.log('spawnAndLog', data);
+		spawnAndLog(data.cmd, data.args || [], data.options, done);
 	},
-	'appInstall': function(args, done) {
-		console.log('appInstall', args);
-		spawnAndLog('./appInstall.sh', args && args.args,
-			args && args.options, done);
-	},
-	'appStart': function(data, done) {
+	'foreverStart': function(data, done) {
 		console.log('appStart', data);
 		foreverStart('mrt', data.args, data.options, done, {
 			error: function(error) {
