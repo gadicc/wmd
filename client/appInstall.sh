@@ -40,7 +40,14 @@ git pull $2 $3
 git submodule init
 git submodule update
 __END__
-
 chmod a+x /home/$USER/appInstall.sh
+
+cat > /home/$USER/appUpdate.sh <<'__END__'
+#!/bin/sh
+cd $REPO
+git pull $URL $BRANCH
+git submodule update
+__END__
+chmod a+x /home/$USER/appUpdate.sh
 
 su - $USER -c "./appInstall.sh $REPO $URL $BRANCH"

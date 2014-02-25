@@ -1,6 +1,12 @@
 {
   "packages": {
-    "iron-router": {},
+    "iron-router": {
+      "XXpath": "/home/dragon/www/smart/iron-router",
+      "XXgit": "https://github.com/gadicohen/iron-router.git",
+      "git": "https://github.com/EventedMind/iron-router.git",
+      "branch": "shark",
+      "XXbranch": "cmather"
+	},
     "npm": {},
     "reactive-objects": {},
     "mongo-counter": {},

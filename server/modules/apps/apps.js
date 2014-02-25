@@ -6,6 +6,7 @@ if (Meteor.isClient) {
 			},
 			data: function() {
 				var user = Meteor.user();
+				if (!user) return;
 
 				var repos = wmdRepos.find({
 						userId: user._id,
@@ -28,12 +29,35 @@ if (Meteor.isClient) {
 		});
 	});
 
+	// template-engine-preview-10.1 fixes
+	Template.apps.name = function() {
+		return this.name;
+	}
+
+
 	var updateName = function() {
 		var repoName = $('#appAdd_repoId option:selected').text();
 		var branch = $('#appAdd_branch').val();
 		$('#appAdd_name').attr('placeholder',
 			'Default: ' + repoName + '#' + branch);
+
+		var repo = wmdRepos.findOne($('#appAdd_repoId option:selected').val());
+		console.log(repo);
+		$('#appAdd_meteorDir').attr('placeholder',
+			'Default: ' + repo.meteorDir);
 	}
+
+	Template.allApps.sourceOptions = function() {
+		// move to seperate repo package
+		if (this.source == 'repo') {
+			var repo = wmdRepos.findOne(this.repoId);
+			if (!repo) return;
+			return Extensions.runPlugin('appOptions', repo.service, {
+				app: this, repo: repo
+			});
+		}
+	}
+	Extensions.declarePlugin('appOptions', '0.1.0');
 
 	Template.allApps.events({
 		'click button': function(event, tpl) {
@@ -81,6 +105,8 @@ if (Meteor.isClient) {
 					forcedOn: [ $(tpl.find('#appAdd_server')).val() ]
 				}
 			}
+			var meteorDir = $(tpl.find('#appAdd_meteorDir')).val();
+			if (meteorDir) deployOptions.meteorDir = meteorDir;
 			Meteor.call('appAdd', name, repoId, branch, deployOptions);
 		}
 	});
@@ -116,6 +142,11 @@ if (Meteor.isServer) {
 					desiredOn: [],
 				}
 			}
+
+			//_.extend(appData, deployOptions);  TODO, deepextend
+			if (deployOptions.meteorDir)
+				appData.meteorDir = deployOptions.meteorDir;
+
 			
 			// ext.registerPlugin('addApp', 'github', '0.1.0', callback)
 			// Can modify appData if desired before db insert
@@ -132,15 +163,56 @@ if (Meteor.isServer) {
 			var app = Apps.findOne(appId);
 			if (!app)
 				throw new Meteor.Error(404, 'No such app');
-
-			switch(action) {
-
-				case 'delete':
-				// TODO, safely stop all instances, delete from server
-				Apps.remove(appId);
-				break;
-
-			}
+			if (appActions[action])
+				appActions[action](app);
 		}
 	});
+
+	appActions = {};
+	appActions.setup = function(app) {
+		// actually "re" setup
+		_.each(app.servers.deployedOn, function(serverId) {
+			appInstall(app, serverId);
+		});				
+	}
+	appActions.delete = function(app) {
+		// TODO, safely stop all instances, delete from server
+		Apps.remove(app._id);
+	}
+	appActions.update = function(app) {
+		console.log('update');
+		var data = {
+			env: {
+				USER: 'app' + app.appId,
+				HOME: '/home/app' + app.appId,
+				PATH: '/bin:/usr/bin:/usr/local/bin'
+			}
+		};
+
+		var source = app.source;
+
+		// move to seperate repo package (dupe from manage.js)
+		if (source == 'repo') {
+			data.repo = wmdRepos.findOne(app.repoId);
+			data.env.BRANCH = app.branch;
+			console.log(data.repo);
+			Extensions.runPlugin('appInstall',
+				data.repo.service, data, true);
+		}
+
+		var spawnData = {
+			cmd: './appUpdate.sh',
+			options: {
+				cwd: '/home/app' + app.appId,
+				env: data.env
+			}
+		};
+
+		_.each(app.servers.deployedOn, function(serverId) {
+			console.log(serverId);
+			sendCommand(serverId, 'spawnAndLog', spawnData, function(err, data) {
+				console.log(data);
+			});
+		});		
+	}
 }

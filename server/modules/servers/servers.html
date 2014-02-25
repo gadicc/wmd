@@ -7,9 +7,12 @@
 		<h3>{{name}}</h3>
 		{{#each servers}}
 			<table class="table table-bordered" style="width: auto">
+				<thead>
 				<tr>
 					<td> &nbsp; <a href="/servers/{{username}}">{{username}}</a> &nbsp; </td>
-				</tr><tr>
+				</tr>
+				</thead><tbody>
+				<tr>
 					<td>IP address: {{digitalocean.ip_address}}</td>
 				</tr><tr>
 					<td>Hours: {{hours}}, Total: ${{totalCost}}</td>
@@ -24,6 +27,7 @@
 				  	{{/if}}
 				  </td>
 				</tr>
+				</tbody>
 			</table>
 		{{/each}}
 

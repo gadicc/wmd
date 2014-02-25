@@ -1,10 +1,29 @@
 #/bin/bash
 
-echo Installing rsync, wget, git...
-yum install -y rsync wget git...
+echo Setting up swap space...
+fallocate -l 512M /swapfile
+chmod 600 /swapfile
+mkswap -f /swapfile
+swapon /swapfile
+echo "/swapfile	none	swap	defaults	0	0" >> /etc/fstab
+
+echo Adjusting swappiness and cfs_cache_pressure values
+
+sed '/vm\.swappiness/d' /etc/sysctl.conf
+echo "vm.swappiness = 10" >> /etc/sysctl.conf
+sysctl vm.swappiness=10
+
+sed '/vm\.vm.vfs_cache_pressure' /etc/sysctl.conf
+echo "vm.vfs_cache_pressure = 50" >> /etc/sysctl.conf
+sysctl vm.vfs_cache_pressure=50
 
 echo Adding EPEL...
 rpm -Uvh http://download-i2.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+
+## TODO, firewall, fail2ban
+
+echo Installing rsync, wget, git...
+yum install -y rsync wget git...
 
 echo Installing nodejs and npm...
 yum install -y nodejs --enablerepo=epel

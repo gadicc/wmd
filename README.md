@@ -142,3 +142,26 @@ for all your domains.
 
 In theory we could automate most of the above for this eventuality,
 or have regular rotations for extra security, or something.
+
+## Load testing Questions
+
+https://github.com/alanning/meteor-load-test
+
+1. How many concurrent users on each set of typical server specs?
+Until significant speed loss, until melt down.
+1. Algorithm for rough estimation of how many users per *x* servers,
+with standard setup (load balancer, nginx for static assets, seperate
+db servers, etc).
+1. Automate testing of isolated differing approaches for same goal,
+e.g. optimization of publications, etc.  CPU, time, etc.
+
+## wmd.json (per app, all params optional)
+
+{
+	name:
+	meteorDir:
+	instances: {
+		min:
+		max:
+	}
+}

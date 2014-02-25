@@ -11,7 +11,7 @@
 <template name="showLog">
 	{{#with log}}
 		<h1>{{title}}</h1>
-		<p>{{ctime}}<p>
+		<p>{{ctime}}</p>
 
 		<div id="showLogWrapper">
 			<div id="showLog">{{#if content}}{{content}}{{else}}{{#each lines}}{{> showLogLine}}{{/each}}{{/if}}</div>

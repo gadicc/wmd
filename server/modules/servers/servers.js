@@ -15,6 +15,14 @@ if (Meteor.isClient) {
 		});
 	});
 
+	// template-engine-preview-10.1 fixes
+	Template.servers.name = function() {
+		return this.name;
+	}
+	Template.servers.regions = function() {
+		return this.regions;
+	}
+
 	Template.servers.helpers({
 		'hours': function() {
 			return Math.floor((new Date() - this.createdAt) / 1000 / 60 / 60);
@@ -221,12 +229,7 @@ if (Meteor.isServer) {
 				./install.sh
 			*/    //});
 
-			var url = Meteor.require('url');
-			var rootUrl = url.parse(process.env.ROOT_URL);
-			if (rootUrl.hostname == 'localhost'
-					&& config.get('dyndnsHost'))
-				rootUrl.hostname = config.get('dyndnsHost');
-
+			var rootUrl = extRootUrl();
 			var script = 'mkdir wmd-client ; cd wmd-client\n';
 			for (file in installScripts)
 				script += 'cat > ' + file + ' <<"__WMD_EOF__"\n'

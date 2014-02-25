@@ -67,6 +67,17 @@ if (Meteor.isServer) {
   	})); // callbacks?
   }
 
+  extRootUrl = function() {
+	var url = Meteor.require('url');
+	var rootUrl = url.parse(process.env.ROOT_URL);
+	if (rootUrl.hostname == 'localhost' && config.get('dyndnsHost')) {
+		rootUrl.hostname = config.get('dyndnsHost');
+		rootUrl.host = rootUrl.host.replace(/localhost/, rootUrl.hostname);
+		rootUrl.href = rootUrl.href.replace(/localhost/, rootUrl.hostname);
+	}
+	return rootUrl;
+  }
+
   Meteor.methods({
   	'updateStats': function(os, procs) {
   		if (!this.userId)

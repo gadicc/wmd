@@ -4,6 +4,20 @@ if (Meteor.isClient) {
 			Meteor.call('wmd.github.updateRepos');
 		}
 	});
+
+	ext.plugin('appOptions', 'github', '0.1.0', function(data) {
+		var repo = ghRepos.findOne(data.repo.serviceId);
+		var branch = data.branch;
+		return Template.ghAppOptions;
+	});
+
+	Template.ghAppOptions.events({
+		'click [name="autoUpdate"]': function(event, tpl) {
+			var appId = $(event.target).closest('table').data('app-id');
+			var enabled = $(event.target).is(':checked');
+			Meteor.call('wmd.github.setAutoUpdate', appId, enabled);
+		}
+	});
 }
 
 if (Meteor.isServer) {
@@ -37,27 +51,11 @@ if (Meteor.isServer) {
 			if (updatingUserRepos[this.userId])
 				return;
 			updatingUserRepos[this.userId] = true;
+			this.unblock();
 
-			var user = Meteor.users.findOne(this.userId);
 			var self = this;
-
-			var Github = Meteor.require('github');
-			var github = new Github({version: "3.0.0"});
-
-			github.user = Async.wrap(github.user, [
-				'getOrgs'
-			]);
-			github.gitdata = Async.wrap(github.gitdata, [
-				'getTree'
-			]);
-			github.repos = Async.wrap(github.repos, [
-				'getAll', 'getFromOrg', 'getBranches', 'getContent'
-			]);
-
-	    github.authenticate({
-	        type: "oauth",
-	        token: user.services.github.accessToken
-	    });
+			var user = Meteor.users.findOne(this.userId);
+			var github = authedWrappedGithub(user);
 
 	    // where we store eTags for this user's github requests
 	    var meta = ghRepos.findOne({userId: this.userId, repo: '_meta'});
@@ -219,14 +217,108 @@ if (Meteor.isServer) {
 
 			// finished updating.
 			delete(updatingUserRepos[this.userId]);
-		} /* Method wmd.github.updateRepos */
+		}, /* Method wmd.github.updateRepos */
+
+		'wmd.github.setAutoUpdate': function(appId, enabled) {
+			var app = Apps.findOne(appId);
+			var repo = wmdRepos.findOne(app.repoId);
+			var ghRepo = ghRepos.findOne(repo.serviceId);
+			var user = Meteor.users.findOne(this.userId);
+			var github = authedWrappedGithub(user);
+			var rootUrl = extRootUrl();
+			var self = this;
+
+			if (app.github.autoUpdate == enabled)
+				return;
+
+			if (enabled) {
+				var hook = github.repos.createHook({
+					user: ghRepo.repo.owner.login,
+					repo: ghRepo.repo.name,
+					name: 'web',
+					config: {
+						url: rootUrl.href + 'gitHubHook',
+						// TODO, secret + UI for insecure_ssl
+						// secret: 'xx'
+						insecure_ssl: 1
+					}
+				});
+				Apps.update(appId, { $set: { 'github.autoUpdate': hook.id }});
+			} else {
+				github.repos.deleteHook({
+					user: ghRepo.repo.owner.login,
+					repo: ghRepo.repo.name,
+					id: app.github.autoUpdate
+				});
+				Apps.update(appId, { $set: { 'github.autoUpdate': false }});
+			}
+
+		},
+
+		'hooktest': function() {
+			var github = authedWrappedGithub(this.userId);
+			github.repos.testHook({
+				user: 'gadicohen',
+				repo: 'meteor-messageformat',
+				id: 1855886
+			});
+		}
 
 	}); /* Meteor methods */
 
-	ext.registerPlugin('addApp', 'github', '0.1.0', function(data) {
+	function authedWrappedGithub(user) {
+		if (!_.isObject(user))
+			user = Meteor.users.findOne(user);
+
+			var Github = Meteor.require('github');
+			var github = new Github({version: "3.0.0"});
+
+			github.user = Async.wrap(github.user, [
+				'getOrgs'
+			]);
+			github.gitdata = Async.wrap(github.gitdata, [
+				'getTree'
+			]);
+			github.repos = Async.wrap(github.repos, [
+				'getAll', 'getFromOrg', 'getBranches', 'getContent',
+				'createHook', 'deleteHook', 'testHook'
+			]);
+
+	    github.authenticate({
+	        type: "oauth",
+	        token: user.services.github.accessToken
+	    });
+
+	    return github;
+	}
+
+	ext.plugin('addApp', 'github', '0.1.0', function(data) {
 		var repo = ghRepos.findOne(data.repo.serviceId);
 		var branch = data.branch;
-		
+
+		appData.github = {};
 		return true;
+	});
+
+	Router.map(function() {
+		this.route('gitHubHook', {
+			where: 'server',
+			action: function() {
+				this.response.writeHead(200);
+				this.response.end();
+
+				var data = JSON.parse(this.request.body.payload);
+
+				// wow, a bit convoluted... reconsider how we store everything?
+				var ghRepo = ghRepos.findOne({'repo.id': data.repository.id});
+				var repo = wmdRepos.findOne({
+					service:'github', serviceId: ghRepo._id
+				});
+				var app = Apps.findOne({repoId: repo._id});
+
+				console.log('Github push for ' + app.name + ', updating...');
+				appActions.update(app);
+			}
+		})
 	});
 }

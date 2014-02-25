@@ -9,8 +9,12 @@
 <template name="allApps">
 	{{#each apps}}
 		<table data-app-id="{{_id}}" class="table table-bordered" style="width: auto">
+			<thead>
 			<tr>
 				<td> &nbsp; <a href="/apps/{{_id}}">{{name}}</a> &nbsp; </td>
+			</tr>
+			</thead><tbody><tr>
+				<td>{{> sourceOptions}}</td>
 			</tr><tr>
 			  <td>
 			  	<button data-action="setup" data-id="{{_id}}">Setup</button>
@@ -19,7 +23,7 @@
 			  	<button data-action="stop" data-id="{{_id}}">Stop</button>
 			  	<button data-action="delete" data-id="{{_id}}">Delete</button>
 			  </td>
-			</tr>
+			</tr></tbody>
 		</table>
 	{{/each}}
 </template>
@@ -42,6 +46,9 @@
 
 		<p>
 			Name: <input type="text" id="appAdd_name" size=40 />
+		</p>
+		<p>
+			MeteorDir: <input type="text" id="appAdd_meteorDir" size=40 />
 		</p>
 
 		<p>

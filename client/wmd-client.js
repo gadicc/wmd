@@ -166,7 +166,7 @@ function execCommand(id, cmd, options) {
 
 var spawnAndLog = function(cmd, args, options, done) {
 	// Preserve PATH
-	if (options.env && !options.env.PATH)
+	if (options && options.env && !options.env.PATH)
 		options.env.PATH = process.env.PATH;
 
 	var child = child_process.spawn(cmd, args || [], options);

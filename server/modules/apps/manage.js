@@ -44,7 +44,7 @@ if (Meteor.isServer) {
 		// update if changed
 	}
 
-	var appInstall = function(app, serverId) {
+	appInstall = function(app, serverId) {
 		console.log('starting setup');
 
 		var data = {
@@ -56,7 +56,7 @@ if (Meteor.isServer) {
 
 		var source = app.source;
 
-		// move to seperate repo package
+		// move to seperate repo package (duped in apps.js)
 		if (source == 'repo') {
 			data.repo = wmdRepos.findOne(app.repoId);
 			data.env.BRANCH = app.branch;
@@ -73,11 +73,13 @@ if (Meteor.isServer) {
 		}, function(error, result) {
 			if (result.code) // i.e. non-zero, failure
 				Apps.update(app._id, {
-					$push: { 'servers.failingOn': serverId }
+					$pull: { 'servers.deployedOn': serverId },
+					$addToSet: { 'servers.failingOn': serverId }
 				});
 			else // install success
 				Apps.update(app._id, {
-					$push: { 'servers.deployedOn': serverId }
+					$pull: { 'servers.failingOn': serverId },
+					$addToSet: { 'servers.deployedOn': serverId }
 				});
 		});
 	}

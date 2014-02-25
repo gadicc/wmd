@@ -5,6 +5,4 @@ ext = new Extension({
     description: "Github support for WMD"
 });
 
-if (Meteor.isServer) {
-	ghRepos = new Meteor.Collection('github_repos');
-}
+ghRepos = new Meteor.Collection('github_repos');

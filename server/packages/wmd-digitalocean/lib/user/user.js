@@ -15,7 +15,7 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
 
-	ext.addHook('ssh.keygen', '0.1.0', function(data) {
+	ext.on('ssh.keygen', '0.1.0', function(data) {
 		var creds = data.user.apis.digitalocean;
 		var DO = new DigitalOceanAPI(creds.clientId, creds.apiKey);
 		DO = Async.wrap(DO, ['sshKeyAdd']);

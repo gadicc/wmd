@@ -26,17 +26,18 @@
             <li><a href="/servers">Servers</a></li>
 			<li><a href="/servers/devServer">(devServer)</a></li>
 			<li><a href="/logs">Logs</a></li>
+			<li><a href="/tasks">Tasks</a></li>
           </ul>
 		  {{/constant}}
 		   <ul class="nav navbar-nav navbar-right">
-	  		 <li>{{loginButtons align="right"}}</li>	
+	  		 <li>{{> loginButtons align="right"}}</li>	
 		   </ul>
         </div><!--/.nav-collapse -->
       </div>
     </div>
 
     <div class="container">
-		{{yield}}
+		{{> yield}}
 	</div>
 </template>
 
