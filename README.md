@@ -15,10 +15,11 @@ Copyright (c) 2014 Gadi Cohen, see license below.
 
 * Create new cloud servers on demand.  With realtime stats.
 * Each Meteor process is run under forever-monitor, restarted
-automatically, with logs & stats on the Web UI.
+automatically, with realtime logs & stats on the Web UI.
 * Meteor is run directly, no bundling involved, for faster deploys
 (see FAQ).
-* Deployments are via git deploys (see FAQ).
+* Deployments are via git deploys (see FAQ), with auto update on
+push.
 
 ## Features (coming soon)
 
@@ -27,6 +28,8 @@ automatically, with logs & stats on the Web UI.
 servers, etc.  During a move, the old process stays up until the new one
 is removed, for zero downtime.
 * nginx and SSL management.
+* Mongo management.  Support for multi-region databases.
+* Extensions for e.g. email/sms/call if app goes down, etc.
 
 ## Quick start
 
