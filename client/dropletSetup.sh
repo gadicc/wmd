@@ -1,5 +1,15 @@
 #/bin/bash
 
+# TODO, pass info from server
+METEOR=`grep -E 'combo|meteor' credentials.json`
+NGINX=`grep -E 'combo|nginx' credentials.json`
+MONGO=`grep -E 'combo|mongo' credentials.json`
+
+echo Adding EPEL...
+rpm -Uvh http://download-i2.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
+
+## TODO, firewall, fail2ban
+
 echo Setting up swap space...
 fallocate -l 512M /swapfile
 chmod 600 /swapfile
@@ -17,11 +27,6 @@ sed '/vm\.vm.vfs_cache_pressure' /etc/sysctl.conf
 echo "vm.vfs_cache_pressure = 50" >> /etc/sysctl.conf
 sysctl vm.vfs_cache_pressure=50
 
-echo Adding EPEL...
-rpm -Uvh http://download-i2.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
-
-## TODO, firewall, fail2ban
-
 echo Installing rsync, wget, git...
 yum install -y rsync wget git...
 
@@ -29,15 +34,31 @@ echo Installing nodejs and npm...
 yum install -y nodejs --enablerepo=epel
 yum install -y npm --enablerepo=epel
 
-echo Install Meteor install script
-mv launch-meteor.sh /usr/local/bin
+if [ $METEOR ] ; then
+	echo Install Meteor install script
+	mv launch-meteor.sh /usr/local/bin
 
-echo Installing meteorite...
-npm list -g meteorite | grep -q empty
-if [ $? -eq 0 ] ; then
-	npm install -g meteorite
-else
-	echo Already Intalled
+	echo Installing meteorite...
+	npm list -g meteorite | grep -q empty
+	if [ $? -eq 0 ] ; then
+		npm install -g meteorite
+	else
+		echo Already Intalled
+	fi
+fi
+
+if [ $NGINX ] ; then
+	echo Installing nginx...
+	cat > /etc/yum.repos.d <<'__END__'
+[nginx]
+name=nginx repo
+baseurl=http://nginx.org/packages/centos/6/$basearch/
+gpgcheck=0
+enabled=1
+__END__
+	yum install -y nginx
+	chkconfig nginx on
+	service nginx start
 fi
 
 echo Installing forver...

@@ -139,11 +139,12 @@ commands = {
 	},
 	'foreverStart': function(data, done) {
 		console.log('appStart', data);
-		foreverStart('mrt', data.args, data.options, done, {
+		foreverStart(data.cmd, data.args, data.options, done, {
 			error: function(error) {
 				console.log('error', error, data);
 			},
 			exit: function(forever) {
+
 				console.log('exit', forever, data);
 			}
 		});
