@@ -34,7 +34,7 @@ if (Meteor.isServer) {
 				_.each(app.instances.data, function(ai) {
 					if (ai.state == 'running') {
 						var server = Servers.findOne(ai.serverId); // TODO, cache
-						out += '\tserver ' + server.digitalocean.ip_address
+						out += '\tserver ' + server.ip
 							+ ':' + ai.port + ';\n';
 					}
 				});

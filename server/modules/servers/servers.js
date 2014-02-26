@@ -120,7 +120,9 @@ if (Meteor.isServer) {
 
 			Servers.update(server._id, { $set: {
 				digitalocean: droplet,
-				costPerHour: droplet.sizeData.cost_per_hour
+				costPerHour: droplet.sizeData.cost_per_hour,
+				ip: droplet.ip_address,
+				privateIp: droplet.private_ip_address
 			}});
 
 			if (!droplet) {
