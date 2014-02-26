@@ -70,6 +70,7 @@ if (Meteor.isServer) {
 			ctime: new Date()
 		});
 		this.logId = logs.insert(data);
+		this.lastLineId = null;
 	};
 
 	slog.prototype.addLine = function(line) {
@@ -78,7 +79,17 @@ if (Meteor.isServer) {
 				' but log already closed: ' + line);
 
 		if (!_.isString(line)) line = line.toString();
-		logLines.insert({
+
+		if (line.match(/^\r/) && this.lastLineId) {
+			console.log('update last line');
+			// TODO, handle \n in middle of chunk
+			logLines.update(this.lastLineId, { $set: {
+				l: line.replace(/^\r/, '')
+			}});
+			return;
+		}
+
+		this.lastLineId = logLines.insert({
 			//c: incrementCounter('log'+this.logId),
 			c: new Date().getTime(),
 			i: this.logId,
@@ -115,6 +126,8 @@ if (Meteor.isServer) {
 	*/
 
 	// TODO, check source, contents, etc before insert
+	var lastLineIds = {};
+	var lastLines = {};
 	Meteor.methods({
 		'cslogs.new': function(title, data) {
 			data.fromServer = this.userId;
@@ -123,12 +136,36 @@ if (Meteor.isServer) {
 			return logId;
 		},
 		'cslogs.addLine': function(logId, line) {
-			logLines.insert({
-				//c: incrementCounter('log'+this.logId),
-				c: new Date().getTime(),
-				i: logId,
-				l: line
-			});
+			line = line.replace(/\r[^\n]*(\r[^\n]*?)/, '$1');
+
+			if (line.match(/\r/) && lastLines[logId].match(/\n/)
+					&& lastLineIds[logId]) {
+
+				lastLines[logId] = lastLines[logId].replace(/\n.*?$/,
+					line.replace(/[^\n]*\r(.*?)$/, '\n$1'));
+				logLines.update(lastLineIds[logId], { $set: {
+					l: lastLines[logId]
+				}});
+
+			} else if (!line.match(/\n/) && line.length < 80
+				&& lastLineIds[logId]) {
+
+				lastLines[logId] += line;
+				logLines.update(lastLineIds[logId], { $set: {
+					l: lastLines[logId]
+				}});
+
+			} else {
+
+				lastLines[logId] = line;
+				lastLineIds[logId] = logLines.insert({
+					//c: incrementCounter('log'+this.logId),
+					c: new Date().getTime(),
+					i: logId,
+					l: line
+				});
+
+			}
 		},
 		'cslogs.close': function(logId, line) {
 			var lines = logLines.find({i: logId},

@@ -292,6 +292,7 @@ if (Meteor.isServer) {
 	    return github;
 	}
 
+	/*
 	ext.plugin('addApp', 'github', '0.1.0', function(data) {
 		var repo = ghRepos.findOne(data.repo.serviceId);
 		var branch = data.branch;
@@ -299,6 +300,7 @@ if (Meteor.isServer) {
 		appData.github = {};
 		return true;
 	});
+	*/
 
 	Router.map(function() {
 		this.route('gitHubHook', {

@@ -30,6 +30,8 @@ is removed, for zero downtime.
 * nginx and SSL management.
 * Mongo management.  Support for multi-region databases.
 * Extensions for e.g. email/sms/call if app goes down, etc.
+* Use private-IPs if available.
+* Automated mongo backups (schedule, before upgrade, etc)
 
 ## Quick start
 

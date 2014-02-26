@@ -200,9 +200,9 @@ var forevers = {};
 var foreverStart = function(cmd, args, options, done, callbacks) {
 	console.log('options', options);
 	var child = forever.start(_.union([cmd], args), options);
-	var log = new cslog(ddpclient, cmd + (args ? ' ' + args + args.join(' ') : ''));
+	var log = new cslog(ddpclient, cmd + (args ? ' ' + args.join(' ') : ''));
 	var childId = new Date().getTime() + Math.random();
-	forevers[childId] = child;
+	//forevers[childId] = child;
 
 	child.on('stdout', function(data) {
 		log.addLine(data);

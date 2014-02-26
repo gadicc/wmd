@@ -4,7 +4,13 @@ if (Meteor.isClient) {
 	Router.map(function() {
 		this.route('serverInfo', {
 			path: 'servers/:server',
+			waitOn: subAll,
 			data: function() {
+				// waitOn broken in shark branch
+				return { serverParam: this.params.server }
+				/*
+				if (!subAll.ready())
+					return;
 				var server = Servers.findOne({
 					$or: [
 						{_id: this.params.server},
@@ -16,10 +22,17 @@ if (Meteor.isClient) {
 					name: server.username,
 					serverStats: ServerStats.findOne(server._id)
 				}
+				*/
 			},
-			action: function() {
+			after: function() {
 				if (handle) handle.stop()
-				handle = ServerStats.find({_id: this.params.serverId}).observe({
+				var server = Servers.findOne({
+					$or: [
+						{_id: this.params.server},
+						{username: this.params.server}
+					]
+				});
+				handle = ServerStats.find({_id: server._id}).observe({
 					added: function(doc) {
 					},
 					changed: function(doc) {
@@ -56,7 +69,7 @@ if (Meteor.isClient) {
 			minValue: 0.0, maxValue: 1.0,
 			millisPerPixel: 20,
 			grid: { strokeStyle: '#555555', lineWidth: 1, millisPerLine: 1000, verticalSections: 10 },
-			timestampFormatter:SmoothieChart.timeFormatter
+			// timestampFormatter:SmoothieChart.timeFormatter
 		});
 		chart.addTimeSeries(data.mem, { strokeStyle: 'rgba(255, 255, 0, 1)', fillStyle: 'rgba(255, 255, 0, 0.2)', lineWidth: 4 });
 		chart.addTimeSeries(data.cpu, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 4 });

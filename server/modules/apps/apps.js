@@ -39,12 +39,12 @@ if (Meteor.isClient) {
 		var repoName = $('#appAdd_repoId option:selected').text();
 		var branch = $('#appAdd_branch').val();
 		$('#appAdd_name').attr('placeholder',
-			'Default: ' + repoName + '#' + branch);
+			repoName + '#' + branch);
 
 		var repo = wmdRepos.findOne($('#appAdd_repoId option:selected').val());
 		console.log(repo);
 		$('#appAdd_meteorDir').attr('placeholder',
-			'Default: ' + repo.meteorDir);
+			repo.meteorDir == '.' ? '(project root)' : repo.meteorDir);
 	}
 
 	Template.allApps.sourceOptions = function() {
@@ -127,34 +127,22 @@ if (Meteor.isServer) {
 				source: 'repo',
 				repoId: repoId,
 				repo: repo.name,
-				meteorDir: repo.meteorDir,
+				meteorDir: deployOptions.meteorDir || repo.meteorDir,
 				appId: 1000 + incrementCounter('apps'),
 				instances: {
-					min: undefined,
-					max: undefined,
+					min: 1,
+					max: 1,
+					target: 1,
+					deployed: 0,
 					running: 0,
-					desired: 1
-				},
-				servers: {
-					forcedOn: deployOptions.servers.forcedOn,
-					deployedOn: [],
-					runningOn: [],
-					desiredOn: [],
+					data: []
 				}
 			}
 
-			//_.extend(appData, deployOptions);  TODO, deepextend
-			if (deployOptions.meteorDir)
-				appData.meteorDir = deployOptions.meteorDir;
-
-			
 			// ext.registerPlugin('addApp', 'github', '0.1.0', callback)
 			// Can modify appData if desired before db insert
-			if (!Extensions.runPlugin('addApp', repo.service,
-					{ repo: repo, branch: branch, appData: appData })) {
-				console.log('[addApp] No ' + repo.service
-					+ ' plugin (or no return value)');
-			}
+			Extensions.runPlugin('addApp', repo.service,
+					{ repo: repo, branch: branch, appData: appData });
 
 			Apps.insert(appData);
 		},
@@ -163,56 +151,65 @@ if (Meteor.isServer) {
 			var app = Apps.findOne(appId);
 			if (!app)
 				throw new Meteor.Error(404, 'No such app');
-			if (appActions[action])
-				appActions[action](app);
+			if (appMethods[action])
+				appMethods[action](app);
 		}
 	});
 
-	appActions = {};
-	appActions.setup = function(app) {
-		// actually "re" setup
-		_.each(app.servers.deployedOn, function(serverId) {
-			appInstall(app, serverId);
-		});				
-	}
-	appActions.delete = function(app) {
-		// TODO, safely stop all instances, delete from server
-		Apps.remove(app._id);
-	}
-	appActions.update = function(app) {
-		console.log('update');
-		var data = {
-			env: {
-				USER: 'app' + app.appId,
-				HOME: '/home/app' + app.appId,
-				PATH: '/bin:/usr/bin:/usr/local/bin'
-			}
-		};
+	var appMethods = {
+		setup: function(app) {
+			// actually "re" setup
+			appInstall(app, freeServer('meteor'));
+		},
 
-		var source = app.source;
-
-		// move to seperate repo package (dupe from manage.js)
-		if (source == 'repo') {
-			data.repo = wmdRepos.findOne(app.repoId);
-			data.env.BRANCH = app.branch;
-			console.log(data.repo);
-			Extensions.runPlugin('appInstall',
-				data.repo.service, data, true);
-		}
-
-		var spawnData = {
-			cmd: './appUpdate.sh',
-			options: {
-				cwd: '/home/app' + app.appId,
-				env: data.env
-			}
-		};
-
-		_.each(app.servers.deployedOn, function(serverId) {
-			console.log(serverId);
-			sendCommand(serverId, 'spawnAndLog', spawnData, function(err, data) {
-				console.log(data);
+		start: function(app) {
+			_.each(app.instances.data, function(instance) {
+				if (instance.state == 'deployed' || instance.state == 'stopped')
+					App.start(app, instance);
 			});
-		});		
-	}
+		},
+
+		delete: function(app) {
+			// TODO, safely stop all instances, delete from server
+			Apps.remove(app._id);
+		},
+
+		update: function(app) {
+			console.log('update');
+			var data = {
+				env: {
+					USER: 'app' + app.appId,
+					HOME: '/home/app' + app.appId,
+					PATH: '/bin:/usr/bin:/usr/local/bin'
+				}
+			};
+
+			var source = app.source;
+
+			// move to seperate repo package (dupe from manage.js)
+			if (source == 'repo') {
+				data.repo = wmdRepos.findOne(app.repoId);
+				data.env.BRANCH = app.branch;
+				console.log(data.repo);
+				Extensions.runPlugin('appInstall',
+					data.repo.service, data, true);
+			}
+
+			var spawnData = {
+				cmd: './appUpdate.sh',
+				options: {
+					cwd: '/home/app' + app.appId,
+					env: data.env
+				}
+			};
+
+			_.each(app.servers.deployedOn, function(serverId) {
+				console.log(serverId);
+				sendCommand(serverId, 'spawnAndLog', spawnData, function(err, data) {
+					console.log(data);
+				});
+			});		
+
+		}
+	};
 }

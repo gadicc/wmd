@@ -14,34 +14,75 @@ if (Meteor.isServer) {
 	 *    _id: 'AYLhiET3YcRC8FyTy' }
 	*/
 
-	/*
-	 * Note: the entire 'servers' section will probably become
-	 * part of an array/object of 'datacenters' in the future.
-	 */
+	App = {
 
-	var appCheck = function(appOrig) {
-		var app = _.clone(appOrig);
-		console.log(app);
+		check: function(app) {
+			var ai = app.instances;
 
-		// forcedOn list must always be in desiredOn list too
-		_.each(app.servers.forcedOn, function(forcedId) {
-			if (!_.contains(app.servers.desiredOn, forcedId))
-				app.servers.desiredOn.push(forcedId);
-		});
+			/*
+			 * TODO, check for failed deploys, try deploy on another
+			 * server if available, otherwise notify admin
+			 */
+			if (ai.deployed < ai.target)
+				appInstall(app, freeServer('meteor'));
+		},
 
-		// check if all desireds are deployed (and run setup)
-		_.each(app.servers.desiredOn, function(desiredId) {
-			if (!_.contains(app.servers.deployedOn, desiredId))
-				appInstall(app, desiredId);
-		});
+		start: function(app, instance) {
+			console.log('starting app');
+			//var instance = _.findWhere(app.instances.data, { _id: instanceId });
 
-		// is the app running on all servers it's deployed to?
-		_.each(app.servers.deployedOn, function(deployedId) {
-			if (!_.contains(app.servers.runningOn, deployedId))
-				appStart(app, deployedId);
-		});
+			var data = {
+				cmd: 'mrt',
+				args: [
+					'--production',
+					'--port',
+					instance.port
+				],
+				options: {
+					silent: false, // for now, but we have our own log
+					uid: app.appId,
+					max: 3,
+					killTree: true,
+					minUptime: 2000,
+					spinSleepTime: 1000,
+					cwd: '/home/app' + app.appId + '/' + app.repo + '/'
+						+ (app.meteorDir == '.' ? '' : app.meteorDir),
+					env: {
+						USER: 'app' + app.appId,
+						HOME: '/home/app' + app.appId,
+						PATH: '/bin:/usr/bin:/usr/local/bin'
+					}
+				}
+			};
 
-		// update if changed
+			sendCommand(instance.serverId, 'foreverStart', data, function(error, result) {
+				console.log(error, result);
+				if (result.code) // i.e. non-zero, failure
+					Apps.update({ _id: app._id, 'instances.data._id': instance._id }, {
+						$set: { 'instances.data.$.state': 'startFailed' },
+						$inc: { 'instances.failing': 1 }
+					});
+				else // start success
+					Apps.update({ _id: app._id, 'instances.data._id': instance._id }, {
+						$set: { 'instances.data.$.state': 'running' },
+						$inc: { 'instances.running': 1 }
+					});
+			});
+		}
+
+
+
+
+	}
+
+
+	// find (or create, if necessary and allowed)
+	// server with sufficient resources
+	freeServer = function(type) {
+		var query = type == 'combo'
+			? { type: 'combo' }
+			: { $or: [ {type: 'combo'}, {type: type} ] };
+		return Servers.findOne(query)._id;
 	}
 
 	appInstall = function(app, serverId) {
@@ -67,62 +108,32 @@ if (Meteor.isServer) {
 
 		console.log(data);
 
+		var instanceId = Random.id();
 		sendCommand(serverId, 'spawnAndLog', {
+			instanceId: instanceId,
 			cmd: './appInstall.sh',
 			options: { env: data.env }
 		}, function(error, result) {
 			if (result.code) // i.e. non-zero, failure
-				Apps.update(app._id, {
-					$pull: { 'servers.deployedOn': serverId },
-					$addToSet: { 'servers.failingOn': serverId }
-				});
+				Apps.update(app._id, { $push: { 'instances.data': {
+					_id: instanceId,
+					state: 'deployFailed',
+					serverId: serverId,
+					port: 5000
+				}}, $inc: { 'instances.failing': 1 }});
 			else // install success
-				Apps.update(app._id, {
-					$pull: { 'servers.failingOn': serverId },
-					$addToSet: { 'servers.deployedOn': serverId }
-				});
+				Apps.update(app._id, { $push: { 'instances.data': {
+					_id: instanceId,
+					state: 'deployed',
+					serverId: serverId,
+					port: 5000
+				}}, $inc: { 'instances.deployed': 1 }});
 		});
 	}
 	Extensions.registerPluginType('appInstall', '0.1.0');
 
-	var appStart = function(app, serverId) {
-		console.log('starting app');
-
-		var data = {
-			cmd: 'mrt',
-			args: [],
-			options: {
-				silent: false, // for now, but we have our own log
-				uid: app.appId,
-				max: 3,
-				killTree: true,
-				minUptime: 2000,
-				spinSleepTime: 1000,
-				cwd: '/home/app' + app.appId + '/' + app.repo + '/'
-					+ (app.meteorDir == '.' ? '' : app.meteorDir),
-				env: {
-					USER: 'app' + app.appId,
-					HOME: '/home/app' + app.appId,
-					PATH: '/bin:/usr/bin:/usr/local/bin'
-				}
-			}
-		};
-
-		sendCommand(serverId, 'foreverStart', data, function(error, result) {
-			console.log(error, result);
-			if (result.code) // i.e. non-zero, failure
-				Apps.update(app._id, {
-					$push: { 'servers.failingOn': serverId }
-				});
-			else // start success
-				Apps.update(app._id, {
-					$push: { 'servers.runningOn': serverId }
-				});
-		});
-	}
-
 	Apps.find().observe({
-		added: appCheck, changed: appCheck
+		added: App.check, changed: App.check
 	});
 
 }

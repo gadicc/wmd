@@ -1,5 +1,6 @@
 <template name="serverInfo">
 	<h1>{{name}}</h1>
+			<canvas id="chart" width="400" height="100"></canvas>
 
 	{{#with serverStats}}
 	{{#isolate}}<p>Last updated: {{lastUpdate}}</p>{{/isolate}}
