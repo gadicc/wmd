@@ -59,16 +59,6 @@ if (Meteor.isClient) {
 	}
 	Extensions.declarePlugin('appOptions', '0.1.0');
 
-	Template.allApps.events({
-		'click button': function(event, tpl) {
-			event.preventDefault();
-			var target = $(event.target);
-			var appId = target.closest('table').data('app-id');
-			var action = target.data('action');
-			Meteor.call('appAction', appId, action);
-		}
-	});
-
 	Template.appAdd.rendered = function() {
 		Session.set('selectedRepoId', $('#appAdd_repoId').val());
 		updateName();
@@ -167,6 +157,14 @@ if (Meteor.isServer) {
 				if (instance.state == 'deployed' || instance.state == 'stopped')
 					App.start(app, instance);
 			});
+		},
+
+		stop: function(app) {
+			_.each(app.instances.data, function(instance) {
+				if (instance.state == 'started' || instance.state == 'running')
+					App.stop(app, instance);
+			});
+
 		},
 
 		delete: function(app) {

@@ -12,17 +12,24 @@ if (Meteor.isServer) {
 		var apps = Apps.find().fetch();
 		_.each(apps, function(app) {
 			out += 'server_names_hash_bucket_size 64;\n\n'
-				+ 'upstream app' + app.appId + ' {\n';
+				+ 'upstream app' + app.appId + ' {\n'
+				+ '\tip_hash;\n';
 			_.each(app.instances.data, function(ai) {
-				if (ai.state == 'running') {
+				if (_.indexOf(['running','stopped','started'], ai.state) != -1) {
 					var server = Servers.findOne(ai.serverId); // TODO, cache
 					out += '\tserver ' + server.ip
-						+ ':' + ai.port + ';\n';
+						+ ':' + ai.port
+						+ (ai.state == 'stopped' || ai.state == 'started' ? ' down' : '')
+						+ ';\n';
 				}
 			});
 			out += '}\n\nserver {\n'
 				+ '\tlisten 80;\n'
-				+ '\tserver_name app' + app.appId + '.gadi.cc;\n'
+				+ '\tserver_name app' + app.appId + '.gadi.cc';
+			_.each(app.vhosts, function(host) {
+				out += ' ' + host;
+			});
+			out += ';\n'
 				+ '\tlocation / {\n'
 				+ '\t\tproxy_pass http://app' + app.appId + '/;\n'
 				+ '\t\tproxy_http_version 1.1;\n'

@@ -1,0 +1,47 @@
+<template name="showApp">
+	{{#with app}}
+
+		<h1>{{name}}</h1>
+
+		<h2>Status</h2>
+
+		{{> appButtons}}
+		<table class="table table-bordered" style="width: auto">
+		<tbody>
+		{{#each instances.data}}
+			<tr>
+				<td>{{serverId}}</td>
+				<td>{{state}}</td>
+				<!--
+				<td>{{> appButtons}}</td>
+				-->
+			</tr>
+		{{/each}}
+		</tbody>
+		</table>
+
+		{{> appConfig}}
+
+	{{/with}}
+</template>
+
+<template name="appConfig">
+	<h2>Config</h2>
+
+	<p><b>Vhosts:</b> (one per line)<br />
+	<textarea id="vhosts" cols=40 rows=5>{{vhosts}}</textarea><br />
+	If your load balancer is nginx, can use a full hostname,
+	wildcards (*.example.org), and regexps (~^moo$)  See
+	<a href="http://nginx.org/en/docs/http/server_names.html">server_names</a>.
+	</p>
+</template>
+
+<template name="appButtons">
+	<p>
+	  	<button data-action="setup" data-app-id="{{_id}}" data-server-id="{{serverId}}">Setup</button>
+	  	<button data-action="update" data-app-id="{{_id}}" data-server-id="{{serverId}}">Update</button>
+	  	<button data-action="start" data-app-id="{{_id}}" data-server-id="{{serverId}}">Start</button>
+	  	<button data-action="stop" data-app-id="{{_id}}" data-server-id="{{serverId}}">Stop</button>
+	  	<button data-action="delete" data-app-id="{{_id}}" data-server-id="{{serverId}}">Delete</button>
+	</p>
+</template>

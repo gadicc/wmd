@@ -8,3 +8,16 @@ if (Meteor.isClient) {
 		});
 	});
 }
+
+if (Meteor.isServer) {
+
+	Task = function(data) {
+		this.desc = data.desc || 'New Task';
+		this.serverId = data.serverId;
+		this.appId = data.appId;
+		this.state = 'running'; // failed, completed, aborted
+		this.percent = 0;
+		this.log;
+	}
+
+}
