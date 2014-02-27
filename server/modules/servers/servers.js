@@ -1,19 +1,21 @@
 if (Meteor.isClient) {
 	Router.map(function() {
 		this.route('servers', {
-			data: function() {
-				return {
-					servers: [
-						{ name: 'Combo Servers', servers: Servers.find({$and: [ {type: 'combo'}, { username: { $not: 'devServer'}} ]} ) },
-						{ name: 'Meteor Servers', servers: Servers.find({type: 'meteor'}) },
-						{ name: 'Mongo Servers', servers: Servers.find({type: 'mongo'}) },
-						{ name: 'Nginx Servers', servers: Servers.find({type: 'nginx'}) }
-					],
-					iaasData: iaasData
-				}
-			}
 		});
 	});
+
+	Template.servers.serverTypes = function() {
+		return [
+			{ name: 'Combo Servers', servers: Servers.find({$and: [ {type: 'combo'}, { username: { $not: 'devServer'}}, { destroyedAt: { $exists: false }} ]} )},
+			{ name: 'Meteor Servers', servers: Servers.find({$and: [ {type: 'meteor'}, { username: { $not: 'devServer'}}, { destroyedAt: { $exists: false }} ]} )},
+			{ name: 'Mongo Servers', servers: Servers.find({$and: [ {type: 'mongo'}, { username: { $not: 'devServer'}}, { destroyedAt: { $exists: false }} ]} )},
+			{ name: 'Nginx Servers', servers: Servers.find({$and: [ {type: 'nginx'}, { username: { $not: 'devServer'}}, { destroyedAt: { $exists: false }} ]} )}
+		];
+	}
+
+	Template.servers.iaasData = function() {
+		return iaasData;
+	}
 
 	// template-engine-preview-10.1 fixes
 	Template.servers.name = function() {
@@ -116,13 +118,11 @@ if (Meteor.isServer) {
 				sizeId, imageId, regionId, optionals);
 
 			// For safety, keep exact/historical spec/price data
-			droplet.sizeData = _.findWhere(iaas.sizes, { id: sizeId });
+			var sizeData = _.findWhere(iaas.sizes, { id: sizeId });
 
 			Servers.update(server._id, { $set: {
 				digitalocean: droplet,
-				costPerHour: droplet.sizeData.cost_per_hour,
-				ip: droplet.ip_address,
-				privateIp: droplet.private_ip_address
+				costPerHour: sizeData.cost_per_hour,
 			}});
 
 			if (!droplet) {
@@ -133,12 +133,15 @@ if (Meteor.isServer) {
 			DO_eventCheck(droplet.event_id, user, null,
 				function(result, data) {
 					var creds = data.user.apis.digitalocean;
-			  	var DO = new DigitalOceanAPI(creds.clientId, creds.apiKey);
-  				DO = Async.wrap(DO, ['dropletGet']);
+			  		var DO = new DigitalOceanAPI(creds.clientId, creds.apiKey);
+  					DO = Async.wrap(DO, ['dropletGet']);
 
-  				var droplet = DO.dropletGet(result.droplet_id);
+  					var droplet = DO.dropletGet(result.droplet_id);
+  					droplet.sizeData = sizeData;
 					Servers.update(server._id, { $set: {
-						digitalocean: droplet
+						digitalocean: droplet,
+						ip: droplet.ip_address,
+						privateIp: droplet.private_ip_address
 					}});
 				}, {});
 
