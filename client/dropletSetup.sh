@@ -40,7 +40,8 @@ yum install -y npm --enablerepo=epel
 if [ $METEOR ] ; then
 	echo
 	echo Install Meteor install script
-	mv launch-meteor.sh /usr/local/bin
+	mv launch-meteor.sh /usr/local/bin/meteor
+	chmod a+x /usr/local/bin/meteor
 
 	echo Installing meteorite...
 	npm list -g meteorite | grep -q empty
