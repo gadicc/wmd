@@ -16,6 +16,8 @@ if (Meteor.isServer) {
 
 		'cmdResult': function(commandId, data) {
 			var command = Commands.findOne(commandId);
+			if (_.isString(data))
+				data = { result: data };
 
 			if (!command)
 				console.log("Got cmdReturn for non-existant cmd " + commandId);
@@ -34,9 +36,9 @@ if (Meteor.isServer) {
 
 		// TODO, DISABLE
 		'cmdTest': function(serverId, command, options, callback) {
-			var commandId = sendCommand(serverId, command, options, function(err, result) {
-				console.log('cmdTest return: ', this, arguments);
-			});
+			var wrappedSendCommand = Async.wrap(sendCommand);
+			var result = wrappedSendCommand(serverId, command, options);
+			return result;
 		}
 	});
 }

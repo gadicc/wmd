@@ -5,8 +5,10 @@ if (Meteor.isClient) {
 		this.route('serverInfo', {
 			path: 'servers/:server',
 			waitOn: subAll,
-			data: function() {
-				// waitOn broken in shark branch
+			data: {}, 
+
+				/* function() {
+				// waitOn broken in shark branch, and data is not reactive
 				return { serverParam: this.params.server }
 				/*
 				if (!subAll.ready())
@@ -23,6 +25,20 @@ if (Meteor.isClient) {
 					serverStats: ServerStats.findOne(server._id)
 				}
 				*/
+			//},
+			action: function() {
+				console.log(1);
+				if (!subAll.ready())
+					return;
+				console.log(2);
+				var server = Servers.findOne({
+					$or: [
+						{_id: this.params.server},
+						{username: this.params.server}
+					]
+				});
+				this.data.server = server;
+				this.render();
 			},
 			after: function() {
 				if (handle) handle.stop()
@@ -50,8 +66,31 @@ if (Meteor.isClient) {
 	});
 
 	Template.serverInfo.helpers({
+		'name': function() {
+			// template engine preview 10.1 bug
+			return this.name;
+		},
 		'memUsage': function() {
 			return this.freemem / this.totalmem;
+		},
+		'serverStats': function() {
+			return ServerStats.findOne(this.server._id);
+		}
+	});
+
+	Template.serverInfo.events({
+		'submit .sendCmd': function(event, tpl) {
+			event.preventDefault();
+			var form = $(event.target).closest('form');
+			var serverId = form.data('server-id');
+			var cmd = form.find('[name=cmd]').val();
+			var data = JSON.parse(form.find('[name=data]').val());
+			console.log(serverId,cmd,data);
+			Meteor.call('cmdTest', serverId, cmd, data, function(err, result) {
+				$('div.cmdReturn[data-server-id="' + serverId + '"]').html(
+					JSON.stringify(result, null, 4)
+				);
+			});
 		}
 	});
 

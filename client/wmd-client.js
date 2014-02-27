@@ -1,20 +1,50 @@
 #!/usr/bin/env node
+
+// node core
 var child_process = require('child_process');
-var DDPClient = require("ddp");
 var os = require('os');
-var osUtils = require('os-utils');
-var _ = require('underscore');
+var fs = require('fs');
+var sha1 = require('sha1');
+var util = require('util')
+
+// npm
 var forever = require('forever-monitor');
+var _ = require('underscore');
+var osUtils = require('os-utils');
+var DDPClient = require("ddp");
+
 
 var credentials = require('./credentials.json');
 var cslog = require('./cslog.js');
 
 console.log('wmd-client starting...');
 
+var stateFile = './state.json';
+var state = {
+	files: {},
+	forevers: {}
+};
+var saveState = _.debounce(function() {
+	fs.writeFile(stateFile, JSON.stringify(state), function(err) {
+		if (err)
+		console.log("Can't save state.json!  Not reboot safe.");
+	});
+}, 1000);
+
 // forever not using --sourceDir for CWD?
 if (process.cwd() == '/')
 	process.chdir('/root/wmd-client');
 console.log('CWD: ' + process.cwd());
+
+// sync to ensure we load state before doing anything else
+try {
+	var data = fs.readFileSync(stateFile);
+} catch (err) {
+	if (err.errno == 34)
+		console.log('No preexisting ' + stateFile + ', running fresh...');
+	else
+		throw(err)
+}
 
 // http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
 function isNumber(n) {
@@ -148,11 +178,19 @@ commands = {
 				console.log('exit', forever, data);
 			}
 		});
+	},
+	'writeFile': function(data, done) {
+		console.log('writeFile', data);
+		writeFile(data.filename, data.contents, data.options, done);
 	}
 };
 
 function execDone(err, result) {
 	console.log('execDone', this.commandId, err, result);
+
+	if (err && !result.err && !result.error)
+		result.error = util.isError(err) ? JSON.stringify(err) : err;
+
 	ddpclient.call('cmdResult', [this.commandId, result], function(error, result) {
 		console.log(error);
 		//if (error) throw error;
@@ -227,4 +265,16 @@ var foreverStart = function(cmd, args, options, done, callbacks) {
 		child.on('exit', callbacks.exit);
 
 	return child;
+}
+
+var writeFile = function(filename, contents, options, done) {
+	fs.writeFile(filename, contents, function(err) {
+		if (err)
+			done(err);
+
+		var hash = sha1(contents);
+		state.files[filename] = hash;
+		saveState();
+		done(null, hash);
+	});
 }

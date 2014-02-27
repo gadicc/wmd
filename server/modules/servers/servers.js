@@ -337,7 +337,7 @@ if (Meteor.isServer) {
 	glob('{*.js,*.sh,*.json}', { cwd: path }, function(err, files) {
 		if (err) throw err;
 		_.each(files, function(file) {
-			if (file == "credentials.json")
+			if (file == "credentials.json" || file == "state.json")
 				return;
 			loadScript(file);
 		});

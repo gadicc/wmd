@@ -1,14 +1,22 @@
 <template name="serverInfo">
-	<h1>{{name}}</h1>
-			<canvas id="chart" width="400" height="100"></canvas>
+	<h1>{{server.username}}</h1>
+
+	{{#isolate}}<p>Last updated: {{serverStats.lastUpdate}}</p>{{/isolate}}
+
+	<canvas id="chart" width="400" height="100"></canvas>
+
+	<form class="sendCmd" data-server-id="{{server._id}}">
+		RAW CMD:
+			<input name="cmd" size=8 />
+			<input name="data" size=25 />
+			<input type="submit" />
+	</form>
+	<div class="cmdReturn" data-server-id="{{server._id}}">
+	</div>
 
 	{{#with serverStats}}
-	{{#isolate}}<p>Last updated: {{lastUpdate}}</p>{{/isolate}}
 
 		<h2>Server Info</h2>
-		{{#constant}}
-			<canvas id="chart" width="400" height="100"></canvas>
-		{{/constant}}
 		{{#with os}}
 			<table>
 				<tr>
