@@ -11,6 +11,16 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
 	Meteor.publish('all', function() {
+		if (!this.userId)
+			return;
+		var user = Meteor.users.findOne(this.userId);
+		if (!user.authorized) {
+			if (Meteor.users.findOne({authorized: true}))
+				return;
+			// first user... do this on accountcreation!  TODO
+			Meteor.users.update(user._id, {$set: { authorized: true }});
+		}
+
 		// prototyping, TODO, proper pub/subs
 		var cols = ['Apps', 'Servers', 'ServerStats', 'databases'];
 		cols = cols.map(function(col) { return root[col].find() });
