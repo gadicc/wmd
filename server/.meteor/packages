@@ -20,3 +20,4 @@ config
 extensions
 wmd-digitalocean
 wmd-github
+wmd-nginx

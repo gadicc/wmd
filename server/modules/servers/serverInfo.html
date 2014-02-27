@@ -3,7 +3,9 @@
 
 	{{#isolate}}<p>Last updated: {{serverStats.lastUpdate}}</p>{{/isolate}}
 
+	{{#constant}}
 	<canvas id="chart" width="400" height="100"></canvas>
+	{{/constant}}
 
 	<form class="sendCmd" data-server-id="{{server._id}}">
 		RAW CMD:

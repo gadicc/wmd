@@ -16,7 +16,7 @@ if (Meteor.isServer) {
 
 		'cmdResult': function(commandId, data) {
 			var command = Commands.findOne(commandId);
-			if (_.isString(data))
+			if (!_.isObject(data))
 				data = { result: data };
 
 			if (!command)
@@ -26,10 +26,11 @@ if (Meteor.isServer) {
 				console.log(this.userId + ' tried to give cmdReturn for '
 					+ command.serverId + ', ignoring...');
 
+			console.log('cmdResult', commandId, data);
 			Commands.update(commandId, { $set: data } );
 
 			if (commandCallbacks[commandId]) {
-				commandCallbacks[commandId].call(command, null, data);
+				commandCallbacks[commandId].call(command, data.error, data);
 				delete(commandCallbacks[commandId]);
 			}
 		},

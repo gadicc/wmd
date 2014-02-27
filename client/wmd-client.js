@@ -51,6 +51,25 @@ function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+// Gets updated after every DDP call
+var updateInterval = 1000;
+
+var cpuUsage = 0;
+osUtils.cpuUsage(function setCpuUsage(usage) { cpuUsage = usage; });
+
+// expected 'pid' to be first, and 'cmd' must be last (because of spaces)
+var psInfo = ['pid', 'user', 'pcpu', 'pmem', 'cputime', 'cmd'];
+var cmd = 'ps wax -o ' + psInfo.join(',') + ' | grep -E "node|mongo"';
+var ps;
+
+var psRE = '^';
+for (var i=0; i < psInfo.length-1; i++)
+	psRE += '([^ ]+) +';
+psRE = new RegExp(psRE + '(.+)$', 'mg');
+
+function psExec() {
+	ps = child_process.exec(cmd, psFunc);
+}
 function psFunc(error, stdout, stderr) {
 	if (error) throw new Error(error);
 	var procs = [];
@@ -87,26 +106,9 @@ function psFunc(error, stdout, stderr) {
 	osUtils.cpuUsage(function setCpuUsage(usage) { cpuUsage = usage; });
 
 	// start interval after we finish current lap
-	setTimeout(function() {
-		ps = child_process.exec(cmd, psFunc);
-	}, updateInterval);
+	//global.gc();
+	setTimeout(psExec, updateInterval);
 }
-
-// Gets updated after every DDP call
-var updateInterval = 1000;
-
-var cpuUsage = 0;
-osUtils.cpuUsage(function setCpuUsage(usage) { cpuUsage = usage; });
-
-// expected 'pid' to be first, and 'cmd' must be last (because of spaces)
-var psInfo = ['pid', 'user', 'pcpu', 'pmem', 'cputime', 'cmd'];
-var cmd = 'ps wax -o ' + psInfo.join(',') + ' | grep -E "node|mongo"';
-var ps;
-
-var psRE = '^';
-for (var i=0; i < psInfo.length-1; i++)
-	psRE += '([^ ]+) +';
-psRE = new RegExp(psRE + '(.+)$', 'mg');
 
 var ddpclient = new DDPClient({
   host: credentials.host, 
@@ -160,15 +162,11 @@ ddpclient.on('message', function(msg) {
 	execCommand(data.id, data.fields.command, data.fields.options);
 });
 
-ps = child_process.exec(cmd, psFunc);
-
 commands = {
 	'spawnAndLog': function(data, done) {
-		console.log('spawnAndLog', data);
 		spawnAndLog(data.cmd, data.args || [], data.options, done);
 	},
 	'foreverStart': function(data, done) {
-		console.log('appStart', data);
 		foreverStart(data.cmd, data.args, data.options, done, {
 			error: function(error) {
 				console.log('error', error, data);
@@ -180,16 +178,34 @@ commands = {
 		});
 	},
 	'writeFile': function(data, done) {
-		console.log('writeFile', data);
 		writeFile(data.filename, data.contents, data.options, done);
+	},
+	'kill': function(data, done) {
+		processKill(data, data.signal, done);
+	},
+	'writeAndKill': function(data, done) {
+		writeFile(data.filename, data.contents, data.options,
+			function(err, result) {
+				if (err)
+					done(err);
+				else
+					processKill(data, data.signal, done);
+			});
 	}
 };
 
 function execDone(err, result) {
 	console.log('execDone', this.commandId, err, result);
 
-	if (err && !result.err && !result.error)
+	if (!result) result = {};
+
+	if (err && !result.err && !result.error) {
+		result.status = 'error';
 		result.error = util.isError(err) ? JSON.stringify(err) : err;
+	}
+
+	if (_.keys(result).length == 0)
+		result.status = 'success';
 
 	ddpclient.call('cmdResult', [this.commandId, result], function(error, result) {
 		console.log(error);
@@ -269,12 +285,51 @@ var foreverStart = function(cmd, args, options, done, callbacks) {
 
 var writeFile = function(filename, contents, options, done) {
 	fs.writeFile(filename, contents, function(err) {
-		if (err)
+		if (err) {
 			done(err);
-
+			return;
+		}
+		
 		var hash = sha1(contents);
 		state.files[filename] = hash;
 		saveState();
 		done(null, hash);
 	});
 }
+
+var processKill = function(data, signal, done) {
+	if (data.pid) {
+
+		try {
+			process.kill(data.pid, signal);
+		} catch (err) {
+			done(err);
+			return;
+		}
+		done(null, true);
+
+	} else if (data.pidFile) {
+
+		fs.readFile(data.pidFile, function(err, pid) {
+			if (err) done(err);
+			try {
+				process.kill(parseInt(pid), signal);
+			} catch (err) {
+				done(err);
+				return;
+			}
+			done(null, true);
+		});
+
+	} else if (data.all) {
+
+		done(new Error('killAll not implemented yet'));
+
+	} else {
+
+		done(new Error('no pid/pidFile/all specified'));
+
+	}
+}
+
+psExec();

@@ -31,13 +31,14 @@ if (Meteor.isClient) {
 				if (!subAll.ready())
 					return;
 				console.log(2);
+				console.log(this.params.server);
 				var server = Servers.findOne({
 					$or: [
 						{_id: this.params.server},
 						{username: this.params.server}
 					]
 				});
-				this.data.server = server;
+				Session.set('serverId', server._id);
 				this.render();
 			},
 			after: function() {
@@ -73,8 +74,11 @@ if (Meteor.isClient) {
 		'memUsage': function() {
 			return this.freemem / this.totalmem;
 		},
+		'server': function() {
+			return Servers.findOne(Session.get('serverId'));
+		},
 		'serverStats': function() {
-			return ServerStats.findOne(this.server._id);
+			return ServerStats.findOne(Session.get('serverId'));
 		}
 	});
 
