@@ -1,4 +1,4 @@
-<template name="showApp">
+<template name="appInfo">
 	{{#with app}}
 
 		<h1>{{name}}</h1>
@@ -28,12 +28,27 @@
 <template name="appConfig">
 	<h2>Config</h2>
 
-	<p><b>Vhosts:</b> (one per line)<br />
+	<p><b>Vhosts:</b> (one per line, first line autosets ROOT_URL)<br />
 	<textarea id="vhosts" cols=40 rows=5>{{vhosts}}</textarea><br />
-	If your load balancer is nginx, can use a full hostname,
-	wildcards (*.example.org), and regexps (~^moo$)  See
+	If your load balancer is nginx, can use a full hostname,<br />
+	wildcards (*.example.org), and regexps (~^moo$).<br />  See
 	<a href="http://nginx.org/en/docs/http/server_names.html">server_names</a>.
 	</p>
+
+	<p><b>Environment variables:</b> (one per line, VAR=VALUE)<br />
+	<textarea id="vhosts" cols=40 rows=5>{{env}}</textarea><br />
+	The following variables are set AUTOMATICALLY,<br /> but will be
+	OVERRIDDEN with any values given above:<br />
+	ROOT_URL, HTTP_FORWARDED_COUNT, MONGO_URL.
+	</p>
+
+	<p><b>SSL</b><br />
+	Public:<br />
+	<textarea id="ssl_public" cols=40 rows=5></textarea><br />
+	Private:<br />
+	<textarea class="sensitive" cols=40 rows=5 id="ssl_private"></textarea>
+	</p>
+
 </template>
 
 <template name="appButtons">

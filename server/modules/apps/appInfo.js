@@ -1,6 +1,6 @@
 if (Meteor.isClient) {
 	Router.map(function() {
-		this.route('showApp', {
+		this.route('appInfo', {
 			path: '/apps/:app',
 			action: function() {
 				if (!subAll.ready())
@@ -16,10 +16,10 @@ if (Meteor.isClient) {
 		});
 	});
 
-	Template.showApp.name = function() {
+	Template.appInfo.name = function() {
 		return this.name;
 	}
-	Template.showApp.app = function() {
+	Template.appInfo.app = function() {
 		return Apps.findOne(Session.get('appId'));
 	}
 

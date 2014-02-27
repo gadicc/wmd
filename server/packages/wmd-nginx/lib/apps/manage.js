@@ -38,7 +38,6 @@ if (Meteor.isServer) {
 	        	+ '\t}\n'
 	        	+ '}\n\n';
       });
-      console.log(out);
       return out;
 	}
 }
