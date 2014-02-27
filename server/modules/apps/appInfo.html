@@ -43,10 +43,11 @@
 	</p>
 
 	<p><b>SSL</b><br />
-	Public:<br />
-	<textarea id="ssl_public" cols=40 rows=5></textarea><br />
-	Private:<br />
-	<textarea class="sensitive" cols=40 rows=5 id="ssl_private"></textarea>
+	Public Certificate (+ CA certs):<br />
+	<textarea id="ssl_cert" cols=40 rows=5 data-app-id="{{_id}}">{{ssl.cert}}</textarea><br />
+	Private Key:<br />
+	<textarea class="sensitive" cols=40 rows=5 id="ssl_key">{{ssl.key}}</textarea><br />
+	<button id="ssl_update">Update</button>
 	</p>
 
 </template>

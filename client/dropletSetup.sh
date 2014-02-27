@@ -55,7 +55,7 @@ fi
 if [ $NGINX ] ; then
 	echo
 	echo Installing nginx...
-	cat > /etc/yum.repos.d <<'__END__'
+	cat > /etc/yum.repos.d/nginx.repo <<'__END__'
 [nginx]
 name=nginx repo
 baseurl=http://nginx.org/packages/centos/6/$basearch/

@@ -45,6 +45,26 @@ if (Meteor.isClient) {
 			var appId = tpl.data._id;
 			var vhosts = $(event.target).val().split('\n');
 			Apps.update(appId, {$set: { vhosts: vhosts }});
+		},
+		'click #ssl_update': function(event, tpl) {
+			var appId = tpl.data._id;
+			var cert = $('#ssl_cert').val();
+			var key = $('#ssl_key').val();
+			Meteor.call('appUpdateSSL', appId, cert, key);
+		}
+	});
+}
+
+if (Meteor.isServer) {
+	Meteor.methods({
+		'appUpdateSSL': function(appId, cert, key) {
+			if (!this.userId) return;
+			Apps.update(appId, { $set: { ssl: {
+				cert: cert,
+				key: key,
+				cert_hash: sha1(cert),
+				key_hash: sha1(key)
+			}}});
 		}
 	});
 }

@@ -1,10 +1,11 @@
 {
 	"digitalocean-api": "0.1.1",
-	"ssh-keypair": "1.0.1",
-	"ssh2": "0.2.17",
-	"heredoc": "1.2.0",
-	"walk": "2.3.1",
-	"glob": "3.2.8",
-	"inotify": "1.2.1",
-	"github": "0.1.14"	
+	     "ssh-keypair": "1.0.1",
+	            "ssh2": "0.2.17",
+	         "heredoc": "1.2.0",
+	            "walk": "2.3.1",
+	            "glob": "3.2.8",
+	         "inotify": "1.2.1",
+	          "github": "0.1.14",
+	           "sha1" : "1.1.0"
 }

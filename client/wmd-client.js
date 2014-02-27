@@ -138,9 +138,9 @@ ddpclient.connect(function(error) {
       console.log('Logged in as ' + credentials.username);
   	});
 
-  	ddpclient.subscribe('commands', [], function() {
-		//console.log('commands complete:');
-		//console.log(ddpclient.collections.commands);
+  	ddpclient.subscribe('commands', [], function(err) {
+	});
+	ddpclient.subscribe('files', [state.files], function(err) {
 	});
 });
 
@@ -148,6 +148,11 @@ ddpclient.connect(function(error) {
 ddpclient.on('message', function(msg) {
 	var data = JSON.parse(msg);
 	//console.log(data);
+	if (data.collection == 'files') {
+		incomingFile(data.fields.filename, data.fields.contents, data.fields.hash);
+		return;
+	}
+
 	if (!(data.msg == 'added' && data.collection == 'Commands'))
 		return;
 
@@ -161,6 +166,19 @@ ddpclient.on('message', function(msg) {
 	var createdAt = new Date(data.fields.createdAt.$date);
 	execCommand(data.id, data.fields.command, data.fields.options);
 });
+
+function incomingFile(filename, contents, hash) {
+	fs.writeFile(filename, contents, function(err) {
+		console.log('incoming ' + filename);
+		if (err) {
+			console.log(err);
+			return;
+		}
+
+		state.files[filename] = hash;
+		saveState();
+	});
+}
 
 commands = {
 	'spawnAndLog': function(data, done) {
@@ -289,7 +307,7 @@ var writeFile = function(filename, contents, options, done) {
 			done(err);
 			return;
 		}
-		
+
 		var hash = sha1(contents);
 		state.files[filename] = hash;
 		saveState();
