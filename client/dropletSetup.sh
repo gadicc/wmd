@@ -17,24 +17,28 @@ mkswap -f /swapfile
 swapon /swapfile
 echo "/swapfile	none	swap	defaults	0	0" >> /etc/fstab
 
-echo Adjusting swappiness and cfs_cache_pressure values
+echo
+echo Adjusting swappiness and cfs_cache_pressure values...
 
-sed '/vm\.swappiness/d' /etc/sysctl.conf
+sed '/vm\.swappiness/d' -ibak /etc/sysctl.conf
 echo "vm.swappiness = 10" >> /etc/sysctl.conf
 sysctl vm.swappiness=10
 
-sed '/vm\.vm.vfs_cache_pressure' /etc/sysctl.conf
+sed '/vm\.vfs_cache_pressure/d' -ibak /etc/sysctl.conf
 echo "vm.vfs_cache_pressure = 50" >> /etc/sysctl.conf
 sysctl vm.vfs_cache_pressure=50
 
+echo
 echo Installing rsync, wget, git...
-yum install -y rsync wget git...
+yum install -y rsync wget git
 
+echo
 echo Installing nodejs and npm...
 yum install -y nodejs --enablerepo=epel
 yum install -y npm --enablerepo=epel
 
 if [ $METEOR ] ; then
+	echo
 	echo Install Meteor install script
 	mv launch-meteor.sh /usr/local/bin
 
@@ -48,6 +52,7 @@ if [ $METEOR ] ; then
 fi
 
 if [ $NGINX ] ; then
+	echo
 	echo Installing nginx...
 	cat > /etc/yum.repos.d <<'__END__'
 [nginx]
@@ -61,6 +66,7 @@ __END__
 	service nginx start
 fi
 
+echo
 echo Installing forver...
 npm list -g forever | grep -q empty
 if [ $? -eq 0 ] ; then
@@ -69,6 +75,7 @@ else
 	echo Already Intalled
 fi
 
+echo
 echo "Setting up init script (/etc/init.d/wmd-client)..."
 cat > /etc/init.d/wmd-client <<'__END__'
 #!/bin/bash
@@ -177,9 +184,11 @@ chmod a+x /etc/init.d/wmd-client
 mkdir /var/run/forever
 chkconfig --add wmd-client
 
+echo
 echo Installing dependencies for wmd-client.js...
 npm install
 
+echo
 echo Starting wmd-client...
 chmod a+x wmd-client.js
 service wmd-client stop

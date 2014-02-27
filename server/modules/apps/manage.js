@@ -24,8 +24,8 @@ if (Meteor.isServer) {
 			 * TODO, check for failed deploys, try deploy on another
 			 * server if available, otherwise notify admin
 			 */
-			if (ai.deployed < ai.target)
-				appInstall(app, freeServer('meteor'));
+//			if (ai.deployed < ai.target)
+//				appInstall(app, freeServer('meteor'));
 
 			Extensions.runHooks('appUpdated', { app: app });
 		},
@@ -108,6 +108,7 @@ if (Meteor.isServer) {
 		var query = type == 'combo'
 			? { type: 'combo' }
 			: { $or: [ {type: 'combo'}, {type: type} ] };
+		query = { $and: [ { destroyedAt: {$exists: false}}, query ]};
 		return Servers.findOne(query)._id;
 	}
 

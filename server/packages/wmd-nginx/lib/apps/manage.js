@@ -45,9 +45,10 @@ if (Meteor.isServer) {
 
 ext.on('appUpdated', '0.1.0', function(data) {
 	var conf = nginxGenConf();
-	var servers = Servers.find({
-		$or: [ {type: 'nginx'}, { type: 'combo'} ]
-	}).fetch();
+	var servers = Servers.find({ $and: [
+		{ destroyedAt: {$exists: false} },
+		{ $or: [ {type: 'nginx'}, { type: 'combo'} ] }
+	]}).fetch();
 	_.each(servers, function(server) {
 		sendCommand(server._id, 'writeAndKill', {
 			filename: '/etc/nginx/conf.d/wmd.conf',

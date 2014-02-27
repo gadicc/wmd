@@ -3,31 +3,32 @@ if (Meteor.isClient) {
 		this.route('apps', {
 			before: function() {
 				this.subscribe('wmdRepos');
-			},
-			data: function() {
-				var user = Meteor.user();
-				if (!user) return;
-
-				var repos = wmdRepos.find({
-						userId: user._id,
-						// should excluse if all branches are deployed
-						//appId: { $exists: false }
-					}, {
-						sort: { name: 1 }
-					});
-
-				var servers = Servers.find({
-					$or: [ { type: 'meteor' }, { type: 'combo'} ]
-				});
-
-				var apps = Apps.find();
-
-				console.log(servers.fetch());
-
-				return { repos: repos, servers: servers, apps: apps };
 			}
 		});
 	});
+
+	Template.apps.apps = function() {
+		return Apps.find();
+	}
+
+	Template.apps.repos = function() {
+		var user = Meteor.user();
+		if (!user) return;
+		return wmdRepos.find({
+			userId: user._id,
+			// should excluse if all branches are deployed
+			//appId: { $exists: false }
+		}, {
+			sort: { name: 1 }
+		});
+	}
+
+	Template.apps.servers = function() {
+		return Servers.find({ $and: [
+			{ destroyedAt: {$exists: false} },
+			{ $or: [ { type: 'meteor' }, { type: 'combo'} ] }
+		]});
+	}
 
 	// template-engine-preview-10.1 fixes
 	Template.apps.name = function() {
@@ -37,12 +38,12 @@ if (Meteor.isClient) {
 
 	var updateName = function() {
 		var repoName = $('#appAdd_repoId option:selected').text();
-		var branch = $('#appAdd_branch').val();
+		var branch = $('#appAdd_branch').val() || 'master';
 		$('#appAdd_name').attr('placeholder',
 			repoName + '#' + branch);
 
 		var repo = wmdRepos.findOne($('#appAdd_repoId option:selected').val());
-		console.log(repo);
+		if (!repo) return;
 		$('#appAdd_meteorDir').attr('placeholder',
 			repo.meteorDir == '.' ? '(project root)' : repo.meteorDir);
 	}
