@@ -10,23 +10,31 @@ if (Meteor.isClient) {
 }
 
 if (Meteor.isServer) {
+	Accounts.validateNewUser(function(user) {
+		var existingNonServer
+			= Meteor.users.findOne({server: {$exists: false}});
+		if (existingNonServer)
+			return false;
+		return true;
+	});
+
+	var cols = ['Apps', 'Servers', 'ServerStats', 'databases'];
 	Meteor.publish('all', function() {
-		if (!this.userId)
-			return;
-		var user = Meteor.users.findOne(this.userId);
-		if (!user.authorized) {
-			if (Meteor.users.findOne({authorized: true}))
-				return;
-			// first user... do this on accountcreation!  TODO
-			Meteor.users.update(user._id, {$set: { authorized: true }});
-		}
+		if (!this.userId) return;
 
 		// prototyping, TODO, proper pub/subs
-		var cols = ['Apps', 'Servers', 'ServerStats', 'databases'];
-		cols = cols.map(function(col) { return root[col].find() });
-		cols.push(Meteor.users.find({_id: this.userId},
+		var finds = cols.map(function(col) { return root[col].find() });
+		finds.push(Meteor.users.find({_id: this.userId},
 			{fields: {apis: 1, 'sshKey.doId': 1}}));
-		return cols;
+		return finds;
+	});
+
+	_.each(cols, function(col) {
+		root[col].allow({
+			insert: function() { return this.userId; },
+			update: function() { return this.userId; },
+			remove: function() { return this.userId; }
+		});
 	});
 
 	Meteor.users.allow({
