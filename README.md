@@ -17,21 +17,27 @@ Copyright (c) 2014 Gadi Cohen, see license below.
 * Each Meteor process is run under forever-monitor, restarted
 automatically, with realtime logs & stats on the Web UI.
 * Meteor is run directly, no bundling involved, for faster deploys
-(see FAQ).
-* Deployments are via git deploys (see FAQ), with auto update on
-push.
+& ultimate node compatibility (see FAQ).
+* Deployments are via github (see FAQ), with auto update on
+a git push.
+* Nginx serves as a load balancer / reverse proxy in front of all
+your Meteor instances, with integrated vhost and SSL management
+via web UI.  Preconfigured for WebSockets and best caching policy
+to minimize load on Meteor (cache policy coming soon).
 
 ## Features (coming soon)
 
-* Multi-tenancy
+* Multi-tenancy.  Spawn a bigger spec machine and put as many of
+your apps on it as you want, pooling resources.  Move the apps to
+their own / seperate servers only once the need arises.  Moving is
+done with zero downtime.
 * Rules for when to spawn new servers, move Meteor to other servers, grow
 servers, etc.  During a move, the old process stays up until the new one
 is removed, for zero downtime.
-* nginx and SSL management.
 * Mongo management.  Support for multi-region databases.
+* Automated mongo backups (schedule, before upgrade, etc)
 * Extensions for e.g. email/sms/call if app goes down, etc.
 * Use private-IPs if available.
-* Automated mongo backups (schedule, before upgrade, etc)
 
 ## Quick start
 
@@ -51,8 +57,7 @@ connections from cloud servers if ROOT_URL contains `localhost`.
 
 NB: This is a work in progress.  You should only be using this in
 development on your home PC.  Few security checks are in place.  Error
-handling is limited.  Currently, any user can login and manage your
-apps and servers :)
+handling is limited.
 
 Super NB: For anything important (i.e., nothing you should be doing
 now), use with force-ssl.  Github OAuth tokens are sent over the wire
@@ -113,8 +118,12 @@ etc).
 Quicker redeploy times.  A bundle on our big project takes 27s
 seconds to generate, and then still extract again (1s :)).  It's
 true Meteor has to minify/compile everything on startup, but after
-this, for redeploys, only changed files.  Overall that was much
-quicker for us.
+this, on redeploys, only for changed files.  Overall that was much,
+much quicker for us (and no need to retransfer entire bundle).
+
+Other advantages include the fact that we get Meteor's recommended
+(and sometimes custom) node version, which can include patches
+ahead of what's easily available / installable.
 
 * **How are git deployments done?**
 
