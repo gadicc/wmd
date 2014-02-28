@@ -147,7 +147,18 @@ if (Meteor.isServer) {
 				throw new Meteor.Error(404, 'No such app');
 			if (appMethods[action])
 				appMethods[action](app);
-		}
+		},
+
+		'foreverExit': function(slug) {
+			slug = slug.split(':');
+			console.log(slug);
+			var app = Apps.findOne({name:slug[0]});
+			var instanceId = slug[1];
+			Apps.update({ _id: app._id, 'instances.data._id': instanceId }, {
+				$set: { 'instances.data.$.state': 'crashed' },
+				$inc: { 'instances.failing': 1 }
+			});
+		},
 	});
 
 	var appMethods = {
@@ -158,7 +169,7 @@ if (Meteor.isServer) {
 
 		start: function(app) {
 			_.each(app.instances.data, function(instance) {
-				if (instance.state == 'deployed' || instance.state == 'stopped')
+				if (instance.state == 'deployed' || instance.state == 'stopped' || instance.state == 'crashed')
 					App.start(app, instance);
 			});
 		},

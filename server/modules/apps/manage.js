@@ -35,6 +35,7 @@ if (Meteor.isServer) {
 			//var instance = _.findWhere(app.instances.data, { _id: instanceId });
 
 			var data = {
+				slug: app.name+":"+instance._id,
 				cmd: 'mrt',
 				args: [
 					'--production',
@@ -75,24 +76,15 @@ if (Meteor.isServer) {
 
 		'stop': function(app, instance) {
 			var data = {};
-			Apps.update({ _id: app._id, 'instances.data._id': instance._id }, {
-				$set: { 'instances.data.$.state': 'stopped' },
-				$inc: { 'instances.running': 1 }
-			});
-
-			return;
+			data.slug = app._id + ':' + instance._id;
 			sendCommand(instance.serverId, 'foreverStop', data, function(error, result) {
 				console.log(error, result);
-				if (result.code) // i.e. non-zero, failure
-					Apps.update({ _id: app._id, 'instances.data._id': instance._id }, {
-						$set: { 'instances.data.$.state': 'startFailed' },
-						$inc: { 'instances.failing': 1 }
-					});
-				else // start success
-					Apps.update({ _id: app._id, 'instances.data._id': instance._id }, {
-						$set: { 'instances.data.$.state': 'stopped' },
-						$inc: { 'instances.running': 1 }
-					});
+				// if (error)
+				// Couldn't stop?  If we tried to stop an already stopped
+				Apps.update({ _id: app._id, 'instances.data._id': instance._id }, {
+					$set: { 'instances.data.$.state': 'stopped' },
+					$inc: { 'instances.running': 1 }
+				});
 			});			
 		}
 

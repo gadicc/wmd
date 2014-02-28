@@ -38,7 +38,11 @@ if (Meteor.isServer) {
 		// TODO, DISABLE
 		'cmdTest': function(serverId, command, options, callback) {
 			var wrappedSendCommand = Async.wrap(sendCommand);
-			var result = wrappedSendCommand(serverId, command, options);
+			try {
+				var result = wrappedSendCommand(serverId, command, options);
+			} catch (err) {
+				throw new Meteor.error(err);
+			}
 			return result;
 		}
 	});
