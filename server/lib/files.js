@@ -43,7 +43,7 @@ if (Meteor.isServer) {
 		var self = this;
 		var handle = Files.collection.find().observe({
 			added: function(doc) {
-				if (existing[doc.filename] !== doc.hash)
+				if (!existing || existing[doc._id] !== doc.hash)
 					self.added('files', doc._id, doc);
 			}, changed: function(doc) {
 				self.changed('files', doc._id, doc);

@@ -141,7 +141,10 @@ ddpclient.connect(function(error) {
 
   	ddpclient.subscribe('commands', [], function(err) {
 	});
-	ddpclient.subscribe('files', [state.files], function(err) {
+	var stateFiles = {};
+	for (key in state.files)
+		stateFiles[key] = state.files[key].hash;
+	ddpclient.subscribe('files', [stateFiles], function(err) {
 	});
 });
 

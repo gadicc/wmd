@@ -36,7 +36,7 @@
 	</p>
 
 	<p><b>Environment variables:</b> (one per line, VAR=VALUE)<br />
-	<textarea id="vhosts" cols=40 rows=5>{{env}}</textarea><br />
+	<textarea id="env" class="monospace" cols=65 rows=5>{{env}}</textarea><br />
 	The following variables are set AUTOMATICALLY,<br /> but will be
 	OVERRIDDEN with any values given above:<br />
 	ROOT_URL, HTTP_FORWARDED_COUNT, MONGO_URL.
@@ -44,9 +44,9 @@
 
 	<p><b>SSL</b><br />
 	Public Certificate (+ CA certs):<br />
-	<textarea id="ssl_cert" cols=40 rows=5 data-app-id="{{_id}}">{{ssl.cert}}</textarea><br />
+	<textarea id="ssl_cert" class="monospace" cols=65 rows=5 data-app-id="{{_id}}">{{ssl.cert}}</textarea><br />
 	Private Key:<br />
-	<textarea class="sensitive" cols=40 rows=5 id="ssl_key">{{ssl.key}}</textarea><br />
+	<textarea class="monospace sensitive" cols=65 rows=5 id="ssl_key">{{ssl.key}}</textarea><br />
 	<button id="ssl_update">Update</button>
 	</p>
 
