@@ -8,12 +8,14 @@ if (Meteor.isClient) {
 	});
 
 	Template.apps.apps = function() {
+		_.defer(updateName);
 		return Apps.find();
 	}
 
 	Template.apps.repos = function() {
 		var user = Meteor.user();
 		if (!user) return;
+		_.defer(updateName);
 		return wmdRepos.find({
 			userId: user._id,
 			// should excluse if all branches are deployed
@@ -34,7 +36,8 @@ if (Meteor.isClient) {
 		var repoName = $('#appAdd_repoId option:selected').text();
 		var branch = $('#appAdd_branch').val() || 'master';
 		$('#appAdd_name').attr('placeholder',
-			repoName + '#' + branch);
+			repoName.replace(/^[Mm]eteor-?/, '')
+			+ (branch == 'master' ? '' : '-' + branch));
 
 		var repo = wmdRepos.findOne($('#appAdd_repoId option:selected').val());
 		if (!repo) return;
@@ -56,7 +59,6 @@ if (Meteor.isClient) {
 
 	Template.appAdd.rendered = function() {
 		Session.set('selectedRepoId', $('#appAdd_repoId').val());
-		updateName();
 	}
 
 	/*
@@ -83,6 +85,7 @@ if (Meteor.isClient) {
 		},
 		'submit': function(event, tpl) {
 			event.preventDefault();
+			var name = $(tpl.find('#appAdd_name')).val();
 			var repoId = $(tpl.find('#appAdd_repoId')).val();
 			var branch = $(tpl.find('#appAdd_branch')).val();
 			var deployOptions = {
@@ -92,22 +95,28 @@ if (Meteor.isClient) {
 			}
 			var meteorDir = $(tpl.find('#appAdd_meteorDir')).val();
 			if (meteorDir) deployOptions.meteorDir = meteorDir;
-			Meteor.call('appAdd', name, repoId, branch, deployOptions);
+			Meteor.call('appAdd', name, repoId, branch, deployOptions,
+				function(error) { alert(error); });
 		}
 	});
 }
 
 if (Meteor.isServer) {
 
-
 	Meteor.methods({
 		'appAdd': function(name, repoId, branch, deployOptions) {
 			var repo = wmdRepos.findOne(repoId);
 			if (!repo)
 				throw new Meteor.Error(404, 'Not such repo');
+			if (name && !name.match(/^[a-z][a-z0-9-_]{0,30}[a-z0-9]$/))
+				throw new Meteor.Error(403, 'Invalid username (see rules)');
+			if (Apps.findOne({name:name}))
+				throw new Meteor.Error(403, 'There is already an app called "' + name + '"');
 
 			var appData = {
-				name: name || repo.name + '#' + branch,
+				name: name || 
+					(repo.name.replace(/^[Mm]eteor-?/, '')
+					+ (branch == 'master' ? '' : '-' + branch)).substr(0,32),
 				branch: branch,
 				source: 'repo',
 				repoId: repoId,

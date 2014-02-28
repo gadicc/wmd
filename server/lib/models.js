@@ -38,9 +38,9 @@ if (Meteor.isServer) {
 
 	_.each(cols, function(col) {
 		root[col].allow({
-			insert: function() { return this.userId; },
-			update: function() { return this.userId; },
-			remove: function() { return this.userId; }
+			insert: function(userId) { return userId; },
+			update: function(userId) { return userId; },
+			remove: function(userId) { return userId; }
 		});
 	});
 

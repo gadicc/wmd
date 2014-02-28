@@ -11,7 +11,7 @@ if (Meteor.isServer) {
 		var out = 'server_names_hash_bucket_size 64;\n\n';
 		var apps = Apps.find().fetch();
 		_.each(apps, function(app) {
-			out += 'upstream app' + app.appId + ' {\n'
+			out += 'upstream ' + app.name + ' {\n'
 				+ '\tip_hash;\n';
 			_.each(app.instances.data, function(ai) {
 				if (_.indexOf(['running','stopped','started'], ai.state) != -1) {
@@ -25,14 +25,14 @@ if (Meteor.isServer) {
 
 			out += '}\n\nserver {\n'
 				+ '\tlisten 80;\n'
-				+ '\tserver_name app' + app.appId + '.gadi.cc';
+				+ '\tserver_name ' + app.name + '.gadi.cc';
 			_.each(app.vhosts, function(host) {
 				out += ' ' + host;
 			});
 			out += ';\n';
 
 			if (app.ssl) {
-				var prefix = '/etc/ssl/certs/app' + app.appId;
+				var prefix = '/etc/ssl/certs/' + app.name;
 				Files.update(prefix+'.crt', app.ssl.cert, 'nginx', app.ssl.cert_hash);
 				Files.update(prefix+'.key', app.ssl.key, 'nginx', app.ssl.key_hash);
 				out += '\tlisten 443 ssl;\n'
