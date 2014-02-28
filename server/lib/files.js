@@ -12,9 +12,7 @@ if (Meteor.isServer) {
 				hash = sha1(contents);
 
 			if (file) {
-				console.log('exists');
 				if (file.hash == hash) return false;
-				console.log('update');
 				this.collection.update(file.id, {
 					$set: { contents: contents, hash: hash }
 				});
@@ -40,8 +38,6 @@ if (Meteor.isServer) {
 			hash: doc.hash
 		}
 	});
-
-	Files.update('moo', 'hello there 3');
 
 	Meteor.publish('files', function(existing) {
 		var self = this;

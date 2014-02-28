@@ -346,7 +346,8 @@ if (Meteor.isServer) {
 			| Inotify.IN_CLOSE_WRITE | Inotify.IN_MOVED_TO,
 		callback: function(event) {
 			if (!event.name.match(/\.js$|\.sh$|\.json$/)
-					|| event.name == 'credentials.json')
+					|| event.name == 'credentials.json'
+					|| event.name == 'state.json')
 				return;
 			console.log('[wmd] ' + event.name + ' modified, refreshing cache...');
 			loadScript(event.name);

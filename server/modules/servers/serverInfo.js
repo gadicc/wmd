@@ -49,6 +49,7 @@ if (Meteor.isClient) {
 						{username: this.params.server}
 					]
 				});
+				if (!server) return;
 				handle = ServerStats.find({_id: server._id}).observe({
 					added: function(doc) {
 					},
@@ -84,12 +85,21 @@ if (Meteor.isClient) {
 			var form = $(event.target).closest('form');
 			var serverId = form.data('server-id');
 			var cmd = form.find('[name=cmd]').val();
-			var data = JSON.parse(form.find('[name=data]').val());
-			console.log(serverId,cmd,data);
+			var returnEl = $('div.cmdReturn[data-server-id="' + serverId + '"]');
+			try {
+				var data = JSON.parse(form.find('[name=data]').val());
+			} catch (error) {
+				returnEl.html(error);
+				return;
+			}
+			returnEl.html('Sending... ' + JSON.stringify({
+				serverId:serverId, cmd:cmd, data:data
+			}));
 			Meteor.call('cmdTest', serverId, cmd, data, function(err, result) {
-				$('div.cmdReturn[data-server-id="' + serverId + '"]').html(
-					JSON.stringify(result, null, 4)
-				);
+				if (err)
+					returnEl.html(JSON.stringify(err, null, 4));
+				else
+					returnEl.html(JSON.stringify(result, null, 4));
 			});
 		}
 	});

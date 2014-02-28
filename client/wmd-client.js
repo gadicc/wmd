@@ -39,6 +39,7 @@ console.log('CWD: ' + process.cwd());
 // sync to ensure we load state before doing anything else
 try {
 	var data = fs.readFileSync(stateFile);
+	state = JSON.parse(data);
 } catch (err) {
 	if (err.errno == 34)
 		console.log('No preexisting ' + stateFile + ', running fresh...');
@@ -190,10 +191,13 @@ commands = {
 				console.log('error', error, data);
 			},
 			exit: function(forever) {
-
-				console.log('exit', forever, data);
+				console.log('foreverExit');
+				ddpclient.call('foreverExit', [data.slug || data.options.slug]);
 			}
 		});
+	},
+	'foreverStop': function(data, done) {
+		foreverStop(data.slug || data.options.slug, done);
 	},
 	'writeFile': function(data, done) {
 		writeFile(data.filename, data.contents, data.options, done);
@@ -271,11 +275,20 @@ var spawnAndLog = function(cmd, args, options, done) {
 
 var forevers = {};
 var foreverStart = function(cmd, args, options, done, callbacks) {
-	console.log('options', options);
+	var slug = options.slug || new Date().getTime() + Math.random();
+	if (state.forevers[slug] && !options.forceRestart) {
+		console.log('slug "' + slug + '" already strarted');
+		done(new Error('slug "' + slug + '" already strarted'));
+		return;
+	}
+	state.forevers[slug] = {
+		cmd: cmd, args: args, options: options
+	}
+	saveState();
+
 	var child = forever.start(_.union([cmd], args), options);
 	var log = new cslog(ddpclient, cmd + (args ? ' ' + args.join(' ') : ''));
-	var childId = new Date().getTime() + Math.random();
-	//forevers[childId] = child;
+	forevers[slug] = child;
 
 	child.on('stdout', function(data) {
 		log.addLine(data);
@@ -286,7 +299,7 @@ var foreverStart = function(cmd, args, options, done, callbacks) {
 
 	child.on('start', function(process,data) {
 		log.addLine('Started successfully');
-		done(null, { status: 'started', childId: childId, log: 1 });
+		done(null, { status: 'started', slug: slug, rlog: log.localId });
 	});
 
 	child.on('error', function(error) {
@@ -297,8 +310,19 @@ var foreverStart = function(cmd, args, options, done, callbacks) {
 
 	if (callbacks.exit)
 		child.on('exit', callbacks.exit);
+}
 
-	return child;
+var foreverStop = function(slug, done) {
+	var child = forevers[slug];
+	if (child) {
+		child.stop();
+		delete(forevers[slug]);
+		delete(state.forevers[slug]);
+		saveState();
+		done(null, true);
+	} else {
+		done(new Error("Couldn't stop non-existant slug '" + slug + "'"));
+	}
 }
 
 var writeFile = function(filename, contents, options, done) {
@@ -348,6 +372,15 @@ var processKill = function(data, signal, done) {
 		done(new Error('no pid/pidFile/all specified'));
 
 	}
+}
+
+for (slug in state.forevers) {
+	var data = state.forevers[slug];
+	data.options.forceRestart = true;
+	foreverStart(data.cmd,data.args,data.options, function(err,data) {
+		// TODO, ,done, callbacks
+		console.log(err, data);
+	}, {});
 }
 
 psExec();
