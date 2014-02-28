@@ -12,10 +12,13 @@ if (Meteor.isServer) {
 				hash = sha1(contents);
 
 			if (file) {
+				console.log('exists');
 				if (file.hash == hash) return false;
-				this.collection.update(hash.id, {
-					$set: { contents: contents }
-				});					
+				console.log('update');
+				this.collection.update(file.id, {
+					$set: { contents: contents, hash: hash }
+				});
+				return true;
 			}
 
 			this.files[filename] = {
@@ -38,11 +41,13 @@ if (Meteor.isServer) {
 		}
 	});
 
+	Files.update('moo', 'hello there 3');
+
 	Meteor.publish('files', function(existing) {
 		var self = this;
 		var handle = Files.collection.find().observe({
 			added: function(doc) {
-				if (!_.findWhere(existing, doc))
+				if (existing[doc.filename] !== doc.hash)
 					self.added('files', doc._id, doc);
 			}, changed: function(doc) {
 				self.changed('files', doc._id, doc);
