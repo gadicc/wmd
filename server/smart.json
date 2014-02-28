@@ -1,19 +1,17 @@
 {
   "packages": {
     "iron-router": {
-      "XXpath": "/home/dragon/www/smart/iron-router",
-      "XXgit": "https://github.com/gadicohen/iron-router.git",
       "git": "https://github.com/EventedMind/iron-router.git",
-      "branch": "shark",
-      "XXbranch": "cmather"
-	},
+      "branch": "blaze-integration"
+    },
     "npm": {},
     "reactive-objects": {},
     "mongo-counter": {},
     "streams": {},
     "bootstrap-3": {},
     "extensions": {
-    	"path": "/home/dragon/www/smart/meteor-extensions"
-    }
+      "path": "/home/dragon/www/smart/meteor-extensions"
+    },
+    "blaze-layout": {}
   }
 }

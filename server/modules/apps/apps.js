@@ -30,12 +30,6 @@ if (Meteor.isClient) {
 		]});
 	}
 
-	// template-engine-preview-10.1 fixes
-	Template.apps.name = function() {
-		return this.name;
-	}
-
-
 	var updateName = function() {
 		var repoName = $('#appAdd_repoId option:selected').text();
 		var branch = $('#appAdd_branch').val() || 'master';
@@ -52,7 +46,7 @@ if (Meteor.isClient) {
 		// move to seperate repo package
 		if (this.source == 'repo') {
 			var repo = wmdRepos.findOne(this.repoId);
-			if (!repo) return;
+			if (!repo) return null;
 			return Extensions.runPlugin('appOptions', repo.service, {
 				app: this, repo: repo
 			});

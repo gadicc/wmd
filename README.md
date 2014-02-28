@@ -34,7 +34,7 @@ done with zero downtime.
 * Rules for when to spawn new servers, move Meteor to other servers, grow
 servers, etc.  During a move, the old process stays up until the new one
 is removed, for zero downtime.
-* Mongo management.  Support for multi-region databases.
+* Mongo management (with oplog, duh).  Support for multi-region databases.
 * Automated mongo backups (schedule, before upgrade, etc)
 * Extensions for e.g. email/sms/call if app goes down, etc.
 * Use private-IPs if available.

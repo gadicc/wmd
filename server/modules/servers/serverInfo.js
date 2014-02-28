@@ -67,10 +67,6 @@ if (Meteor.isClient) {
 	});
 
 	Template.serverInfo.helpers({
-		'name': function() {
-			// template engine preview 10.1 bug
-			return this.name;
-		},
 		'memUsage': function() {
 			return this.freemem / this.totalmem;
 		},

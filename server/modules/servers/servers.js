@@ -17,14 +17,6 @@ if (Meteor.isClient) {
 		return iaasData;
 	}
 
-	// template-engine-preview-10.1 fixes
-	Template.servers.name = function() {
-		return this.name;
-	}
-	Template.servers.regions = function() {
-		return this.regions;
-	}
-
 	Template.servers.helpers({
 		'hours': function() {
 			return Math.floor((new Date() - this.createdAt) / 1000 / 60 / 60);
