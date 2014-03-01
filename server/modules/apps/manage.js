@@ -76,7 +76,7 @@ if (Meteor.isServer) {
 
 		'stop': function(app, instance) {
 			var data = {};
-			data.slug = app._id + ':' + instance._id;
+			data.slug = app.name + ':' + instance._id;
 			sendCommand(instance.serverId, 'foreverStop', data, function(error, result) {
 				console.log(error, result);
 				// if (error)
@@ -133,6 +133,12 @@ if (Meteor.isServer) {
 			cmd: './appInstall.sh',
 			options: { env: data.env }
 		}, function(error, result) {
+			var exists = Apps.findOne({
+				_id: app._id,
+				'instances.data.serverId': serverId});
+			// we don't reall care, just updating setup again
+			if (exists) return;
+
 			if (result.code) // i.e. non-zero, failure
 				Apps.update(app._id, { $push: { 'instances.data': {
 					_id: instanceId,

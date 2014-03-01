@@ -45,7 +45,17 @@ chmod a+x /home/$USER/appInstall.sh
 cat > /home/$USER/appUpdate.sh <<'__END__'
 #!/bin/sh
 cd $REPO
-git pull $URL $BRANCH
+
+# git pull $URL $BRANCH
+# error: Your local changes to 'website/packages/.gitignore' would be overwritten by merge.  Aborting.
+
+# so instead we do
+echo fetch
+git fetch $URL $BRANCH
+echo reset
+git reset --hard FETCH_HEAD
+# git clean -df
+
 git submodule update
 __END__
 chmod a+x /home/$USER/appUpdate.sh

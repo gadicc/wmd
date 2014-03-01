@@ -4,6 +4,7 @@ Servers = new Meteor.Collection('servers');
 ServerStats = new Meteor.Collection('serverStats');
 databases = new Meteor.Collection('databases');
 wmdRepos = new Meteor.Collection('repos');
+subs = {};
 
 if (Meteor.isClient) {
 	subAll = Meteor.subscribe('all');

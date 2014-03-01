@@ -12,18 +12,33 @@ if (Meteor.isClient) {
 		this.route('showLog', {
 			path: '/logs/:logId',
 			before: function() {
-				this.subscribe('logs');
-				this.subscribe('logLines', this.params.logId);
+				subs['logs'] = this.subscribe('logs');
+				subs['logLines'] = this.subscribe('logLines', this.params.logId);
+				subs['logLines'].wait();  // not working!
 			},
 			data: function() {
+				Session.set('logId', this.params.logId);
+				return;
 				return {
-					log: logs.findOne(this.params.logId) // nonreactive
+					logId: this.params.logId //,
+					//log: logs.findOne(this.params.logId) // nonreactive
 				}
 			}
 		});
 
 		Template.logs.logs = function() {
 			return logs.find();
+		}
+
+		// shouldn't be necessary... wait() not working?
+		Template.showLog.log = function() {
+			var dep = subs['logLines'].ready();
+			if (!dep) return;
+			//console.log(this);
+			//return logs.findOne(this.logId);
+			var log = logs.findOne(Session.get('logId'));
+			log.moo = log.content;
+			return log;
 		}
 
 		Template.showLog.lines = function() {
