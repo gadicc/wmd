@@ -3,7 +3,8 @@ Package.describe({
 });
 
 Npm.depends({
-  "github": "0.1.14"
+  "github": "0.1.14",
+  "connect": "2.13.0"
 });
 
 Package.on_use(function (api) {
@@ -15,6 +16,9 @@ Package.on_use(function (api) {
 		'mongo-livedata',
 		'iron-router'
 	], ['server', 'client']);
+
+	// for github hook, see note about iron-router
+	api.use('webapp', 'server');
 
 	api.add_files('wmd-github.js', ['client', 'server']);
 

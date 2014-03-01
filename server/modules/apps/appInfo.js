@@ -2,6 +2,9 @@ if (Meteor.isClient) {
 	Router.map(function() {
 		this.route('appInfo', {
 			path: '/apps/:app',
+			before: function() {
+				this.subscribe('wmdRepos');
+			},
 			action: function() {
 				if (!subAll.ready())
 					return;
@@ -53,6 +56,20 @@ if (Meteor.isClient) {
 			Meteor.call('appUpdateSSL', appId, cert, key);
 		}
 	});
+
+	Template.appConfig.sourceOptions = function() {
+		// move to seperate repo package
+		if (this.source == 'repo') {
+			console.log(this.repoId);
+			var repo = wmdRepos.findOne(this.repoId);
+			if (!repo) return null;
+			return Extensions.runPlugin('appOptions', repo.service, {
+				app: this, repo: repo
+			});
+		}
+	}
+	Extensions.declarePlugin('appOptions', '0.1.0');
+
 }
 
 if (Meteor.isServer) {

@@ -13,7 +13,7 @@ if (Meteor.isClient) {
 
 	Template.ghAppOptions.events({
 		'click [name="autoUpdate"]': function(event, tpl) {
-			var appId = $(event.target).closest('table').data('app-id');
+			var appId = this._id;
 			var enabled = $(event.target).is(':checked');
 			Meteor.call('wmd.github.setAutoUpdate', appId, enabled);
 		}
@@ -228,7 +228,7 @@ if (Meteor.isServer) {
 			var rootUrl = extRootUrl();
 			var self = this;
 
-			if (app.github.autoUpdate == enabled)
+			if (app.github && app.github.autoUpdate == enabled)
 				return;
 
 			if (enabled) {
@@ -260,7 +260,7 @@ if (Meteor.isServer) {
 			github.repos.testHook({
 				user: 'gadicohen',
 				repo: 'meteor-messageformat',
-				id: 1855886
+				id: 1878974
 			});
 		}
 
@@ -302,10 +302,12 @@ if (Meteor.isServer) {
 	});
 	*/
 
+	/* server side routing on iron-router#blaze-integration seems to be broken 
 	Router.map(function() {
 		this.route('gitHubHook', {
 			where: 'server',
 			action: function() {
+				console.log('action');
 				this.response.writeHead(200);
 				this.response.end();
 
@@ -323,4 +325,34 @@ if (Meteor.isServer) {
 			}
 		})
 	});
+  */
+
+  var connect = Npm.require('connect');
+  var Fiber = Npm.require('fibers');
+	WebApp.connectHandlers
+		.use(connect.urlencoded())
+		.use(connect.json())
+		.use('/gitHubHook', function(req, res, next) {
+			res.writeHead(200);
+			res.end();
+
+			var data = JSON.parse(req.body.payload);
+
+			if (data.hook_id) {
+				console.log('Hook ' + data.hook_id + ' successfully created');
+				return;
+			}
+
+			Fiber(function(data) {
+				// wow, a bit convoluted... reconsider how we store everything?
+				var ghRepo = ghRepos.findOne({'repo.id':data.repository.id});
+				var repo = wmdRepos.findOne({
+					service:'github', serviceId: ghRepo._id
+				});
+				var app = Apps.findOne({repoId: repo._id});
+
+				console.log('Github push for ' + app.name + ', updating...');
+				appMethods.update(app);
+			}).run(data);
+		});	
 }

@@ -28,18 +28,22 @@
 <template name="appConfig">
 	<h2>Config</h2>
 
+	<p><b>{{source}} options:</b>
+	{{> sourceOptions}}
+	</p>
+
 	<p><b>Vhosts:</b> (one per line, first line autosets ROOT_URL)<br />
 	<textarea id="vhosts" cols=40 rows=5>{{vhosts}}</textarea><br />
 	If your load balancer is nginx, can use a full hostname,<br />
 	wildcards (*.example.org), and regexps (~^moo$).<br />  See
-	<a href="http://nginx.org/en/docs/http/server_names.html">server_names</a>.
+	<a href="http://nginx.org/en/docs/http/server_names.html">server_names</a>.  Updates on blur.
 	</p>
 
 	<p><b>Environment variables:</b> (one per line, VAR=VALUE)<br />
 	<textarea id="env" class="monospace" cols=65 rows=5>{{env}}</textarea><br />
 	The following variables are set AUTOMATICALLY, but will be
 	OVERRIDDEN with any values<br />
-	given above: ROOT_URL, HTTP_FORWARDED_COUNT, MONGO_URL, MONGO_OPLOG_URL.
+	given above: ROOT_URL, HTTP_FORWARDED_COUNT, MONGO_URL, and<br />MONGO_OPLOG_URL (updates on next app restart).
 	</p>
 
 	<p><b>SSL</b><br />
@@ -47,7 +51,7 @@
 	<textarea id="ssl_cert" class="monospace" cols=65 rows=5 data-app-id="{{_id}}">{{ssl.cert}}</textarea><br />
 	Private Key:<br />
 	<textarea class="monospace sensitive" cols=65 rows=5 id="ssl_key">{{ssl.key}}</textarea><br />
-	<button id="ssl_update">Update</button>
+	<button id="ssl_update">Update Certificates</button>
 	</p>
 
 </template>

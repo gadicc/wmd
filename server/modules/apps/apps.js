@@ -45,18 +45,6 @@ if (Meteor.isClient) {
 			repo.meteorDir == '.' ? '(project root)' : repo.meteorDir);
 	}
 
-	Template.allApps.sourceOptions = function() {
-		// move to seperate repo package
-		if (this.source == 'repo') {
-			var repo = wmdRepos.findOne(this.repoId);
-			if (!repo) return null;
-			return Extensions.runPlugin('appOptions', repo.service, {
-				app: this, repo: repo
-			});
-		}
-	}
-	Extensions.declarePlugin('appOptions', '0.1.0');
-
 	Template.appAdd.rendered = function() {
 		Session.set('selectedRepoId', $('#appAdd_repoId').val());
 	}
@@ -161,7 +149,8 @@ if (Meteor.isServer) {
 		},
 	});
 
-	var appMethods = {
+	// global.  might be called from packages
+	appMethods = {
 		setup: function(app) {
 			// actually "re" setup
 			appInstall(app, freeServer('meteor'));
@@ -216,9 +205,9 @@ if (Meteor.isServer) {
 				}
 			};
 
-			_.each(app.servers.deployedOn, function(serverId) {
-				console.log(serverId);
-				sendCommand(serverId, 'spawnAndLog', spawnData, function(err, data) {
+			_.each(app.instances.data, function(ai) {
+				console.log(ai.serverId);
+				sendCommand(ai.serverId, 'spawnAndLog', spawnData, function(err, data) {
 					console.log(data);
 				});
 			});		
