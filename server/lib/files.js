@@ -14,7 +14,8 @@ if (Meteor.isServer) {
 			if (file) {
 				if (file.hash == hash) return false;
 				this.collection.update(file.id, {
-					$set: { contents: contents, hash: hash }
+					$set: { contents: contents, hash: hash,
+						postAction: options.postAction }
 				});
 				return true;
 			}
@@ -25,7 +26,8 @@ if (Meteor.isServer) {
 					filename: filename,
 					hash: hash,
 					contents: contents,
-					dest: dest
+					dest: dest,
+					postAction: options.postAction
 				})
 			};
 			return true;
@@ -46,7 +48,16 @@ if (Meteor.isServer) {
 				if (!existing || existing[doc._id] !== doc.hash)
 					self.added('files', doc._id, doc);
 			}, changed: function(doc) {
-				self.changed('files', doc._id, doc);
+				try {
+					self.changed('files', doc._id, doc);
+				} catch (err) {
+					// [Error: Could not find element with id zJ5WK2ZqJmpTtX4Km to change]
+					if (!err.toString().match(/Could not find element/))
+						throw(err);
+
+					// Wasn't sent down before because it was cached
+					self.added('files', doc._id, doc);
+				}
 			}
 		});
 		self.ready();

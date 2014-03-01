@@ -62,33 +62,12 @@ ext.on('appUpdated', '0.1.0', function(data) {
 		{ destroyedAt: {$exists: false} },
 		{ $or: [ {type: 'nginx'}, { type: 'combo'} ] }
 	]}).fetch();
-	var updated = Files.update('/etc/nginx/conf.d/wmd.conf', conf,
-		'nginx', null, { update: 'manual' });
-	if (!updated) return;
-	_.each(servers, function(server) {
-		// File update will be sent down before this, but, possible
-		// race condition, that kill is called before file write
-		// is finished.  also, file could change when server is
-		// disconnected.  it will get the new file on connect but
-		// won't HUP nginx.  TODO: static handlers for certain filenames
-		sendCommand(server._id, 'kill', {
-			pidFile: '/var/run/nginx.pid',
-			signal: 'SIGHUP'
- 		});
-		/*
-		sendCommand(server._id, 'writeAndKill', {
-			filename: '/etc/nginx/conf.d/wmd.conf',
-			contents: conf,
-			pidFile: '/var/run/nginx.pid',
-			signal: 'SIGHUP'
-		}, function(err, result) {
-			if (err) {
-				console.log("Error updating nginx config on " + server.username);
-				console.log(err);
-			} else {
-				console.log("Updated nginx config on " + server.username);
+	Files.update('/etc/nginx/conf.d/wmd.conf', conf,
+		'nginx', null, { update: 'manual', postAction: {
+			cmd: 'kill',
+			data: {
+				pidFile: '/var/run/nginx.pid',
+				signal: 'SIGHUP'
 			}
-		});
-		*/
-	});
+		}});
 });

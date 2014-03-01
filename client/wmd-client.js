@@ -153,7 +153,9 @@ ddpclient.on('message', function(msg) {
 	var data = JSON.parse(msg);
 	//console.log(data);
 	if (data.collection == 'files') {
-		incomingFile(data.id, data.fields.filename, data.fields.contents, data.fields.hash);
+		incomingFile(data.id, data.fields.filename,
+			data.fields.contents, data.fields.hash,
+			data.fields.postAction);
 		return;
 	}
 
@@ -171,9 +173,14 @@ ddpclient.on('message', function(msg) {
 	execCommand(data.id, data.fields.command, data.fields.options);
 });
 
-function incomingFile(id, filename, contents, hash) {
-	if (!filename) // update (filename change not supported)
-		filename = state.files[id].filename;
+function incomingFile(id, filename, contents, hash, postAction) {
+	if (!filename) { // update (filename change not supported)
+		if (state.files[id])
+			filename = state.files[id].filename;
+		else
+			console.log('Uh oh!  Got an update without an add! '
+				+ ' Consequence of a previously failed write.');
+	}
 
 	fs.writeFile(filename, contents, function(err) {
 		console.log('incoming ' + filename);
@@ -187,6 +194,12 @@ function incomingFile(id, filename, contents, hash) {
 			hash: hash
 		}
 		saveState();
+
+		if (postAction && commands[postAction.cmd])
+			commands[postAction.cmd](postAction.data, function(err, result) {
+				if (err)
+					console.log(err);
+			});
 	});
 }
 
@@ -332,6 +345,7 @@ var foreverStop = function(slug, done) {
 }
 
 var processKill = function(data, signal, done) {
+	console.log('kill');
 	if (data.pid) {
 
 		try {
