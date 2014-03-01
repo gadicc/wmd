@@ -140,10 +140,8 @@ if (Meteor.isServer) {
 
 			_.each(allRepos, function(repo) {
 
-				console.log(repo.name);
-
 				var myRepo = ghRepos.findOne({
-					userId: self.userId, repo: repo.name
+					userId: self.userId, name: repo.name
 				});
 
 				var branches = github.repos.getBranches({
@@ -161,10 +159,12 @@ if (Meteor.isServer) {
 				}
 
 				if (myRepo) {
+					console.log('updating ' + repo.name);
 					ghRepos.update(myRepo._id, { $set: {
 						etagBranches: branches.meta.etag
 					}} );
 				} else {
+					console.log('added ' + repo.name);
 					myRepo = { _id: ghRepos.insert({
 						userId: self.userId,
 						name: repo.name,
