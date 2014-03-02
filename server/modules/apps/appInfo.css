@@ -1,7 +1,9 @@
 .monospace { font-family: courier;}
 
-.appButtons button[disabled]:not(.active) { opacity: .15; color: #333; }
+.appButtons button[disabled]/*:not(.active)*/ { opacity: .15; color: #333; }
+/*
 .appButtons button.active {
 	color: black; font-weight: bold;
 	border: 2px solid black !important;
 }
+*/

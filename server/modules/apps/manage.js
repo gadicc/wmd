@@ -57,12 +57,16 @@ if (Meteor.isServer) {
 						+ (app.meteorDir == '.' ? '' : app.meteorDir),
 					env: {
 						ROOT_URL: proto + '://' + app.vhosts[0] + '/',
+						NODE_ENV: 'production',
 						USER: 'app' + app.appId,
 						HOME: '/home/app' + app.appId,
 						PATH: '/bin:/usr/bin:/usr/local/bin'
 					}
 				}
 			};
+
+			// Override our defaults with user specified variables
+			_.extend(data.options.env, app.env);
 
 			sendCommand(instance.serverId, 'foreverStart', data, function(error, result) {
 				console.log(error, result);

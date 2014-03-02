@@ -90,6 +90,12 @@ if (Meteor.isClient) {
 	Template.appConfig.helpers({
 		vhosts: function() {
 			return this.vhosts ? this.vhosts.join('\n') : '';
+		},
+		env: function() {
+			var out = '';
+			for (key in this.env)
+				out += key + '=' + this.env[key] + '\n';
+			return out;
 		}
 	});
 
@@ -98,6 +104,16 @@ if (Meteor.isClient) {
 			var appId = tpl.data._id;
 			var vhosts = $(event.target).val().split('\n');
 			Apps.update(appId, {$set: { vhosts: vhosts }});
+		},
+		'change #env': function(event, tpl) {
+			var appId = tpl.data._id;
+			var env = {};
+			_.each($(event.target).val().split('\n'), function(pair) {
+				pair = /^([^=]+)=(['"]?)(.*)\2$/.exec(pair);
+				if (pair)
+					env[pair[1]] = pair[3];
+			});
+			Apps.update(appId, {$set: { env: env }});
 		},
 		'click #ssl_update': function(event, tpl) {
 			var appId = tpl.data._id;
