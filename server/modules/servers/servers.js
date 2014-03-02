@@ -4,13 +4,13 @@ if (Meteor.isClient) {
 		});
 	});
 
-	Template.servers.serverTypes = function() {
-		return [
-			{ name: 'Combo Servers', servers: Servers.find({$and: [ {type: 'combo'}, { username: { $not: 'devServer'}}, { destroyedAt: { $exists: false }} ]} )},
-			{ name: 'Meteor Servers', servers: Servers.find({$and: [ {type: 'meteor'}, { username: { $not: 'devServer'}}, { destroyedAt: { $exists: false }} ]} )},
-			{ name: 'Mongo Servers', servers: Servers.find({$and: [ {type: 'mongo'}, { username: { $not: 'devServer'}}, { destroyedAt: { $exists: false }} ]} )},
-			{ name: 'Nginx Servers', servers: Servers.find({$and: [ {type: 'nginx'}, { username: { $not: 'devServer'}}, { destroyedAt: { $exists: false }} ]} )}
-		];
+	Template.servers.servers = function() {
+		return Servers.find({$and: [
+			{ username: { $not: 'devServer'}},
+			{ destroyedAt: { $exists: false }}
+		]}, {
+			sort: { name: 1 }
+		});
 	}
 
 	Template.servers.iaasData = function() {

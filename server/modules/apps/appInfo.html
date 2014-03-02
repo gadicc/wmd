@@ -5,16 +5,17 @@
 
 		<h2>Status</h2>
 
+		<h3>Global Options</h3>
 		{{> appButtons}}
-		<table class="table table-bordered" style="width: auto">
+
+		<h3>Instance Options</h3>
+		<table id="instances" class="table table-bordered" style="width: auto">
 		<tbody>
 		{{#each instances.data}}
 			<tr>
-				<td>{{serverId}}</td>
+				<td><a href="/servers/{{serverId}}">{{serverName}}</a></td>
 				<td>{{state}}</td>
-				<!--
 				<td>{{> appButtons}}</td>
-				-->
 			</tr>
 		{{/each}}
 		</tbody>
@@ -57,11 +58,11 @@
 </template>
 
 <template name="appButtons">
-	<p>
-	  	<button data-action="setup" data-app-id="{{_id}}" data-server-id="{{serverId}}">Setup</button>
-	  	<button data-action="update" data-app-id="{{_id}}" data-server-id="{{serverId}}">Update</button>
-	  	<button data-action="start" data-app-id="{{_id}}" data-server-id="{{serverId}}">Start</button>
-	  	<button data-action="stop" data-app-id="{{_id}}" data-server-id="{{serverId}}">Stop</button>
-	  	<button data-action="delete" data-app-id="{{_id}}" data-server-id="{{serverId}}">Delete</button>
+	<p class="appButtons">
+	  	<button class="btn btn-primary" {{config 'setup'}}>Setup</button>
+	  	<button class="btn btn-info" {{config 'update'}}>Update</button>
+	  	<button class="btn btn-success" {{config 'start'}}>Start</button>
+	  	<button class="btn btn-warning" {{config 'stop'}}>Stop</button>
+	  	<button class="btn btn-danger" {{config 'delete'}}>Delete</button>
 	</p>
 </template>

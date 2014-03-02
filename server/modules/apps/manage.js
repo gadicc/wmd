@@ -34,6 +34,10 @@ if (Meteor.isServer) {
 			console.log('starting app');
 			//var instance = _.findWhere(app.instances.data, { _id: instanceId });
 
+			var proto = 'http';
+			if (app.ssl && app.ssl.cert)
+				proto += 's';
+
 			var data = {
 				slug: app.name+":"+instance._id,
 				cmd: 'mrt',
@@ -52,6 +56,7 @@ if (Meteor.isServer) {
 					cwd: '/home/app' + app.appId + '/' + app.repo + '/'
 						+ (app.meteorDir == '.' ? '' : app.meteorDir),
 					env: {
+						ROOT_URL: proto + '://' + app.vhosts[0] + '/',
 						USER: 'app' + app.appId,
 						HOME: '/home/app' + app.appId,
 						PATH: '/bin:/usr/bin:/usr/local/bin'
@@ -66,11 +71,16 @@ if (Meteor.isServer) {
 						$set: { 'instances.data.$.state': 'startFailed' },
 						$inc: { 'instances.failing': 1 }
 					});
-				else // start success
+				else { // start success
 					Apps.update({ _id: app._id, 'instances.data._id': instance._id }, {
 						$set: { 'instances.data.$.state': 'running' },
 						$inc: { 'instances.running': 1 }
 					});
+
+					instance.state = 'running';
+					if (_.every(app.instances.data, function(instance) { return instance.state == 'running' } ))
+						Apps.update(app._id, { $set: { state: 'running' }} );
+				}
 			});
 		},
 
@@ -81,10 +91,16 @@ if (Meteor.isServer) {
 				console.log(error, result);
 				// if (error)
 				// Couldn't stop?  If we tried to stop an already stopped
+
 				Apps.update({ _id: app._id, 'instances.data._id': instance._id }, {
 					$set: { 'instances.data.$.state': 'stopped' },
-					$inc: { 'instances.running': 1 }
+					$inc: { 'instances.running': -1 }
 				});
+
+				instance.state = 'stopped';
+				if (_.every(app.instances.data, function(instance) { return instance.state == 'stopped' } ))
+					Apps.update(app._id, { $set: { state: 'stopped' }} );
+
 			});			
 		}
 

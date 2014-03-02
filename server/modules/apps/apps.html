@@ -55,6 +55,15 @@
 			</select>
 		</p>
 
+		<p>Database:</p>
+		<label><input type="radio" name="db" value="create"> Create new - required for multiple instances</label><br />
+		<label><input type="radio" name="db" value="meteor"> Meteor internal - great for disposable apps</label><br />
+		<label><input type="radio" name="db" value="existing"> Pick an existing database from WMD</label> 
+			<select name=""></select><br />
+		<label><input type="radio" name="db" value="specify"> Specify your own MONGO_URL</label>
+			<input type="text" /><br />
+
+		<br />
 		<p>
 			<input type="submit">
 		</p>

@@ -50,9 +50,7 @@ cd $REPO
 # error: Your local changes to 'website/packages/.gitignore' would be overwritten by merge.  Aborting.
 
 # so instead we do
-echo fetch
 git fetch $URL $BRANCH
-echo reset
 git reset --hard FETCH_HEAD
 # git clean -df
 

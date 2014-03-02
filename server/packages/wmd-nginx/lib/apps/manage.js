@@ -14,13 +14,12 @@ if (Meteor.isServer) {
 			out += 'upstream ' + app.name + ' {\n'
 				+ '\tip_hash;\n';
 			_.each(app.instances.data, function(ai) {
-				if (_.indexOf(['running','stopped','started'], ai.state) != -1) {
-					var server = Servers.findOne(ai.serverId); // TODO, cache
-					out += '\tserver ' + server.ip
-						+ ':' + ai.port
-						+ (ai.state == 'stopped' || ai.state == 'started' ? ' down' : '')
-						+ ';\n';
-				}
+				var server = Servers.findOne(ai.serverId); // TODO, cache
+				console.log(ai.state);
+				out += '\tserver ' + server.ip
+					+ ':' + ai.port
+					+ (ai.state == 'running' ? '' : ' down')
+					+ ';\n';
 			});
 
 			out += '}\n\nserver {\n'
@@ -45,10 +44,11 @@ if (Meteor.isServer) {
 				+ '\tfastcgi_buffers 64 4k;\n';
 
 			out	+= '\tlocation / {\n'
-				+ '\t\tproxy_pass http://app' + app.appId + '/;\n'
+				+ '\t\tproxy_pass http://' + app.name + '/;\n'
 				+ '\t\tproxy_http_version 1.1;\n'
 	        	+ '\t\tproxy_set_header Upgrade $http_upgrade;\n'
 	        	+ '\t\tproxy_set_header Connection "upgrade";\n'
+	        	+ '\t\tproxy_set_header Host $host;\n' // override
 	        	+ '\t}\n'
 	        	+ '}\n\n';
       });

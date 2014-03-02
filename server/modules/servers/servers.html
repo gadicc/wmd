@@ -2,38 +2,37 @@
 
 	<h1>All Servers</h1>
 
-	{{#each serverTypes}}
+	<table class="table table-bordered" style="width: auto">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>IP</th>
+				<th>Hours</th>
+				<th>Cost</th>
+				<th>Actions</th>
+			</tr>
+		</thead><tbody>
 
-		<h3>{{name}}</h3>
 		{{#each servers}}
-			<table class="table table-bordered" style="width: auto">
-				<thead>
-				<tr>
-					<td> &nbsp; <a href="/servers/{{username}}">{{username}}</a> &nbsp; </td>
-				</tr>
-				</thead><tbody>
-				<tr>
-					<td>IP address: {{ip}}</td>
-				</tr><tr>
-					<td>Hours: {{hours}}, Total: ${{totalCost}}</td>
-				</tr><tr>
-				  <td>
-				  	{{#if event.action_status}}
-					  	<button class="destroy" data-id="{{_id}}">Destroy</button>
-					  	<button class="setup" data-id="{{_id}}">Setup</button>
-				  	{{else}}
-				  		{{event.event_desc}}
-				  		{{event.percentage}}%
-				  	{{/if}}
-				  </td>
-				</tr>
-				</tbody>
-			</table>
-
+			<tr>
+				<td><a href="/servers/{{username}}">{{username}}</a></td>
+				<td>{{ip}}</td>
+				<td>{{hours}}</td>
+				<td>${{totalCost}}</td>
+			  <td>
+			  	{{#if event.action_status}}
+				  	<button class="destroy" data-id="{{_id}}">Destroy</button>
+				  	<button class="setup" data-id="{{_id}}">Setup</button>
+			  	{{else}}
+			  		{{event.event_desc}}
+			  		{{event.percentage}}%
+			  	{{/if}}
+			  </td>
+			</tr>
 		{{/each}}
 
-
-	{{/each}}
+		</tbody>
+	</table>
 
 	<h1>Create New</h1>
 

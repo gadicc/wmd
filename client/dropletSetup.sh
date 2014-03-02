@@ -1,5 +1,9 @@
 #/bin/bash
 
+# TODO
+# * sysctl network tuning, security
+# * firewall, fail2ban
+
 # TODO, pass info from server
 METEOR=`grep -E 'combo|meteor' credentials.json`
 NGINX=`grep -E 'combo|nginx' credentials.json`
@@ -7,8 +11,6 @@ MONGO=`grep -E 'combo|mongo' credentials.json`
 
 echo Adding EPEL...
 rpm -Uvh http://download-i2.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
-
-## TODO, firewall, fail2ban
 
 echo Setting up swap space...
 fallocate -l 512M /swapfile

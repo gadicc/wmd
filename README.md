@@ -134,13 +134,29 @@ rsync (over SSH) to all the servers.  Think (hypothetically)
 an option for the case where control server is on dev's home
 PC, or servers are in multiple data centers.
 
-* **How does wmd-client authenticate itself?**
+* **How does wmd-client work and authenticate itself?**
 
-Currently, servers are added as Meteor users.  This allowed
-rapid development by leveraging Meteor's SRP implementation
-and DDP authentication.  In the future, we'll use our own
-two-way authentication to ensure a fake server can't be setup,
-DNS hijacked, and as such, gain control of servers.
+When WMD creates a new server, it installs wmd-client on it.
+There is no way to connect to the client, the client simply
+repeatedly tries to open a DDP connection to wmd-server.
+Servers are added as Meteor users; this allowed rapid
+development by leveraging Meteor's SRP implementation and 
+DDP authentication.  In the future, we want to add a
+two-way authentication, situations where a fake server
+could potentially hijack DNS (probably safer to use an IP),
+or other methods.  Note, even though the client password
+isn't sent in plaintext (thanks to SRP), plenty of sensitive
+info is sent over the wire (like Github OAuth tokens); as
+such, you server should be set up with SSL and force-ssl.
+
+* **What happens if the controller (wmd-server) is down?**
+
+All created servers are fully self functioning (and reboot
+safe!).  Nginx will notice if a server/app is crashing and
+remove it from the pool, but wmd-server won't notice this
+and won't spawn new servers (or once resource limit flags
+are reached according to rules).  Obviously, you won't be
+able to manually start/stop apps, adjust vhost config, etc.
 
 * **I think my database was compromised, what to do?**
 
@@ -157,6 +173,7 @@ for all your domains.
 In theory we could automate most of the above for this eventuality,
 or have regular rotations for extra security, or something.
 
+
 ## Load testing Questions
 
 https://github.com/alanning/meteor-load-test
@@ -169,7 +186,7 @@ db servers, etc).
 1. Automate testing of isolated differing approaches for same goal,
 e.g. optimization of publications, etc.  CPU, time, etc.
 
-## wmd.json (per app, all params optional)
+## wmd.json (per app in root dir, all params optional.  TODO)
 
 {
 	name:
@@ -179,3 +196,42 @@ e.g. optimization of publications, etc.  CPU, time, etc.
 		max:
 	}
 }
+
+## Relevant Digital Ocean "ideas" to vote for!
+
+* [Deploy to physically seperated hardware](https://digitalocean.uservoice.com/forums/136585-digitalocean/suggestions/3859618-deploy-to-physically-separated-hardware) - so that if a DO server dies, it will take down
+at most, one of your instances (currently 1,190 votes, marked as
+"planned" for end of Q1 2014).
+
+* [movable IP from VM to VM ("elastic IP")](https://digitalocean.uservoice.com/forums/136585-digitalocean/suggestions/2993170-movable-ip-from-vm-to-vm-elastic-ip-) - currently if your load balancer is down, all your sites
+are down.  No way to have a secondary/backup (currently 834 votes,
+marked as "planned")
+
+* Private IPs are implemented [only in NYC2](https://www.digitalocean.com/blog_posts/introducing-private-networking) so far
+
+## Differences between Galaxy / Meteor.Com
+
+Galaxy is a commercially backed venture, maintained by the creators
+of Meteor (i.e. the Meteor experts), which handles everthing
+deployment related for you (so you don't have to), and has an SLA
+guaranteeing uptime.
+
+WMD is an open source developer tool maintained by the community.
+It explicity offers no guarantees and has a very liberal disclaimer.
+It involves more work, more responsibility, but if you're reading
+this, you probably understand this and you have your reasons for
+wanting to manage your own deployments.
+
+Particularly, vs current non-Galaxy Meteor.com deploys, WMD lets
+you have SSL on custom domains, and oplog support.  These issues
+of course are addressed on Galaxy.
+
+Reasons for wanting your own deployments could include:
+
+* Security implications of hosting all your own infrastructure
+* More flexibly resource management (VMs with high CPU/RAM just
+for your app)
+* More flexible software options -- you run your own servers and
+can install native Linux software on them to be used by your app.
+* Load balancing and stress testing.
+* Data center placement, e.g. Europe vs USA, etc.

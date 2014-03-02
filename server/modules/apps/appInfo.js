@@ -19,6 +19,12 @@ if (Meteor.isClient) {
 		});
 	});
 
+	Handlebars.registerHelper('serverName', function(serverId) {
+		if (!serverId)
+			serverId = this.serverId;
+		return Servers.findOne(serverId).username;
+	});
+
 	Template.appInfo.name = function() {
 		return this.name;
 	}
@@ -29,13 +35,38 @@ if (Meteor.isClient) {
 	Template.appButtons.events({
 		'click button': function(event, tpl) {
 			event.preventDefault();
-			var target = $(event.target);
-			var appId = target.data('app-id');
-			var serverId = target.data('server-id');
-			var action = target.data('action');
-			Meteor.call('appAction', appId, action, serverId);
+			var appId, instanceId;
+			if (tpl.data.serverId) {
+				appId = tpl.__component__.parent.parent.templateInstance.data._id;
+				instanceId = tpl.data._id;
+			} else {
+				appId = tpl.data._id;
+				instanceId = undefined;
+			}
+			var action = $(event.target).data('action');
+			Meteor.call('appAction', appId, action, instanceId);
 		}
 	});
+	Template.appButtons.config = function(action) {
+		var disabled = null;
+		switch(action) {
+			case 'start':
+				if (this.state == 'running')
+					disabled = true;
+				break;
+
+			case 'stop':
+				if (this.state == 'stopped')
+					disabled = true;
+				break;
+
+			case 'delete':
+				if (this.state == 'running')
+					disabled = true;
+				break;
+		}
+		return { 'data-action': action, disabled: disabled }
+	}
 
 	Template.appConfig.helpers({
 		vhosts: function() {

@@ -129,12 +129,14 @@ if (Meteor.isServer) {
 			Apps.insert(appData);
 		},
 
-		'appAction': function(appId, action) {
+		'appAction': function(appId, action, instanceId) {
 			var app = Apps.findOne(appId);
 			if (!app)
 				throw new Meteor.Error(404, 'No such app');
-			if (appMethods[action])
-				appMethods[action](app);
+			if (appMethods[action]) {
+				this.unblock();
+				appMethods[action](app, app.instances.data[instanceId]);
+			}
 		},
 
 		'foreverExit': function(slug) {
@@ -156,19 +158,20 @@ if (Meteor.isServer) {
 			appInstall(app, freeServer('meteor'));
 		},
 
-		start: function(app) {
-			_.each(app.instances.data, function(instance) {
+		start: function(app, instance) {
+			var instances = instance ? [instance] : app.instances.data;
+			_.each(instances, function(instance) {
 				if (instance.state == 'deployed' || instance.state == 'stopped' || instance.state == 'crashed')
 					App.start(app, instance);
 			});
 		},
 
-		stop: function(app) {
-			_.each(app.instances.data, function(instance) {
+		stop: function(app, instance) {
+			var instances = instance ? [instance] : app.instances.data;
+			_.each(instances, function(instance) {
 				if (instance.state == 'started' || instance.state == 'running')
 					App.stop(app, instance);
 			});
-
 		},
 
 		delete: function(app) {
