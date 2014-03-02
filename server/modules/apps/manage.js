@@ -48,7 +48,6 @@ if (Meteor.isServer) {
 				],
 				options: {
 					silent: false, // for now, but we have our own log
-					uid: app.appId,
 					max: 3,
 					killTree: true,
 					minUptime: 2000,
@@ -60,7 +59,12 @@ if (Meteor.isServer) {
 						NODE_ENV: 'production',
 						USER: 'app' + app.appId,
 						HOME: '/home/app' + app.appId,
-						PATH: '/bin:/usr/bin:/usr/local/bin'
+						PATH: '/bin:/usr/bin:/usr/local/bin',
+						HTTP_FORWARDED_COUNT: 1
+					},
+					spawnWith: {
+						uid: app.appId,
+						gid: app.appId
 					}
 				}
 			};

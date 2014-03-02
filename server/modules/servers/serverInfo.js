@@ -69,13 +69,69 @@ if (Meteor.isClient) {
 
 	Template.serverInfo.helpers({
 		'memUsage': function() {
-			return this.freemem / this.totalmem;
+			return 1 - this.freemem / this.totalmem;
 		},
 		'server': function() {
 			return Servers.findOne(Session.get('serverId'));
 		},
 		'serverStats': function() {
 			return ServerStats.findOne(Session.get('serverId'));
+		},
+		'cmd': function() {
+			return this.cmd.replace(
+				/\/home\/.*\/\.meteor\/tools\/[0-9a-f]+\//,
+				'{meteorTools}/');
+		},
+		'userLink': function(user) {
+			if (user == 'root')
+				return user;
+			var app = Apps.findOne({appId: parseInt(user.replace(/^app/, ''))});
+			if (!app)
+				return user;
+			return '<a href="/apps/"' + app._id + '">'
+				+ app.name + '</a>';
+		},
+		'procs': function() {
+			var rootProcs = [];
+			var procs = _.filter(this.procs, function(proc) {
+				if (proc.user == 'root')
+					rootProcs.push(proc);
+				return proc.user != 'root'
+					&& !(proc.pcpu == 0 && proc.pmem == 0);
+			});
+			procs = _.sortBy(procs, function(proc) { return proc.user; } );
+			procs = _.union(rootProcs, procs);
+
+			var orig = procs, lastUser = 'root';
+			var totals = { pcpu: 0, pmem: 0 };
+			procs = [];
+			_.each(orig, function(proc) {
+				totals.pcpu += proc.pcpu;
+				totals.pmem += proc.pmem;
+				if (proc.user != lastUser) {
+					if (lastUser != 'root') {
+						procs.push({
+							user: 'total',
+							pcpu: sprintf('%.1f', totals.pcpu),
+							pmem: sprintf('%.1f', totals.pmem),
+							cmd: ' '
+						});
+					}
+					procs.push({user:'',cmd:''});
+					lastUser = proc.user;
+					totals.pcpu = 0;
+					totals.pmem = 0;
+				}
+				procs.push(proc);
+			});
+			procs.push({
+				user: 'total',
+				pcpu: sprintf('%.1f', totals.pcpu),
+				pmem: sprintf('%.1f', totals.pmem),
+				cmd: ''
+			});
+
+			return procs;
 		}
 	});
 

@@ -59,8 +59,8 @@ var cpuUsage = 0;
 osUtils.cpuUsage(function setCpuUsage(usage) { cpuUsage = usage; });
 
 // expected 'pid' to be first, and 'cmd' must be last (because of spaces)
-var psInfo = ['pid', 'user', 'pcpu', 'pmem', 'cputime', 'cmd'];
-var cmd = 'ps wax -o ' + psInfo.join(',') + ' | grep -E "node|mongo"';
+var psInfo = ['pid', 'ppid', 'user', 'pcpu', 'pmem', 'cputime', 'cmd'];
+var cmd = 'ps wax -o ' + psInfo.join(',') + ' | grep -E "node|mongo" | grep -v grep';
 var ps;
 
 var psRE = '^';

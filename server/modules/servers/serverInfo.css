@@ -2,3 +2,5 @@ div.cmdReturn {
 	font-family: courier;
 	white-space: pre;
 }
+
+#procTable td:empty { border: 0; }

@@ -54,6 +54,7 @@ git fetch $URL $BRANCH
 git reset --hard FETCH_HEAD
 # git clean -df
 
+git submodule init
 git submodule update
 __END__
 chmod a+x /home/$USER/appUpdate.sh

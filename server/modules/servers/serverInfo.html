@@ -20,21 +20,36 @@
 
 		<h2>Server Info</h2>
 		{{#with os}}
-			<table>
+			<table class="table table-bordered" style="width: auto">
+				<tbody>
 				<tr>
 					<td>CPU</td>
 					<td>{{sprintf '%2d%%' cpuUsage percent=true}}</td>
 				</tr><tr>
 					<td>RAM</td>
 					<td>{{sprintf '%2d%%' memUsage percent=true}}</td>
+				</tr><tr>
+					<td>Load Avg &nbsp;</td>
+					<td>{{#each loadavg}}{{sprintf '%0.2f' this}} &nbsp; {{/each}}</td>
 				</tr>
+				</tbody>
 			</table>
 		{{/with}}
-		<table>
-			<tr><th>%CPU</th><th>%MEM</th><th>Command</th></tr>
+
+		<br />
+		<table id="procTable" class="table table-bordered">
+			<thead>
+			<tr><th>User</th><th>%CPU</th><th>%MEM</th><th>Command</th></tr>
+			</thead><tbody>
 			{{#each procs}}
-				<tr><td>{{pcpu}}</td><td>{{pmem}}</td><td>{{cmd}}</td></tr>
+				<tr>
+					<td style="text-align: right;">{{{userLink user}}}</td>
+					<td>{{pcpu}}</td>
+					<td>{{pmem}}</td>
+					<td>{{cmd}}</td>
+				</tr>
 			{{/each}}
+			</tbody>
 		</table>
 	{{/with}}
 </template>
