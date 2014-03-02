@@ -15,7 +15,6 @@ if (Meteor.isServer) {
 				+ '\tip_hash;\n';
 			_.each(app.instances.data, function(ai) {
 				var server = Servers.findOne(ai.serverId); // TODO, cache
-				console.log(ai.state);
 				out += '\tserver ' + server.ip
 					+ ':' + ai.port
 					+ (ai.state == 'running' ? '' : ' down')
@@ -63,7 +62,7 @@ ext.on('appUpdated', '0.1.0', function(data) {
 		{ $or: [ {type: 'nginx'}, { type: 'combo'} ] }
 	]}).fetch();
 	Files.update('/etc/nginx/conf.d/wmd.conf', conf,
-		'nginx', null, { update: 'manual', postAction: {
+		'nginx', null, { postAction: {
 			cmd: 'kill',
 			data: {
 				pidFile: '/var/run/nginx.pid',

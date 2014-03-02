@@ -47,25 +47,44 @@ if (Meteor.isClient) {
 			Meteor.call('appAction', appId, action, instanceId);
 		}
 	});
+	Template.appButtons.active = function() {
+
+	};
 	Template.appButtons.config = function(action) {
 		var disabled = null;
+		var cssClass = 'btn ';
 		switch(action) {
+			case 'setup':
+				cssClass += 'btn-primary';
+				break;
+
+			case 'update':
+				cssClass += 'btn-info';
+				break;
+
 			case 'start':
-				if (this.state == 'running')
+				cssClass += 'btn-success';
+				if (this.state == 'running') {
 					disabled = true;
+					cssClass += ' active';
+				}
 				break;
 
 			case 'stop':
-				if (this.state == 'stopped')
+				cssClass += 'btn-warning';
+				if (this.state == 'stopped') {
 					disabled = true;
+					cssClass += ' active'
+				}
 				break;
 
 			case 'delete':
+				cssClass += 'btn-danger';
 				if (this.state == 'running')
 					disabled = true;
 				break;
 		}
-		return { 'data-action': action, disabled: disabled }
+		return { 'data-action': action, disabled: disabled, class: cssClass }
 	}
 
 	Template.appConfig.helpers({

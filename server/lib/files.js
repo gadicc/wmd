@@ -10,13 +10,20 @@ if (Meteor.isServer) {
 			var file = this.files[filename];
 			if (!hash)
 				hash = sha1(contents);
+			if (!options)
+				options = {};
 
 			if (file) {
-				if (file.hash == hash) return false;
+				if (file.hash == hash)
+					return false;
+				if (options.postAction)
+					options.postAction.forceUpdate
+						= new Date().getTime() + Math.random();
 				this.collection.update(file.id, {
 					$set: { contents: contents, hash: hash,
 						postAction: options.postAction }
 				});
+				file.hash = hash;
 				return true;
 			}
 
