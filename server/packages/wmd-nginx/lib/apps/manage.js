@@ -3,9 +3,22 @@
  *
  * We might consider having nginx check the file before sending SIGHUP
  *
+ * SSL.  Don't sighup after every update.  see what updates, send 1
+ * sighup after
+ *
  */
 
 if (Meteor.isServer) {
+
+	var nginxKillHUP = {
+		postAction: {
+			cmd: 'kill',
+			data: {
+				pidFile: '/var/run/nginx.pid',
+				signal: 'SIGHUP'
+			}
+		}
+	};
 
 	var nginxGenConf = function() {
 		var out = 'server_names_hash_bucket_size 64;\n\n';
@@ -31,8 +44,8 @@ if (Meteor.isServer) {
 
 			if (app.ssl) {
 				var prefix = '/etc/ssl/certs/' + app.name;
-				Files.update(prefix+'.crt', app.ssl.cert, 'nginx', app.ssl.cert_hash);
-				Files.update(prefix+'.key', app.ssl.key, 'nginx', app.ssl.key_hash);
+				Files.update(prefix+'.crt', app.ssl.cert, 'nginx', app.ssl.cert_hash, nginxKillHUP);
+				Files.update(prefix+'.key', app.ssl.key, 'nginx', app.ssl.key_hash, nginxKillHUP);
 				out += '\tlisten 443 ssl;\n'
 					+ '\tssl on;\n'
 					+ '\tssl_certificate ' + prefix + '.crt;\n'
@@ -62,11 +75,5 @@ ext.on('appUpdated', '0.1.0', function(data) {
 		{ $or: [ {type: 'nginx'}, { type: 'combo'} ] }
 	]}).fetch();
 	Files.update('/etc/nginx/conf.d/wmd.conf', conf,
-		'nginx', null, { postAction: {
-			cmd: 'kill',
-			data: {
-				pidFile: '/var/run/nginx.pid',
-				signal: 'SIGHUP'
-			}
-		}});
+		'nginx', null, nginxKillHUP);
 });
