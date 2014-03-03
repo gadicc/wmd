@@ -4,8 +4,13 @@ if (Meteor.isClient) {
 	  loadingTemplate: 'loading',
 	  waitOn: subAll,
     after: function() {
-      $('li.active').removeClass('active');
-      $('a[href="'+this.path+'"]').parent().addClass('active');
+    	var self = this;
+	    Meteor.setTimeout(function() {
+	      $('li.active').removeClass('active');
+	      $('a[href="'+self.path+'"]').parent().addClass('active');
+	      $('a.active').removeClass('active');
+	      $('a[href="'+self.path+'"]').addClass('active');
+	    }, 50);
     }
 	});
 

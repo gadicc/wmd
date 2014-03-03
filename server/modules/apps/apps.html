@@ -6,6 +6,15 @@
 	{{> appAdd}}
 </template>
 
+<template name="appSidebar">
+	<div id="appSidebar">
+		<a href="/apps">Summary<div></div></a>
+		{{#each apps}}
+			<a href="/apps/{{_id}}">{{name}}<div></div></a>
+		{{/each}}
+	</div>
+</template>
+
 <template name="allApps">
 	{{#each apps}}
 		<table data-app-id="{{_id}}" class="table table-bordered" style="width: auto">

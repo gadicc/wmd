@@ -1,8 +1,13 @@
 if (Meteor.isClient) {
 	Router.map(function() {
 		this.route('apps', {
+			layoutTemplate: 'sidebar-layout',
 			before: function() {
 				this.subscribe('wmdRepos');
+			},
+			action: function() {
+				this.render();
+				this.render('appSidebar', { to: 'sidebar' });
 			}
 		});
 	});
@@ -11,6 +16,7 @@ if (Meteor.isClient) {
 		_.defer(updateName);
 		return Apps.find();
 	}
+	Template.appSidebar.apps = Template.apps.apps;
 
 	Template.apps.repos = function() {
 		var user = Meteor.user();

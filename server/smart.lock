@@ -11,8 +11,10 @@
       "mongo-counter": {},
       "streams": {},
       "bootstrap-3": {},
+      "config": {},
       "extensions": {
-        "path": "../../../smart/meteor-extensions"
+        "git": "https://github.com/gadicohen/meteor-extensions.git",
+        "branch": "master"
       },
       "blaze-layout": {}
     },
@@ -47,8 +49,15 @@
         "tag": "v3.1.0-1",
         "commit": "329dccb08bfc18c635676dea600ac9953162cda9"
       },
+      "config": {
+        "git": "https://github.com/gadicohen/meteor-config.git",
+        "tag": "v0.0.1",
+        "commit": "1ac1a5a0b6a4ec4157d8ce154d4df8b0393433e1"
+      },
       "extensions": {
-        "path": "../../../smart/meteor-extensions"
+        "git": "https://github.com/gadicohen/meteor-extensions.git",
+        "branch": "master",
+        "commit": "8540270e0e29bafa5fea5c56f4e82eee9537347a"
       },
       "blaze-layout": {
         "git": "https://github.com/EventedMind/blaze-layout.git",

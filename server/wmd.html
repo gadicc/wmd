@@ -5,7 +5,7 @@
 <body>
 </body>
 
-<template name="layout">
+<template name="topbar">
    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
@@ -35,13 +35,29 @@
         </div><!--/.nav-collapse -->
       </div>
     </div>
+</template>
 
+<template name="layout">
+	{{> topbar}}
     <div class="container">
 		{{> yield}}
 	</div>
 </template>
 
+<template name="sidebar-layout">
+	{{> topbar}}
+	<div class="row">
+		<div class="col-md-3" style="background: #333; min-height: 800px; padding-right: 0px;">
+			{{> yield region="sidebar"}}
+		</div>
+		<div class="col-md-9">
+			{{> yield}}
+		</div>
+	</div>
+</template>
+
 <template name="loading">
+loading...
 </template>
 
 <template name="home">

@@ -2,3 +2,24 @@
 #instances .appButtons .btn { padding: 2px 4px; }
 #instances td { vertical-align: middle; }
 #instances p { margin: 0; }
+
+#appSidebar > a {
+	padding: 10px;
+	line-height: 22px;
+	background: #555;
+	margin-bottom: 1px;
+	color: #ccc;
+	font-size: 1.1em;
+	display: block;
+	padding-left: 45px;
+	position: relative;
+}
+
+#appSidebar > a.active > div {
+	position: absolute;
+	right: 0; top: 0;
+	width: 0; height: 0; 
+	border-top: 22px solid transparent;
+	border-bottom: 22px solid transparent;
+	border-right: 22px solid white;	
+}

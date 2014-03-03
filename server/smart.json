@@ -9,8 +9,13 @@
     "mongo-counter": {},
     "streams": {},
     "bootstrap-3": {},
+    "config": {
+      "_git": "https://github.com/gadicohen/meteor-config",
+      "_path": "/home/dragon/www/smart/config"
+	},
     "extensions": {
-      "path": "/home/dragon/www/smart/meteor-extensions"
+      "git": "https://github.com/gadicohen/meteor-extensions.git",
+      "_path": "/home/dragon/www/smart/meteor-extensions"
     },
     "blaze-layout": {}
   }

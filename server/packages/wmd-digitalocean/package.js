@@ -7,11 +7,10 @@ Npm.depends({
 });
 
 Package.on_use(function (api) {
-	api.use('extensions', 'server');
-	api.use('templating', ['server', 'client']);
+	api.use(['extensions', 'templating'], ['server', 'client']);
 
 	api.add_files('digitalocean.js', 'server');
 
 	api.add_files(['lib/user/user.html', 'lib/user/user.css'], 'client');
-	api.add_files(['lib/user/user.js'], ['server', 'client']);
+	api.add_files(['lib/user/user.js', 'lib/user/user.js'], ['server', 'client']);
 });

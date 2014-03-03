@@ -106,8 +106,6 @@ if (Meteor.isClient) {
 			var totals = { pcpu: 0, pmem: 0 };
 			procs = [];
 			_.each(orig, function(proc) {
-				totals.pcpu += proc.pcpu;
-				totals.pmem += proc.pmem;
 				if (proc.user != lastUser) {
 					if (lastUser != 'root') {
 						procs.push({
@@ -119,8 +117,11 @@ if (Meteor.isClient) {
 					}
 					procs.push({user:'',cmd:''});
 					lastUser = proc.user;
-					totals.pcpu = 0;
-					totals.pmem = 0;
+					totals.pcpu = proc.pcpu;
+					totals.pmem = proc.pmem;
+				} else {
+					totals.pcpu += proc.pcpu;
+					totals.pmem += proc.pmem;
 				}
 				procs.push(proc);
 			});
