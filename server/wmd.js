@@ -1,17 +1,9 @@
 if (Meteor.isClient) {
+
 	Router.configure({
 	  layoutTemplate: 'layout',
 	  loadingTemplate: 'loading',
-	  waitOn: subAll,
-    after: function() {
-    	var self = this;
-	    Meteor.setTimeout(function() {
-	      $('li.active').removeClass('active');
-	      $('a[href="'+self.path+'"]').parent().addClass('active');
-	      $('a.active').removeClass('active');
-	      $('a[href="'+self.path+'"]').addClass('active');
-	    }, 50);
-    }
+	  waitOn: subAll
 	});
 
 	Router.map(function() {

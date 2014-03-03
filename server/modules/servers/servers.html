@@ -1,3 +1,15 @@
+<template name="serverSidebar">
+	<div id="appSidebar">
+		<a href="/servers">Summary<div></div></a>
+		<a href="/servers/new">Add New<div></div></a>
+		<div></div>
+		{{#each servers}}
+			<a href="/servers/{{_id}}">{{username}}<div></div></a>
+			{{activeLinks}}
+		{{/each}}
+	</div>
+</template>
+
 <template name="servers">
 
 	<h1>All Servers</h1>

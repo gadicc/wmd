@@ -60,7 +60,7 @@ osUtils.cpuUsage(function setCpuUsage(usage) { cpuUsage = usage; });
 
 // expected 'pid' to be first, and 'cmd' must be last (because of spaces)
 var psInfo = ['pid', 'ppid', 'user', 'pcpu', 'pmem', 'cputime', 'cmd'];
-var cmd = 'ps wax -o ' + psInfo.join(',') + ' | grep -E "node|mongo" | grep -v grep';
+var cmd = 'ps wax -o ' + psInfo.join(',') + ' | grep -E "node|mongo|nginx" | grep -v grep';
 var ps;
 
 var psRE = '^';

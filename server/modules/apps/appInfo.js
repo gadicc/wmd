@@ -2,6 +2,7 @@ if (Meteor.isClient) {
 	Router.map(function() {
 		this.route('appInfo', {
 			path: '/apps/:app',
+			layoutTemplate: 'sidebar-layout',
 			before: function() {
 				this.subscribe('wmdRepos');
 			},
@@ -13,8 +14,10 @@ if (Meteor.isClient) {
 					{ name: this.params.app }
 				]});
 				Session.set('appId', app._id);
-				if (app)
+				if (app) {
 					this.render();
+					this.render('appSidebar', { to: 'sidebar' });
+				}
 			}
 		});
 	});

@@ -9,26 +9,37 @@
 <template name="appSidebar">
 	<div id="appSidebar">
 		<a href="/apps">Summary<div></div></a>
+		<a href="/apps/new">Add New<div></div></a>
+		<div></div>
 		{{#each apps}}
 			<a href="/apps/{{_id}}">{{name}}<div></div></a>
+			{{activeLinks}}
 		{{/each}}
 	</div>
 </template>
 
 <template name="allApps">
-	{{#each apps}}
-		<table data-app-id="{{_id}}" class="table table-bordered" style="width: auto">
-			<thead>
+
+	<table id="allApps" class="table table-bordered" style="width: auto">
+		<thead>
 			<tr>
-				<td> &nbsp; <a href="/apps/{{_id}}">{{name}}</a> &nbsp; </td>
+				<th>Name</th>
+				<th>Global State</th>
+				<th>Actions</th>
 			</tr>
-			</thead><tbody><tr>
-			  <td>
-			  	{{> appButtons}}
-			  </td>
-			</tr></tbody>
-		</table>
-	{{/each}}
+		</thead><tbody>
+
+		{{#each apps}}
+			<tr>
+				<td><a href="/apps/{{_id}}">{{name}}</a></td>
+				<td>{{state}}</td>
+			  <td>{{> appButtons}}</td>
+			</tr>
+		{{/each}}
+
+		</tbody>
+	</table>
+
 </template>
 
 <template name="appAdd">

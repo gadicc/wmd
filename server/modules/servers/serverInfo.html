@@ -1,11 +1,15 @@
+<template name="statCanvas">
+		<canvas id="chart" width="400" height="100"></canvas>
+</template>
+
 <template name="serverInfo">
 	<h1>{{server.username}}</h1>
 
-	{{#isolate}}<p>Last updated: {{serverStats.lastUpdate}}</p>{{/isolate}}
+	<p>Last updated: {{serverStats.lastUpdate}}</p>
 
-	{{#constant}}
-	<canvas id="chart" width="400" height="100"></canvas>
-	{{/constant}}
+	{{#each servers}}
+		{{> statCanvas}}
+	{{/each}}
 
 	<form class="sendCmd" data-server-id="{{server._id}}">
 		RAW CMD:

@@ -1,6 +1,11 @@
 if (Meteor.isClient) {
 	Router.map(function() {
 		this.route('servers', {
+			layoutTemplate: 'sidebar-layout',
+			action: function() {
+				this.render();
+				this.render('serverSidebar', { to: 'sidebar' });
+			}
 		});
 	});
 
@@ -12,6 +17,8 @@ if (Meteor.isClient) {
 			sort: { name: 1 }
 		});
 	}
+	Template.serverSidebar.servers = Template.servers.servers;
+	Template.serverSidebar.rendered = activeLinks;
 
 	Template.servers.iaasData = function() {
 		return iaasData;

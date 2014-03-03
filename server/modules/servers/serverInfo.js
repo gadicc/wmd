@@ -1,86 +1,42 @@
 if (Meteor.isClient) {
-	var handle = null;
-
 	Router.map(function() {
 		this.route('serverInfo', {
 			path: 'servers/:server',
+			layoutTemplate: 'sidebar-layout',
 			waitOn: subAll,
-			data: {}, 
-
-				/* function() {
-				// waitOn broken in shark branch, and data is not reactive
-				return { serverParam: this.params.server }
-				/*
-				if (!subAll.ready())
-					return;
+			data: function() {
 				var server = Servers.findOne({
 					$or: [
 						{_id: this.params.server},
 						{username: this.params.server}
 					]
 				});
-				this.params.serverId = server._id;
 				return {
-					name: server.username,
-					serverStats: ServerStats.findOne(server._id)
+					server: server
 				}
-				*/
-			//},
-			action: function() {
-				console.log(1);
-				if (!subAll.ready())
-					return;
-				console.log(2);
-				console.log(this.params.server);
-				var server = Servers.findOne({
-					$or: [
-						{_id: this.params.server},
-						{username: this.params.server}
-					]
-				});
-				Session.set('serverId', server._id);
-				this.render();
 			},
-			after: function() {
-				if (handle) handle.stop()
-				var server = Servers.findOne({
-					$or: [
-						{_id: this.params.server},
-						{username: this.params.server}
-					]
-				});
-				if (!server) return;
-				handle = ServerStats.find({_id: server._id}).observe({
-					added: function(doc) {
-					},
-					changed: function(doc) {
-						if (chart) {
-							data.cpu.append(doc.lastUpdate.getTime(), doc.os.cpuUsage);
-							data.mem.append(doc.lastUpdate.getTime(),
-								(doc.os.totalmem - doc.os.freemem) / doc.os.totalmem);
-						}
-					}
-				});
-
+			action: function() {
+				this.render('serverSidebar', { to: 'sidebar' });
 				this.render();
 			}
 		});
 	});
 
+	Template.serverInfo.servers = function() {
+		// don't ask :)  for force rerender of statCanvas
+		return this.server ? Servers.find(this.server._id) : '';
+	}
 	Template.serverInfo.helpers({
 		'memUsage': function() {
 			return 1 - this.freemem / this.totalmem;
-		},
-		'server': function() {
-			return Servers.findOne(Session.get('serverId'));
-		},
-		'serverStats': function() {
-			return ServerStats.findOne(Session.get('serverId'));
 		},
 		'cmd': function() {
 			return this.cmd.replace(
 				/\/home\/.*\/\.meteor\/tools\/[0-9a-f]+\//,
 				'{meteorTools}/');
+		},
+		'serverStats': function() {
+			return this.server ? ServerStats.findOne(this.server._id) : null;
 		},
 		'userLink': function(user) {
 			if (user == 'root')
@@ -161,12 +117,10 @@ if (Meteor.isClient) {
 		}
 	});
 
-	var chart = null, data = null;
-	Template.serverInfo.rendered = function() {
+	var statsObserve = null, chart = null, data = null;
+	Template.statCanvas.rendered = function() {
+		// Our "rendered" function (redrawn on serverId change)
 		var $canvas = $('#chart');
-		if ($canvas.data('rendered'))
-			return;
-		$canvas.data('rendered', true);
 		data = {
 			cpu: new TimeSeries(),
 			mem: new TimeSeries()
@@ -180,5 +134,20 @@ if (Meteor.isClient) {
 		chart.addTimeSeries(data.mem, { strokeStyle: 'rgba(255, 255, 0, 1)', fillStyle: 'rgba(255, 255, 0, 0.2)', lineWidth: 4 });
 		chart.addTimeSeries(data.cpu, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0.2)', lineWidth: 4 });
 		chart.streamTo($canvas[0], 1000 /* should be serve updateInterval */);
+
+		// console.log('Observing ' + this.data._id);
+
+		if (statsObserve) statsObserve.stop()
+		statsObserve = ServerStats.find(this.data._id).observe({
+			added: function(doc) {
+			},
+			changed: function(doc) {
+				if (chart) {
+					data.cpu.append(doc.lastUpdate.getTime(), doc.os.cpuUsage);
+					data.mem.append(doc.lastUpdate.getTime(),
+						(doc.os.totalmem - doc.os.freemem) / doc.os.totalmem);
+				}
+			}
+		});
 	};
 }

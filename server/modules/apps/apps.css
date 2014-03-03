@@ -1,7 +1,4 @@
 #appAdd label { font-weight: normal; }
-#instances .appButtons .btn { padding: 2px 4px; }
-#instances td { vertical-align: middle; }
-#instances p { margin: 0; }
 
 #appSidebar > a {
 	padding: 10px;
@@ -14,6 +11,13 @@
 	padding-left: 45px;
 	position: relative;
 }
+#appSidebar a.active {
+	color: white;
+}
+
+#appSidebar > div {
+	height: 3px;
+}
 
 #appSidebar > a.active > div {
 	position: absolute;
@@ -23,3 +27,7 @@
 	border-bottom: 22px solid transparent;
 	border-right: 22px solid white;	
 }
+
+#allApps .appButtons .btn { padding: 2px 4px; }
+#allApps td { vertical-align: middle; }
+#allApps p { margin: 0; }

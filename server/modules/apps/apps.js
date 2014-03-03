@@ -17,6 +17,7 @@ if (Meteor.isClient) {
 		return Apps.find();
 	}
 	Template.appSidebar.apps = Template.apps.apps;
+	Template.appSidebar.rendered = activeLinks;
 
 	Template.apps.repos = function() {
 		var user = Meteor.user();
