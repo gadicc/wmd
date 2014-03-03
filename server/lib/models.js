@@ -15,7 +15,7 @@ if (Meteor.isServer) {
 		console.log(user);
 
 		// always allow creation of new servers
-		if (user.server)
+		if (_.contains(validServers, user.username))
 			return true;
 
 		var existingNonServer

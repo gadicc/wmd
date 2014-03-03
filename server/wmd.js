@@ -29,20 +29,28 @@ if (Meteor.isServer) {
     // code to run on server at startup
   });
 
+  validServers = [];
   newServer = function(namePrefix, noPrefix, optional) {
-  	var data = { username: namePrefix, password: Random.id(), server: true };
-  	console.log(2);
+  	// No other way to pass info to createUser and validateNewUser :)
+  	var tmpUserName = (new Date().getTime() + Math.random()).toString();
+  	validServers.push(tmpUserName);
+
+  	var data = { username: tmpUserName, password: Random.id() };
   	var userId = Accounts.createUser(data);
-  	console.log(3);
+  	validServers = _.without(validServers, tmpUserName);
+
   	var nid = incrementCounter('servers');
   	var name;
   	if (noPrefix) {
   		name = namePrefix;
+	  	Meteor.users.update(userId, { $set: {
+	  		username: name, nid: nid, server: true
+	  	}});
   	} else {
 	  	name = namePrefix + '-' + nid;
 	  	data.username = name;
 	  	Meteor.users.update(userId, { $set: {
-	  		username: name, nid: nid
+	  		username: name, nid: nid, server: true
 	  	}});
 	}
 
