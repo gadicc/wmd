@@ -13,12 +13,17 @@ if (Meteor.isClient) {
 if (Meteor.isServer) {
 	Accounts.validateNewUser(function(user) {
 		console.log(user);
+
+		// always allow creation of new servers
+		if (user.server)
+			return true;
+
 		var existingNonServer
 			= Meteor.users.findOne({server: {$exists: false}});
 		/*
 		if (_.contains(user.emails, validEmail))
 			return true;
-		*/
+		*/ 
 		if (existingNonServer)
 			throw new Meteor.Error(403, "Additional users require preapproval.");
 

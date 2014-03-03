@@ -20,6 +20,7 @@ if (Meteor.isClient) {
 				parseInt($(tpl.find('#digitalocean [name="regionId"]')).val()),
 				parseInt($(tpl.find('#digitalocean [name="sizeId"]')).val())
 			);
+			Router.go('/servers');
 		}
 	});
 }

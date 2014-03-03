@@ -210,7 +210,7 @@ if (Meteor.isServer) {
 	 * Will call update() callback and finished() callback when relevant
 	 * with callback(result, data);  (Data is passed on first call)
 	 */
-	var DO_eventCheck = function(eventId, user, update, finished, data) {
+	DO_eventCheck = function(eventId, user, update, finished, data) {
 		var creds = user.apis.digitalocean;
   	var DO = new DigitalOceanAPI(creds.clientId, creds.apiKey);
   	DO = Async.wrap(DO, ['eventGet']);

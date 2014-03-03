@@ -30,8 +30,10 @@ if (Meteor.isServer) {
   });
 
   newServer = function(namePrefix, noPrefix, optional) {
-  	var data = { username: namePrefix, password: Random.id() };
+  	var data = { username: namePrefix, password: Random.id(), server: true };
+  	console.log(2);
   	var userId = Accounts.createUser(data);
+  	console.log(3);
   	var nid = incrementCounter('servers');
   	var name;
   	if (noPrefix) {
@@ -40,7 +42,7 @@ if (Meteor.isServer) {
 	  	name = namePrefix + '-' + nid;
 	  	data.username = name;
 	  	Meteor.users.update(userId, { $set: {
-	  		username: name, server: true, nid: nid
+	  		username: name, nid: nid
 	  	}});
 	}
 
