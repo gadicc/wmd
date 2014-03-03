@@ -1,27 +1,4 @@
 if (Meteor.isClient) {
-	Router.map(function() {
-		this.route('appInfo', {
-			path: '/apps/:app',
-			layoutTemplate: 'sidebar-layout',
-			before: function() {
-				this.subscribe('wmdRepos');
-			},
-			action: function() {
-				if (!subAll.ready())
-					return;
-				var app = Apps.findOne({ $or: [
-					{ _id: this.params.app },
-					{ name: this.params.app }
-				]});
-				Session.set('appId', app._id);
-				if (app) {
-					this.render();
-					this.render('appSidebar', { to: 'sidebar' });
-				}
-			}
-		});
-	});
-
 	Handlebars.registerHelper('serverName', function(serverId) {
 		if (!serverId)
 			serverId = this.serverId;

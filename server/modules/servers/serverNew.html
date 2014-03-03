@@ -1,0 +1,36 @@
+<template name="serverNew">
+	<h1>Create New</h1>
+
+	<p>This is a manual server creation, and is usually not
+	necessary.  New servers are created on demand, automatically.
+	(COMING SOON)</p>
+
+	{{#with iaasData.digitalocean}}
+
+		<form id="digitalocean">
+			<select name="type">
+				<option value="combo" selected>Combo</option>
+				<option value="meteor">Meteor</option>
+				<option value="mongo">Mongo</option>
+				<option value="nginx">Nginx</option>
+			</select>
+			<select name="regionId">
+				{{#each regions}}
+					<option value="{{id}}">{{name}} ({{slug}})</option>
+				{{/each}}
+			</select>
+			<select name="sizeId">
+				{{#each sizes}}
+					<option value="{{id}}">{{name}}</option>
+				{{/each}}
+			</select>
+			<input type="submit" value="Create" />
+		</form>
+
+	{{else}}
+
+		<p>Loading Digital Ocean regions and sizes...</p>
+
+	{{/with}}
+
+</template>

@@ -1,27 +1,4 @@
 if (Meteor.isClient) {
-	Router.map(function() {
-		this.route('serverInfo', {
-			path: 'servers/:server',
-			layoutTemplate: 'sidebar-layout',
-			waitOn: subAll,
-			data: function() {
-				var server = Servers.findOne({
-					$or: [
-						{_id: this.params.server},
-						{username: this.params.server}
-					]
-				});
-				return {
-					server: server
-				}
-			},
-			action: function() {
-				this.render('serverSidebar', { to: 'sidebar' });
-				this.render();
-			}
-		});
-	});
-
 	Template.serverInfo.servers = function() {
 		// don't ask :)  for force rerender of statCanvas
 		return this.server ? Servers.find(this.server._id) : '';

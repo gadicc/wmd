@@ -1,7 +1,7 @@
 <template name="serverSidebar">
 	<div id="appSidebar">
 		<a href="/servers">Summary<div></div></a>
-		<a href="/servers/new">Add New<div></div></a>
+		<a href="/servers/new">Create New<div></div></a>
 		<div></div>
 		{{#each servers}}
 			<a href="/servers/{{_id}}">{{username}}<div></div></a>
@@ -45,38 +45,5 @@
 
 		</tbody>
 	</table>
-
-	<h1>Create New</h1>
-
-	<p>This is a manual server creation, and is usually not
-	necessary.  New servers are created on demand, automatically.</p>
-
-	{{#with iaasData.digitalocean}}
-
-		<form id="digitalocean">
-			<select name="type">
-				<option value="combo" selected>Combo</option>
-				<option value="meteor">Meteor</option>
-				<option value="mongo">Mongo</option>
-				<option value="nginx">Nginx</option>
-			</select>
-			<select name="regionId">
-				{{#each regions}}
-					<option value="{{id}}">{{name}} ({{slug}})</option>
-				{{/each}}
-			</select>
-			<select name="sizeId">
-				{{#each sizes}}
-					<option value="{{id}}">{{name}}</option>
-				{{/each}}
-			</select>
-			<input type="submit" value="Create" />
-		</form>
-
-	{{else}}
-
-		<p>Loading Digital Ocean regions and sizes...</p>
-
-	{{/with}}
 
 </template>

@@ -1,9 +1,6 @@
 <template name="apps">
 	<h1>All Apps</h1>
 	{{> allApps}}
-
-	<h2>Add App</h2>
-	{{> appAdd}}
 </template>
 
 <template name="appSidebar">
@@ -40,59 +37,4 @@
 		</tbody>
 	</table>
 
-</template>
-
-<template name="appAdd">
-	<form id="appAdd">
-
-		<p>
-			<select id="appAdd_repoId">
-				{{#each repos}}
-					<option value="{{_id}}">{{name}}</option>
-				{{/each}}
-			</select>
-			<select id="appAdd_branch">
-				{{#each branches}}
-					<option value="{{this}}">{{this}}</option>
-				{{/each}}
-			</select>
-		</p>
-
-		<p>
-			Slug: <input type="text" id="appAdd_name" size=40 />
-			([a-z][a-z0-9-_]{0,30}[a-z0-9])
-		</p>
-		<p>
-			MeteorDir: <input type="text" id="appAdd_meteorDir" size=40 />
-		</p>
-
-		<p>
-			Force Target:
-			<select id="appAdd_server">
-				{{#each servers}}
-					<option value="{{_id}}">{{username}}</option>
-				{{/each}}
-			</select>
-		</p>
-
-		<p>Database:</p>
-		<label><input type="radio" name="db" value="create"> Create new - required for multiple instances</label><br />
-		<label><input type="radio" name="db" value="meteor"> Meteor internal - great for disposable apps</label><br />
-		<label><input type="radio" name="db" value="existing"> Pick an existing database from WMD</label> 
-			<select name=""></select><br />
-		<label><input type="radio" name="db" value="specify"> Specify your own MONGO_URL</label>
-			<input type="text" /><br />
-
-		<br />
-		<p>
-			<input type="submit">
-		</p>
-
-		<p>OR (coming soon, maybe):</p>
-
-		<p>Local path: <input type="text"></p>
-
-		<p>(Requires manual redeploy)</p>
-
-	</form>
 </template>
