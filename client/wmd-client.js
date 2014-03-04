@@ -63,7 +63,7 @@ var psInfo = ['pid', 'ppid', 'user', 'pcpu', 'pmem', 'cputime', 'cmd'];
 var cmd = 'ps wax -o ' + psInfo.join(',') + ' | grep -E "node|mongo|nginx" | grep -v grep';
 var ps;
 
-var psRE = '^';
+var psRE = '^ *';
 for (var i=0; i < psInfo.length-1; i++)
 	psRE += '([^ ]+) +';
 psRE = new RegExp(psRE + '(.+)$', 'mg');
