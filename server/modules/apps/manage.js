@@ -1,7 +1,8 @@
 if (Meteor.isServer) {
 
 	var path = Meteor.require('path');
-	var BUILD_HOME = process.env.HOME + '/wmd-local/build';
+	var LOCAL_HOME = process.env.HOME + '/wmd-local';
+	var BUILD_HOME = LOCAL_HOME + '/build';
 	var SCRIPT_HOME = path.normalize(process.cwd()
 		+ '/../../../../../private/scripts');
 
@@ -133,11 +134,55 @@ if (Meteor.isServer) {
 		return Servers.findOne(query)._id;
 	}
 
+	Tasks.define('appInstall', { manageLogs: true }, [
+		{
+			desc: 'Retrieving from Github',
+			func: function(data, prevData, log) {
+
+				// move to seperate repo package (duped in apps.js)
+				if (data.source == 'repo') {
+					data.repo = wmdRepos.findOne(data.app.repoId);
+					data.env.BRANCH = data.app.branch;
+					//console.log(data.repo);
+					Extensions.runPlugin('appInstall',
+						data.repo.service, data, true);
+				}
+
+				var result = Tasks.spawnAndLog(SCRIPT_HOME + '/appInstall.sh', [], {
+					env: data.env
+				}, log);
+				console.log('end');
+				console.log('result', result);
+
+			}
+		},
+		{
+			desc: 'SSH to server',
+			func: function(data, prevData, log) {
+
+				// TODO, record user who owns the package?
+				var user = Meteor.users.findOne({sshKey: {$exists: true}});
+				data.env.SSH_PRV = user.sshKey.privkey.replace(/\n/g, '\\n');
+				data.env.SSH_PUB = user.sshKey.pubkey;
+				data.env.SERVER = '188.226.177.118';
+
+				// TODO, parallelize
+
+				console.log('start');
+				var result = Tasks.spawnAndLog(SCRIPT_HOME + '/appSSH.sh', [], {
+					env: data.env
+				}, log);
+				console.log('end');
+				console.log('result', result);
+			}
+		}
+	]);
+
 	appInstall = function(app, serverId) {
 
-		var source = app.source;
-
 		var data = {
+			app: app,
+			source: app.source,
 			env: {
 				'APPID': app.appId,
 				'APPNAME': app.name,
@@ -145,19 +190,7 @@ if (Meteor.isServer) {
 			}
 		};
 
-		// move to seperate repo package (duped in apps.js)
-		if (source == 'repo') {
-			data.repo = wmdRepos.findOne(app.repoId);
-			data.env.BRANCH = app.branch;
-			console.log(data.repo);
-			Extensions.runPlugin('appInstall',
-				data.repo.service, data, true);
-		}
-
-		var log = new slog('Setup ' + app.name);
-		spawnAndLog(SCRIPT_HOME + '/appInstall.sh', [], {
-			env: data.env
-		}, null, log);
+		var task = new Task('appInstall', data);
 
 	}
 

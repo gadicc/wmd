@@ -11,6 +11,6 @@ Router.map(function() {
 
 Template.tasks.tasks = function() {
 	return Tasks.find({}, {
-		sort: { createdAt: 1 }
+		sort: { startedAt: -1 }
 	});
 }

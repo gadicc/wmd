@@ -1,11 +1,10 @@
 // mods of same routines from wmd-client.js incl Fiber support
 // TODO, share lib somehow?  difficult with fibers, etc
 
-var child_process = Meteor.require('child_process');
+var child_process = Npm.require('child_process');
 //child_process = Async.wrap(child_process, ['spawn']);
 
-// don't generate our own log, pass it as extra parameter
-spawnAndLog = function(cmd, args, options, done, log, dontClose) {
+var spawnAndLog = function(cmd, args, options, log, done) {
 	// Preserve PATH
 	if (options && options.env && !options.env.PATH)
 		options.env.PATH = process.env.PATH;
@@ -21,10 +20,10 @@ spawnAndLog = function(cmd, args, options, done, log, dontClose) {
 
 	child.on('close', Meteor.bindEnvironment(function(code) {
 		if (code) { // i.e. non zero
-			log.close('child process exited with code ' + code);
+			// don't close (like in wmd-client)
+			log.addLine('child process exited with code ' + code);
 			if (done) done(null, { status: 'failed', code: code });
 		} else {
-			log.close();
 			if (done) done(null, { status: 'success', code: code });
 		}
 	}));
@@ -32,9 +31,8 @@ spawnAndLog = function(cmd, args, options, done, log, dontClose) {
 	child.on('error', Meteor.bindEnvironment(function(error) {
 		log.addLine('Error spawning "' + cmd + '"\n' + error.toString());
 	}));
-
-	return child;
 }
+Tasks.spawnAndLog = Async.wrap(spawnAndLog);
 
 var forevers = {};
 var foreverStart = function(cmd, args, options, done, callbacks) {

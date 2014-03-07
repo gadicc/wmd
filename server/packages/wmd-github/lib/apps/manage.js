@@ -1,6 +1,6 @@
 ext.plugin('appInstall', 'github', '0.1.0', function(data) {
-		console.log('appInstall');
-		console.log(data);
+		console.log('appInstall-github');
+		//console.log(data);
 		var ghRepo = ghRepos.findOne(data.repo.serviceId);
 		var user = Meteor.users.findOne(ghRepo.userId);
 		var token = user.services.github.accessToken;

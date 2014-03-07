@@ -20,31 +20,35 @@ Tasks = {
 		}
 
 		Tasks.defs[slug] = def;
-	},
-
-	// 'this' object in step functions
-	stepMethods: {
-
-		// for intermediate status updates while status is still
-		// 'running', and before automatically being set to
-		// 'complete' or 'failed' depending on return or throw err
-		update: function(percent, desc) {
-
-		}
 	}
+}
 
+TaskStep = function(context) {
+	_.extend(this, context);
+}
+
+// for intermediate status updates while status is still
+// 'running', and before automatically being set to
+// 'complete' or 'failed' depending on return or throw err
+TaskStep.prototype.update = function(percent, desc) {
+	console.log('update', arguments);
+}
+
+TaskStep.prototype.run = function(data, prevData, log) {
+	return this.func.call(this, data, prevData, log);
 }
 
 /*
  var options = {
-	manageLogs: 'global', 'steps', 'false' (default)
+	manageLogs: 'global' (or true), 'steps', 'false' (default)
 	updateDoc: { collection: 'name', _id: 'id' }
  }
 */
-Task = function(slug, context, options) {
+Task = function(slug, context) {
 	var def = Tasks.defs[slug];
 	if (!def)
-		throw new Error('Tried to run non-existant task: "' + slug + '"');
+		throw new Error('Tried to run non-existant task: "' + slug + '". '
+			+ 'Define it first with Task.define()');
 	this.slug = slug;
 	this.options = def.options;
 	this.steps = def.steps;
@@ -63,64 +67,79 @@ Task = function(slug, context, options) {
 		steps: [],
 		startedAt: new Date(),
 		context: context,
-		options: options
+		options: this.options
 	});
+
+	// make resumeable, safe logId and recreate if resumed
+	this.log = this.options.manageLogs
+		? new slog(slug + ' (task ' + this.id + ')') : null;
 
 	var self = this;
 	Fiber(function() {
 		for (var i=0; i < self.steps.length; i++) {
 			console.log('step ' + (i+1) + '/' + self.total);
-			var step = self.steps[i];
-			var stepData = self.stepData[i] = {
+
+			// data to be stored in DB; also part of instance context
+			self.stepData[i] = {
 				num: (i+1),
 				status: 'running',
-				doneData: {},
-				startedAt: new Date()
+				startedAt: new Date(),
+				doneData: {}				
 			};
+
+			var step = new TaskStep({
+				desc: self.steps[i].desc,
+				func: self.steps[i].func,
+				data: self.stepData[i],
+				task: self
+			});
 
 			self.current++;
 			Tasks.collection.update(self.id, { $set: {
 				current: self.current,
 				currentDesc: step.desc
 			}, $push: {
-				steps: stepData
+				steps: step.data
 			}});
 
 			try {
 
-				var doneData = step.func(context,
-					i > 0 ? self.stepData[i-1].doneData : undefined);
+				var doneData = step.run(context,
+					i > 0 ? self.stepData[i-1].doneData : undefined, self.log);
 
 			} catch (err) {
 
 				console.log(err);
 				self.failing = true;
-				stepData.status = 'failed';
+				step.data.status = 'failed';
 
 				var update = {};
-				stepData.status = update['steps.'+i+'.status'] = 'failed';
+				step.data.status = update['steps.'+i+'.status'] = 'failed';
 				self.currentDesc = update.currentDesc
-					= stepData.error = update['steps.'+i+'.status'] = err.toString();
+					= step.data.error = update['steps.'+i+'.status'] = err.toString();
 				self.status = update.status = 'failed';
 				// stepData.doneData = update['steps.'+i+'.doneData'] = doneData;
-				stepData.finishedAt = update['steps.'+i+'.finishedAt']
+				step.data.finishedAt = update['steps.'+i+'.finishedAt']
 					= self.finishedAt = update.finishedAt = new Date();
 				update.currentDesc = 'failed';
 				Tasks.collection.update(self.id, {
 					$set: update
 				});
+				self.log.close('FAILURE');
 				break;
 
 			}
 
 			var update = {};
-			stepData.status = update['steps.'+i+'.status'] = 'completed';
-			stepData.doneData = update['steps.'+i+'.doneData'] = doneData;
-			stepData.finishedAt = update['steps.'+i+'.finishedAt'] = new Date();
+			step.data.status = update['steps.'+i+'.status'] = 'completed';
+			self.stepData[i].doneData = update['steps.'+i+'.doneData'] = doneData;
+			step.data.finishedAt = update['steps.'+i+'.finishedAt'] = new Date();
 			self.completed++;
 			if (self.completed == self.total) {
-				self.completedAt = update.completedAt = new Date();
+				console.log('completed ' + self.completed + ' total ' + self.total);
+				self.finishedAt = update.finishedAt = new Date();
 				self.status = update.status = 'completed';
+				self.log.close('SUCCESS');
 			}
 			update.currentDesc = 'completed';
 			Tasks.collection.update(self.id, {
@@ -142,6 +161,7 @@ Tasks.define('moo', [
 		func: function(context, data) {
 			console.log('moo2');
 			console.log(data);
+			this.update(0.5, 'bark');
 			return {cowSaid:'moo2'};
 		}
 	}
