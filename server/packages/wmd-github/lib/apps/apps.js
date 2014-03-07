@@ -220,6 +220,7 @@ if (Meteor.isServer) {
 		}, /* Method wmd.github.updateRepos */
 
 		'wmd.github.setAutoUpdate': function(appId, enabled) {
+			this.unblock();
 			var app = Apps.findOne(appId);
 			var repo = wmdRepos.findOne(app.repoId);
 			var ghRepo = ghRepos.findOne(repo.serviceId);

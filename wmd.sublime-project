@@ -9,7 +9,8 @@
 	],
 	"ternjs": {
         "libs": ["browser", "underscore", "jquery"],
-        "aplugins": {
+        "exclude": [".meteor/**", "node_modules/**"],
+        "plugins": {
             "meteor": {}
         }
     }

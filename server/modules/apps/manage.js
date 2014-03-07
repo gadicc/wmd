@@ -1,5 +1,10 @@
 if (Meteor.isServer) {
 
+	var path = Meteor.require('path');
+	var BUILD_HOME = process.env.HOME + '/wmd-local/build';
+	var SCRIPT_HOME = path.normalize(process.cwd()
+		+ '/../../../../../private/scripts');
+
 	/*
 	 *  { name: 'can-i-eat#master',
 	 *    source: 'repo',
@@ -129,6 +134,34 @@ if (Meteor.isServer) {
 	}
 
 	appInstall = function(app, serverId) {
+
+		var source = app.source;
+
+		var data = {
+			env: {
+				'APPID': app.appId,
+				'APPNAME': app.name,
+				'BUILD_HOME': BUILD_HOME
+			}
+		};
+
+		// move to seperate repo package (duped in apps.js)
+		if (source == 'repo') {
+			data.repo = wmdRepos.findOne(app.repoId);
+			data.env.BRANCH = app.branch;
+			console.log(data.repo);
+			Extensions.runPlugin('appInstall',
+				data.repo.service, data, true);
+		}
+
+		var log = new slog('Setup ' + app.name);
+		spawnAndLog(SCRIPT_HOME + '/appInstall.sh', [], {
+			env: data.env
+		}, null, log);
+
+	}
+
+	appInstall_old = function(app, serverId) {
 		console.log('starting setup');
 
 		var data = {

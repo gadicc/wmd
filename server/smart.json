@@ -1,4 +1,8 @@
 {
+  "meteor": {
+    "git": "https://github.com/meteor/meteor.git",
+    "branch": "shark"
+  },
   "packages": {
     "iron-router": {
       "git": "https://github.com/EventedMind/iron-router.git",
@@ -7,12 +11,11 @@
     "npm": {},
     "reactive-objects": {},
     "mongo-counter": {},
-    "streams": {},
     "bootstrap-3": {},
     "config": {
       "_git": "https://github.com/gadicohen/meteor-config",
       "_path": "/home/dragon/www/smart/config"
-	},
+    },
     "extensions": {
       "git": "https://github.com/gadicohen/meteor-extensions.git",
       "_path": "/home/dragon/www/smart/meteor-extensions"

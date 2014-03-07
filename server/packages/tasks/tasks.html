@@ -1,0 +1,20 @@
+<template name="tasks">
+	<h1>Tasks</h1>
+
+	<table class="table table-bordered">
+		<thead>
+		</thead>
+		<tbody>
+		{{#each tasks}}
+			<tr>
+				<td>{{startedAt}}</td>
+				<td>{{slug}}</td>
+				<td>{{status}}</td>
+				<td>{{current}} / {{total}}</td>
+				<td>{{currentDesc}}</td>
+				<td>{{finishedAt}}</td>
+			</tr>
+		{{/each}}
+		</tbody>
+	</table>
+</template>

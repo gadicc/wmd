@@ -1,5 +1,9 @@
 {
-  "meteor": {},
+  "meteor": {
+    "git": "https://github.com/meteor/meteor.git",
+    "branch": "shark",
+    "commit": "d27fa802b71403843c437efc9bd071a2ff091d37"
+  },
   "dependencies": {
     "basePackages": {
       "iron-router": {
@@ -9,7 +13,6 @@
       "npm": {},
       "reactive-objects": {},
       "mongo-counter": {},
-      "streams": {},
       "bootstrap-3": {},
       "config": {},
       "extensions": {
@@ -22,7 +25,7 @@
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",
         "branch": "blaze-integration",
-        "commit": "6fd133401bb6de65a30ba148f7d61ea1b4dc9b43"
+        "commit": "f43f88279b99f4cbbc102d4c3a4612ccad969451"
       },
       "npm": {
         "git": "https://github.com/arunoda/meteor-npm.git",
@@ -39,15 +42,10 @@
         "tag": "v1.1.0",
         "commit": "9a0710543cec7c192e38d5acc54cf3b0a9fbcb20"
       },
-      "streams": {
-        "git": "https://github.com/arunoda/meteor-streams.git",
-        "tag": "v0.1.17",
-        "commit": "9fcbbc9b7bf542827babc92089c19e730892a22f"
-      },
       "bootstrap-3": {
         "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
-        "tag": "v3.1.0-1",
-        "commit": "329dccb08bfc18c635676dea600ac9953162cda9"
+        "tag": "v3.1.1-1",
+        "commit": "63dd38968828bb8963636df93e9a1c45e2dfe67e"
       },
       "config": {
         "git": "https://github.com/gadicohen/meteor-config.git",
@@ -61,8 +59,8 @@
       },
       "blaze-layout": {
         "git": "https://github.com/EventedMind/blaze-layout.git",
-        "tag": "v0.0.1",
-        "commit": "fa631b7b192618e8690d43f0033a3f4c7f77fa1d"
+        "tag": "v0.1.0",
+        "commit": "b3a0d4f4c5cde42af06a125137d7abe9edef899c"
       }
     }
   }

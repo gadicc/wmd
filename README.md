@@ -235,3 +235,12 @@ for your app)
 can install native Linux software on them to be used by your app.
 * Load balancing and stress testing.
 * Data center placement, e.g. Europe vs USA, etc.
+
+Reasons to avoid this package and use Galaxy:
+
+* You want your deployments to be guaranteed by a commercial
+company with an SLA rather than loosely maintained scripts by the
+community with no liability.
+* MDG developed Meteor, understand it better than anyone, and
+have a team whose fulltime job it is to develop, test and maintain
+the Galaxy infrastructure.
