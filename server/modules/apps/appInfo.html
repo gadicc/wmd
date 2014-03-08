@@ -9,6 +9,10 @@
 
 		<h3>Global Options</h3>
 		{{> appButtons}}
+		{{#with task}}
+			<p>{{slug}} {{completed}}/{{total}}
+			[<a href="/logs/{{logId}}">log</a>]: {{desc}}</p>				
+		{{/with}}
 
 		<h3>Instance Options</h3>
 		<table id="instances" class="table table-bordered" style="width: auto">

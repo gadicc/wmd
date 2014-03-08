@@ -166,7 +166,10 @@ if (Meteor.isServer) {
 		return Servers.findOne(query)._id;
 	}
 
-	Tasks.define('appInstall', { manageLogs: true }, [
+	Tasks.define('appInstall', {
+		manageLogs: true,
+
+	}, [
 		{
 			desc: 'Retrieving from Github',
 			func: function(data, prevData, log) {
@@ -244,7 +247,8 @@ if (Meteor.isServer) {
 				'APPID': app.appId,
 				'APPNAME': app.name,
 				'BUILD_HOME': BUILD_HOME
-			}
+			},
+			alsoUpdateCollection: { 'Apps': app._id }
 		};
 
 		var task = new Task('appInstall', data);

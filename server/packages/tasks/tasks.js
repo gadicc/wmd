@@ -41,7 +41,10 @@ TaskStep.prototype.run = function(data, prevData, log) {
 /*
  var options = {
 	manageLogs: 'global' (or true), 'steps', 'false' (default)
-	updateDoc: { collection: 'name', _id: 'id' }
+ }
+
+ context = {
+	alsoUpdateCollection: { 'Apps': app._id }
  }
 */
 Task = function(slug, context) {
@@ -58,6 +61,16 @@ Task = function(slug, context) {
 	this.completed = 0;
 	this.current = 0;
 
+	var updateCol;
+	if (context.alsoUpdateCollection)
+		for (key in context.alsoUpdateCollection)
+			updateCol = {
+				col: root[key] || Collections[key],
+				_id: context.alsoUpdateCollection[key]
+			}
+	else
+		updateCol = false;
+
 	this.id = Tasks.collection.insert({
 		slug: this.slug,
 		status: 'running',
@@ -73,6 +86,15 @@ Task = function(slug, context) {
 	// make resumeable, safe logId and recreate if resumed
 	this.log = this.options.manageLogs
 		? new slog(slug + ' (task ' + this.id + ')') : null;
+	Tasks.collection.update(this.id, { $set: { logId: this.log.logId }} );
+
+	if (updateCol)
+		updateCol.col.update(updateCol._id, { $set: { task: {
+			slug: slug,
+			total: this.total,
+			completed: this.completed,
+			logId: this.log.logId
+		}}});
 
 	var self = this;
 	Fiber(function() {
@@ -101,6 +123,11 @@ Task = function(slug, context) {
 			}, $push: {
 				steps: step.data
 			}});
+
+			if (updateCol)
+				updateCol.col.update(updateCol._id, { $set: {
+					'task.desc': step.desc
+				}});
 
 			try {
 
@@ -135,17 +162,28 @@ Task = function(slug, context) {
 			self.stepData[i].doneData = update['steps.'+i+'.doneData'] = doneData;
 			step.data.finishedAt = update['steps.'+i+'.finishedAt'] = new Date();
 			self.completed++;
+
 			if (self.completed == self.total) {
 				console.log('completed ' + self.completed + ' total ' + self.total);
 				self.finishedAt = update.finishedAt = new Date();
 				self.status = update.status = 'completed';
 				self.log.close('SUCCESS');
+				if (updateCol)
+					updateCol.col.update(updateCol._id, { $unset: { task: 1 }});
+			} else {
+				if (updateCol)
+					updateCol.col.update(updateCol._id, { $set: {
+						'task.completed': self.completed
+					}});
 			}
+
 			update.currentDesc = 'completed';
+
 			Tasks.collection.update(self.id, {
 				$set: update,
 				$inc: { completed: 1 }
 			});
+
 		}
 	}).run();
 }
