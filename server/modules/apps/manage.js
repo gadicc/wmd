@@ -116,10 +116,42 @@ if (Meteor.isServer) {
 					Apps.update(app._id, { $set: { state: 'stopped' }} );
 
 			});			
+		},
+
+		'delete': function(app, instance) {
+
+			var data = {
+				app: app,
+				source: app.source,
+				env: {
+					'APPID': app.appId,
+				}
+			};
+
+			// any hooks?
+			console.log(instance);
+
+			sendCommand(instance.serverId, 'spawnAndLog', {
+				instanceId: instance._id,
+				cmd: './appDelete.sh',
+				options: { env: data.env }
+			}, function(error, result) {
+				console.log('cmd return');
+				console.log(error, result);
+				var inc = {};
+				inc['instances.' + instance.state] = -1;
+				if (result.code) // i.e. non-zero, failure, i.e. couldn't delete
+					Apps.update({ _id: app._id, 'instances.data._id': instance._id }, {
+						$set: { 'instances.data.$.state': 'deleteFailed' },
+					});
+				else // delete success
+					Apps.update({ _id: app._id}, {
+						$pull: { 'instances.data': { _id: instance._id } },
+						$inc: inc
+					});
+			});
+
 		}
-
-
-
 
 	}
 
@@ -164,9 +196,11 @@ if (Meteor.isServer) {
 				var user = Meteor.users.findOne({sshKey: {$exists: true}});
 				data.env.SSH_PRV = user.sshKey.privkey.replace(/\n/g, '\\n');
 				data.env.SSH_PUB = user.sshKey.pubkey;
-				data.env.SERVER = '188.226.177.118';
 
-				// TODO, parallelize
+				// TODO, parallelize for multiple servers, think about step 1, etc.
+
+				var server = Servers.findOne(data.serverId);
+				data.env.SERVER = server.ip;
 
 				console.log('start');
 				var result = Tasks.spawnAndLog(SCRIPT_HOME + '/appSSH.sh', [], {
@@ -174,6 +208,28 @@ if (Meteor.isServer) {
 				}, log);
 				console.log('end');
 				console.log('result', result);
+
+				var instanceId = Random.id();
+				var set = {};
+				if (result.code) { // i.e. non-zero, failure
+					if (!data.app.instances.data.length)
+						set.state = 'deployFailed';
+					Apps.update(data.app._id, { $push: { 'instances.data': {
+						_id: instanceId,
+						state: 'deployFailed',
+						serverId: data.serverId,
+						port: 5000
+					}}, $inc: { 'instances.failing': 1 }, $set: set });
+				} else { // install success
+					if (!data.app.instances.data.length)
+						set.state = 'deployed';
+					Apps.update(data.app._id, { $push: { 'instances.data': {
+						_id: instanceId,
+						state: 'deployed',
+						serverId: data.serverId,
+						port: 5000
+					}}, $inc: { 'instances.deployed': 1 }, $set: set });
+				}
 			}
 		}
 	]);
@@ -183,6 +239,7 @@ if (Meteor.isServer) {
 		var data = {
 			app: app,
 			source: app.source,
+			serverId: serverId,
 			env: {
 				'APPID': app.appId,
 				'APPNAME': app.name,

@@ -38,8 +38,9 @@ if (Meteor.isClient) {
 			}, {
 				sort: { name: 1 }
 			});
-			if (!Session.get('selectedRepoId')) {
-				Session.set('selectedRepoId', repos.fetch()[0]._id)
+			var reposFetch = repos.fetch();
+			if (reposFetch && !Session.get('selectedRepoId')) {
+				Session.set('selectedRepoId', reposFetch[0]._id)
 			}
 			return repos;
 		}
@@ -66,7 +67,7 @@ if (Meteor.isClient) {
 			var meteorDir = $(tpl.find('#appAdd_meteorDir')).val();
 			if (meteorDir) deployOptions.meteorDir = meteorDir;
 			Meteor.call('appAdd', name, repoId, branch, deployOptions,
-				function(error) { alert(error); });
+				function(error) { console.log(error); });
 		}
 	});
 

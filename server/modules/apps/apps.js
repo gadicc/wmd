@@ -87,7 +87,6 @@ if (Meteor.isServer) {
 	// global.  might be called from packages
 	appMethods = {
 		setup: function(app) {
-			// actually "re" setup
 			appInstall(app, freeServer('meteor'));
 		},
 
@@ -107,9 +106,17 @@ if (Meteor.isServer) {
 			});
 		},
 
-		delete: function(app) {
-			// TODO, safely stop all instances, delete from server
-			Apps.remove(app._id);
+		delete: function(app, instance) {
+			var instances = instance ? [instance] : app.instances.data;
+			_.each(instances, function(instance) {
+				// Can delete all stopped, crashed, deployed instances
+				if (instance.state != 'running')
+					App.delete(app, instance);
+			});
+			// If global delete and nothing exists 
+			// Was a global Delete, delete app data
+			//if (!instance)
+			//	Apps.remove(app._id);
 		},
 
 		update: function(app) {
