@@ -119,41 +119,30 @@ if (Meteor.isServer) {
 			//	Apps.remove(app._id);
 		},
 
-		update: function(app) {
+		update: function(app, instance) {
 			console.log('update');
+
 			var data = {
+				isUpdate: true,
+				app: app,
+				source: app.source,
 				env: {
-					USER: 'app' + app.appId,
-					HOME: '/home/app' + app.appId,
-					PATH: '/bin:/usr/bin:/usr/local/bin'
-				}
+					'APPID': app.appId,
+					'APPNAME': app.name,
+					'BUILD_HOME': BUILD_HOME,
+					'METEOR_DIR': app.meteorDir,
+					'REPO': app.repo
+				},
+				alsoUpdateCollection: { 'Apps': app._id }
 			};
 
-			var source = app.source;
-
-			// move to seperate repo package (dupe from manage.js)
-			if (source == 'repo') {
-				data.repo = wmdRepos.findOne(app.repoId);
-				data.env.BRANCH = app.branch;
-				console.log(data.repo);
-				Extensions.runPlugin('appInstall',
-					data.repo.service, data, true);
-			}
-
-			var spawnData = {
-				cmd: './appUpdate.sh',
-				options: {
-					cwd: '/home/app' + app.appId,
-					env: data.env
-				}
-			};
-
-			_.each(app.instances.data, function(ai) {
-				console.log(ai.serverId);
-				sendCommand(ai.serverId, 'spawnAndLog', spawnData, function(err, data) {
-					console.log(data);
-				});
-			});		
+			// TODO, better instance handling as part of single task!!
+			var instances = instance ? [instance] : app.instances.data;
+			_.each(instances, function(instance) {
+				var localData = _.clone(data);
+				localData.serverId = instance.serverId;
+				new Task('appInstall', localData);
+			});
 
 		}
 	};

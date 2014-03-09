@@ -2,7 +2,7 @@ if (Meteor.isServer) {
 
 	var path = Meteor.require('path');
 	var LOCAL_HOME = process.env.HOME + '/wmd-local';
-	var BUILD_HOME = LOCAL_HOME + '/build';
+	BUILD_HOME = LOCAL_HOME + '/build';
 	var SCRIPT_HOME = path.normalize(process.cwd()
 		+ '/../../../../../private/scripts');
 
@@ -166,6 +166,8 @@ if (Meteor.isServer) {
 	}
 
 	var localMeteors = {};
+	var localMeteorCount = 0;
+
 	Tasks.define('appInstall', {
 		manageLogs: true,
 
@@ -195,17 +197,18 @@ if (Meteor.isServer) {
 		{
 			desc: 'Start app locally',
 			func: function(data, prevData, log) {
+				var appDir = data.env.BUILD_HOME + '/'
+					+ data.env.APPNAME + '/'
+					+ data.env.REPO + '/'
+					+ data.env.METEOR_DIR;
+					console.log(appDir);
+
 				// start Meteor if not already running; task completes on lastStart
 				if (!localMeteors[data.app.name]) {
 					// required for rapidRedeploy
 					var localLog = new slog('Meteor run for task ' + this.task.id);
-					var appDir = data.env.BUILD_HOME + '/'
-						+ data.env.APPNAME + '/'
-						+ data.env.REPO + '/'
-						+ data.env.METEOR_DIR;
-						console.log(appDir);
 					localMeteors[data.app.name] = Tasks.asyncSpawnAndLog('mrt', [
-						'--production', '--port', '5002'
+						'--production', '--port', (4000+localMeteorCount++)
 					], {
 						cwd: appDir
 					}, localLog, function(error, done) {
@@ -247,6 +250,11 @@ if (Meteor.isServer) {
 
 				var instanceId = Random.id();
 				var set = {};
+
+				// TODO, update commit running on each instance?
+				if (data.isUpdate)
+					return;
+
 				if (result.code) { // i.e. non-zero, failure
 					if (!data.app.instances.data.length)
 						set.state = 'deployFailed';
