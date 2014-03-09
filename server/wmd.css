@@ -15,17 +15,15 @@ body {
 	_position: static !important;
 }
 
-#meteor-connection-lost-banner + div.navbar-fixed-top,
-#meteor-connection-try-reconnect + div.navbar-fixed-top {
-	top: 41px;
+#connection-lost-banner + div.navbar-fixed-top,
+#connection-try-reconnect + div.navbar-fixed-top {
+    top: 41px;
 }
-
-div.navbar-fixed-top + #meteor-connection-lost-banner,
-div.navbar-fixed-top + #meteor-connection-try-reconnect {
-	top: 51px;
+div.navbar-fixed-top + #connection-lost-banner,
+div.navbar-fixed-top + #connection-try-reconnect {
+    top: 51px;
 }
-
-div.navbar-fixed-top + #meteor-connection-lost-banner + div.row,
-div.navbar-fixed-top + #meteor-connection-try-reconnect + div.row {
+div.navbar-fixed-top + #connection-lost-banner + div.row,
+div.navbar-fixed-top + #connection-try-reconnect + div.row {
 	margin-top: 41px;
 }

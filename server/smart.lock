@@ -19,7 +19,10 @@
         "git": "https://github.com/gadicohen/meteor-extensions.git",
         "branch": "master"
       },
-      "blaze-layout": {},
+      "blaze-layout": {
+        "git": "https://github.com/EventedMind/blaze-layout.git",
+        "branch": "devel"
+      },
       "connection-banner": {},
       "font-awesome": {}
     },
@@ -27,7 +30,7 @@
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",
         "branch": "blaze-integration",
-        "commit": "bc1c3aeffbac968f898b0c7fd45f43164307a416"
+        "commit": "f8ffd44bceacc6a55f4ebcc218c072f5a18138b4"
       },
       "npm": {
         "git": "https://github.com/arunoda/meteor-npm.git",
@@ -61,13 +64,13 @@
       },
       "blaze-layout": {
         "git": "https://github.com/EventedMind/blaze-layout.git",
-        "tag": "v0.2.0",
-        "commit": "125636d66e7eb250f243bf1ccd1b0067aeb6376c"
+        "branch": "devel",
+        "commit": "f52f416d6277f27b11832355298553e46b8cc6fd"
       },
       "connection-banner": {
         "git": "https://github.com/nate-strauser/meteor-connection-banner.git",
-        "tag": "v0.1.1",
-        "commit": "111dd29669c2e39dda222bbc4f87fd8e66e286a8"
+        "tag": "v0.2.1",
+        "commit": "aeb866f75e626262a97e9c913ac7dd5425e5c118"
       },
       "font-awesome": {
         "git": "https://github.com/nate-strauser/meteor-font-awesome.git",
