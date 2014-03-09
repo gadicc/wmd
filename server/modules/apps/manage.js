@@ -246,7 +246,8 @@ if (Meteor.isServer) {
 			env: {
 				'APPID': app.appId,
 				'APPNAME': app.name,
-				'BUILD_HOME': BUILD_HOME
+				'BUILD_HOME': BUILD_HOME,
+				'METEOR_DIR': app.meteorDir
 			},
 			alsoUpdateCollection: { 'Apps': app._id }
 		};

@@ -10,3 +10,22 @@ body {
 	color: rgba(255,255,255,0);
 	text-shadow: 0px 0px 8px rgba(0,0,0, 1);
 }
+
+#meteor-connection-lost-banner, #meteor-connection-try-reconnect {
+	_position: static !important;
+}
+
+#meteor-connection-lost-banner + div.navbar-fixed-top,
+#meteor-connection-try-reconnect + div.navbar-fixed-top {
+	top: 41px;
+}
+
+div.navbar-fixed-top + #meteor-connection-lost-banner,
+div.navbar-fixed-top + #meteor-connection-try-reconnect {
+	top: 51px;
+}
+
+div.navbar-fixed-top + #meteor-connection-lost-banner + div.row,
+div.navbar-fixed-top + #meteor-connection-try-reconnect + div.row {
+	margin-top: 41px;
+}
