@@ -2,11 +2,9 @@ Package.describe({
     summary: "Taskrunner for Meteor, with resume and reactive collections"
 });
 
-/*
 Npm.depends({
-	"fibers": "1.0.1"
+	"inotify": "1.2.1"
 });
-*/
 
 Package.on_use(function (api) {
 	api.use(['underscore','npm'], 'server');

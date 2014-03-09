@@ -1,6 +1,16 @@
 // mods of same routines from wmd-client.js incl Fiber support
 // TODO, share lib somehow?  difficult with fibers, etc
 
+var waitForChange = function(file, done) {
+	var fs = Npm.require('fs');
+	fs.watchFile(file, function(curr, prev) {
+		console.log('change');
+		fs.unwatchFile(file);
+		done();
+	});
+}
+Tasks.waitForChange = Async.wrap(waitForChange);
+
 var child_process = Npm.require('child_process');
 //child_process = Async.wrap(child_process, ['spawn']);
 
@@ -31,7 +41,10 @@ var spawnAndLog = function(cmd, args, options, log, done) {
 	child.on('error', Meteor.bindEnvironment(function(error) {
 		log.addLine('Error spawning "' + cmd + '"\n' + error.toString());
 	}));
+
+	return child;
 }
+Tasks.asyncSpawnAndLog = spawnAndLog;
 Tasks.spawnAndLog = Async.wrap(spawnAndLog);
 
 var forevers = {};

@@ -153,6 +153,10 @@ Task = function(slug, context) {
 					$set: update
 				});
 				self.log.close('FAILURE');
+				if (updateCol)
+					updateCol.col.update(updateCol._id, { $set: {
+						'task.desc': 'TASK FAILED'
+					}});
 				break;
 
 			}
@@ -173,7 +177,8 @@ Task = function(slug, context) {
 			} else {
 				if (updateCol)
 					updateCol.col.update(updateCol._id, { $set: {
-						'task.completed': self.completed
+						'task.completed': self.completed,
+						'task.current': self.current
 					}});
 			}
 

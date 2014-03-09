@@ -46,11 +46,9 @@ if (Meteor.isServer) {
 
 			var data = {
 				slug: app.name+":"+instance._id,
-				cmd: 'mrt',
+				cmd: 'node',
 				args: [
-					'--production',
-					'--port',
-					instance.port
+					'main.js'
 				],
 				options: {
 					silent: false, // for now, but we have our own log
@@ -58,15 +56,16 @@ if (Meteor.isServer) {
 					killTree: true,
 					minUptime: 2000,
 					spinSleepTime: 1000,
-					cwd: '/home/app' + app.appId + '/' + app.repo + '/'
-						+ (app.meteorDir == '.' ? '' : app.meteorDir),
+					cwd: '/home/app' + app.appId + '/' + app.repo,
 					env: {
 						ROOT_URL: proto + '://' + app.vhosts[0] + '/',
 						NODE_ENV: 'production',
 						USER: 'app' + app.appId,
 						HOME: '/home/app' + app.appId,
 						PATH: '/bin:/usr/bin:/usr/local/bin',
-						HTTP_FORWARDED_COUNT: 1
+						HTTP_FORWARDED_COUNT: 1,
+						PORT: instance.port
+
 					},
 					spawnWith: {
 						uid: app.appId,
@@ -166,11 +165,13 @@ if (Meteor.isServer) {
 		return Servers.findOne(query)._id;
 	}
 
+	var localMeteors = {};
 	Tasks.define('appInstall', {
 		manageLogs: true,
 
 	}, [
 		{
+			// Step 1
 			desc: 'Retrieving from Github',
 			func: function(data, prevData, log) {
 
@@ -192,6 +193,38 @@ if (Meteor.isServer) {
 			}
 		},
 		{
+			desc: 'Start app locally',
+			func: function(data, prevData, log) {
+				// start Meteor if not already running; task completes on lastStart
+				if (!localMeteors[data.app.name]) {
+					// required for rapidRedeploy
+					var localLog = new slog('Meteor run for task ' + this.task.id);
+					var appDir = data.env.BUILD_HOME + '/'
+						+ data.env.APPNAME + '/'
+						+ data.env.REPO + '/'
+						+ data.env.METEOR_DIR;
+						console.log(appDir);
+					localMeteors[data.app.name] = Tasks.asyncSpawnAndLog('mrt', [
+						'--production', '--port', '5002'
+					], {
+						cwd: appDir
+					}, localLog, function(error, done) {
+						console.log('meteor done');
+						delete(localMeteors[data.app.name]);
+					});
+				}
+				console.log('waiting for start');
+
+				// Once app is started, task is done.  Kill if not a rapidRedeploy TODO
+				var build = appDir + '/.meteor/local/build';
+				console.log(build + '/programs/server/lastStart');
+				Tasks.waitForChange(build + '/programs/server/lastStart');
+
+				console.log('started');
+			}
+		},
+		{
+			// Step 3
 			desc: 'SSH to server',
 			func: function(data, prevData, log) {
 
@@ -247,7 +280,8 @@ if (Meteor.isServer) {
 				'APPID': app.appId,
 				'APPNAME': app.name,
 				'BUILD_HOME': BUILD_HOME,
-				'METEOR_DIR': app.meteorDir
+				'METEOR_DIR': app.meteorDir,
+				'REPO': app.repo
 			},
 			alsoUpdateCollection: { 'Apps': app._id }
 		};
