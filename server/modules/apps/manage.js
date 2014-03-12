@@ -99,7 +99,7 @@ if (Meteor.isServer) {
 
 		'stop': function(app, instance) {
 			var data = {};
-			data.slug = app.name + ':' + instance._id;
+			data.slug = 'app'+":"+app._id+":"+instance._id;
 			sendCommand(instance.serverId, 'foreverStop', data, function(error, result) {
 				console.log(error, result);
 				// if (error)
