@@ -24,7 +24,7 @@ if (Meteor.isClient) {
 			return '<a href="/apps/"' + app._id + '">'
 				+ app.name + '</a>';
 		},
-		'procs': function() {
+		'_procs': function() {
 			var rootProcs = [];
 			var procs = _.filter(this.procs, function(proc) {
 				if (proc.user == 'root')
