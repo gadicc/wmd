@@ -45,7 +45,7 @@ if (Meteor.isServer) {
 				proto += 's';
 
 			var data = {
-				slug: app.name+":"+instance._id,
+				slug: 'app'+":"+app._id+":"+instance._id,
 				cmd: 'node',
 				args: [
 					'main.js'

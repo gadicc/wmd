@@ -64,21 +64,31 @@ if (Meteor.isServer) {
 
 		'appAction': function(appId, action, instanceId) {
 			var app = Apps.findOne(appId);
+			var instance = null;
 			if (!app)
-				throw new Meteor.Error(404, 'No such app');
+				throw new Meteor.Error(404, 'No such app ID');
 			if (appMethods[action]) {
 				this.unblock();
-				appMethods[action](app, app.instances.data[instanceId]);
-			}
+				if (instanceId)
+					instance = _.findWhere(app.instances.data, {_id: instanceId});
+				appMethods[action](app, instance);
+			} else
+				throw new Meteor.Error(404, 'No such app action');
 		},
 
+		// now handles apps and databases!  TODO, move somewhere good, cleanup
 		'foreverExit': function(slug) {
 			slug = slug.split(':');
 			console.log(slug);
-			var app = Apps.findOne({name:slug[0]});
-			var instanceId = slug[1];
-			Apps.update({ _id: app._id, 'instances.data._id': instanceId }, {
-				$set: { 'instances.data.$.state': 'crashed' },
+			var what = slug[0], id = slug[1], instanceId = slug[2];
+			var Collection = what == 'app' ? Apps : Databases;
+			var app = Collection.findOne(id);
+			var instance = _.findWhere(app.instances.data, {_id: instanceId});
+			Collection.update({ _id: app._id, 'instances.data._id': instanceId }, {
+				$set: {
+					'instances.data.$.state':
+						instance.state != 'stopping' ? 'crashed' : 'stopped'
+				},
 				$inc: { 'instances.failing': 1 }
 			});
 		}

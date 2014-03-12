@@ -69,6 +69,21 @@ __END__
 	service nginx start
 fi
 
+if [ $MONGO ] ; then
+	echo
+	echo Installing mongod...
+	cat > /etc/yum.repos.d/mongo.repo <<'__END__'
+[mongodb]
+name=MongoDB Repository
+baseurl=http://downloads-distro.mongodb.org/repo/redhat/os/x86_64/
+gpgcheck=0
+enabled=1
+__END__
+	yum install -y mongo-10gen mongo-10gen-server
+	# No central process, one per database/user
+	chkconfig mongod off
+fi
+
 echo
 echo Installing forver...
 npm list -g forever | grep -q empty

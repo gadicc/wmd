@@ -11,19 +11,17 @@ body {
 	text-shadow: 0px 0px 8px rgba(0,0,0, 1);
 }
 
-#meteor-connection-lost-banner, #meteor-connection-try-reconnect {
+#connection-lost-banner {
 	_position: static !important;
+	text-align: center;
 }
 
-#connection-lost-banner + div.navbar-fixed-top,
-#connection-try-reconnect + div.navbar-fixed-top {
+#connection-lost-banner + div.navbar-fixed-top {
     top: 41px;
 }
-div.navbar-fixed-top + #connection-lost-banner,
-div.navbar-fixed-top + #connection-try-reconnect {
+div.navbar-fixed-top + #connection-lost-banner {
     top: 51px;
 }
-div.navbar-fixed-top + #connection-lost-banner + div.row,
-div.navbar-fixed-top + #connection-try-reconnect + div.row {
+div.navbar-fixed-top + #connection-lost-banner + div.row {
 	margin-top: 41px;
 }

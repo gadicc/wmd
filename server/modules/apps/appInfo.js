@@ -2,6 +2,8 @@ if (Meteor.isClient) {
 	Handlebars.registerHelper('serverName', function(serverId) {
 		if (!serverId)
 			serverId = this.serverId;
+		if (!serverId)
+			return '(undefined)';
 		return Servers.findOne(serverId).username;
 	});
 
@@ -15,16 +17,23 @@ if (Meteor.isClient) {
 	Template.appButtons.events({
 		'click button': function(event, tpl) {
 			event.preventDefault();
-			var appId, instanceId;
+			var appId, instanceId, app = null;
 			if (tpl.data.serverId) {
-				appId = tpl.__component__.parent.parent.templateInstance.data._id;
+				app = tpl.__component__.parent.parent.templateInstance.data;
+				appId = app._id;
 				instanceId = tpl.data._id;
 			} else {
 				appId = tpl.data._id;
 				instanceId = undefined;
 			}
 			var action = $(event.target).data('action');
-			Meteor.call('appAction', appId, action, instanceId);
+
+			// TODO, better
+			var what = 'appAction';
+			if ((this.name && this.name.match(/^db-/)) ||
+					(app && app.name && app.name.match(/^db-/)))
+				what = 'dbAction';
+			Meteor.call(what, appId, action, instanceId);
 		}
 	});
 	Template.appButtons.active = function() {

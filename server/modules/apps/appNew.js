@@ -94,7 +94,8 @@ if (Meteor.isServer) {
 				repoId: repoId,
 				repo: repo.name,
 				meteorDir: deployOptions.meteorDir || repo.meteorDir,
-				appId: 1000 + incrementCounter('apps'),
+				appId: 1000 + incrementCounter('apps'), /* deprecated? */
+				uid: 1000 + incrementCounter('uids'),
 				instances: {
 					min: 1,
 					max: 1,

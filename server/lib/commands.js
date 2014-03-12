@@ -46,24 +46,27 @@ if (Meteor.isServer) {
 			return result;
 		}
 	});
-}
 
 
-sendCommand = function(serverId, command, options, callback) {
-	var commandId = Commands.insert({
-		serverId: serverId,
-		status: 'new',
-		command: command,
-		options: options,
-		createdAt: new Date()
-	});
+	sendCommand = function(serverId, command, options, callback) {
+		var commandId = Commands.insert({
+			serverId: serverId,
+			status: 'new',
+			command: command,
+			options: options,
+			createdAt: new Date()
+		});
 
-	console.log("Command '" + commandId + "' created for " + serverId);
+		console.log("Command '" + commandId + "' created for " + serverId);
 
-	if (callback)
-		commandCallbacks[commandId] = callback;
+		if (callback)
+			commandCallbacks[commandId] = callback;
 
-	return commandId;
+		return commandId;
+	}
+
+	sendCommandSync = Async.wrap(sendCommand);
+
 }
 
 if (Meteor.isClient) {

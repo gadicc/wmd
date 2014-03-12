@@ -1,0 +1,17 @@
+<template name="db">
+	<h1>All Databases</h1>
+	
+	<p>Use sidebar for now</p>
+</template>
+
+<template name="dbSidebar">
+	<div id="appSidebar">
+		<a href="/db">Summary<div></div></a>
+		<a href="/db/new">Create New<div></div></a>
+		<div></div>
+		{{#each dbs}}
+			<a href="/db/{{_id}}">{{name}}<div></div></a>
+			{{activeLinks}}
+		{{/each}}
+	</div>
+</template>

@@ -2,7 +2,7 @@
 Apps = new Meteor.Collection('Apps');
 Servers = new Meteor.Collection('servers');
 ServerStats = new Meteor.Collection('serverStats');
-databases = new Meteor.Collection('databases');
+Databases = new Meteor.Collection('databases');
 wmdRepos = new Meteor.Collection('repos');
 subs = {};
 
@@ -31,7 +31,7 @@ if (Meteor.isServer) {
 		return true;
 	});
 
-	var cols = ['Apps', 'Servers', 'ServerStats', 'databases'];
+	var cols = ['Apps', 'Servers', 'ServerStats', 'Databases'];
 	Meteor.publish('all', function() {
 		if (!this.userId) return;
 

@@ -1,0 +1,43 @@
+<template name="dbInfo">
+	{{#with db}}
+
+		<h1>{{name}}</h1>
+
+		<p><b>Status: {{state}}</b></p>
+
+		<h3>Global Options</h3>
+		{{> appButtons}}
+		{{#with task}}
+			<p>{{slug}} {{completed}}/{{total}}
+			[<a href="/logs/{{logId}}">log</a>]: {{desc}}</p>				
+		{{/with}}
+
+		<h3>Instance Options</h3>
+		<table id="instances" class="table table-bordered" style="width: auto">
+		<tbody>
+		{{#each instances.data}}
+			<tr>
+				<td><a href="/servers/{{serverId}}">{{serverName}}</a></td>
+				<td>{{state}}</td>
+				<td>{{> appButtons}}</td>
+			</tr>
+		{{/each}}
+		</tbody>
+		</table>
+
+		<h3>Info</h3>
+
+		<p>
+		MONGO_URL={{mongo_url this}}<br />
+		OPLOG_URL={{oplog_url this}}
+		</p>
+
+		<p>
+		<b>admin:</b>
+		mongo -u {{adminUser}} -p {{adminPassword}} 188.226.177.118:6002/admin<br />
+		<b>meteor:</b>
+		mongo -u {{meteorUser}} -p {{meteorPassword}} 188.226.177.118:6002/meteor
+		</p>
+
+	{{/with}}
+</template>

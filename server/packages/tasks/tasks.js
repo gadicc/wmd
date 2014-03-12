@@ -86,7 +86,7 @@ Task = function(slug, context) {
 	// make resumeable, safe logId and recreate if resumed
 	this.log = this.options.manageLogs
 		? new slog(slug + ' (task ' + this.id + ')') : null;
-	Tasks.collection.update(this.id, { $set: { logId: this.log.logId }} );
+	Tasks.collection.update(this.id, { $set: { logId: this.log ? this.log.logId : null }} );
 
 	if (updateCol)
 		updateCol.col.update(updateCol._id, { $set: { task: {
@@ -152,7 +152,8 @@ Task = function(slug, context) {
 				Tasks.collection.update(self.id, {
 					$set: update
 				});
-				self.log.close('FAILURE');
+				if (self.log)
+					self.log.close('FAILURE');
 				if (updateCol)
 					updateCol.col.update(updateCol._id, { $set: {
 						'task.desc': 'TASK FAILED'
@@ -171,7 +172,6 @@ Task = function(slug, context) {
 				console.log('completed ' + self.completed + ' total ' + self.total);
 				self.finishedAt = update.finishedAt = new Date();
 				self.status = update.status = 'completed';
-				self.log.close('SUCCESS');
 				if (updateCol)
 					updateCol.col.update(updateCol._id, { $unset: { task: 1 }});
 			} else {
@@ -188,9 +188,13 @@ Task = function(slug, context) {
 				$set: update,
 				$inc: { completed: 1 }
 			});
-
 		}
+
+		if (self.log && self.completed == self.total)
+			self.log.close('SUCCESS');
+
 	}).run();
+
 }
 
 /*
