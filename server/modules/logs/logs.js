@@ -27,7 +27,7 @@ if (Meteor.isClient) {
 		});
 
 		Template.logs.logs = function() {
-			return logs.find();
+			return logs.find({}, { sort: { ctime: -1 }});
 		}
 
 		// shouldn't be necessary... wait() not working?

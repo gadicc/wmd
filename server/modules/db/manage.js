@@ -22,7 +22,10 @@ if (Meteor.isServer) {
 	dbMethods = {
 
 		'setup': function(db, instance) {
-			new Task('dbSetup', { db: db, instance: instance } );
+			new Task('dbSetup', {
+				db: db, instance: instance,
+				alsoUpdateCollection: { 'Databases': db._id }
+			});
 		},
 
 		'start': function(db, instance) {
@@ -97,6 +100,28 @@ if (Meteor.isServer) {
 
 		}, /* start */
 
+
+		'stop': function(db, instance) {
+			var data = {};
+			data.slug = 'db'+":"+db._id+":"+instance._id;
+			sendCommand(instance.serverId, 'foreverStop', data, function(error, result) {
+				console.log(error, result);
+				// if (error)
+				// Couldn't stop?  If we tried to stop an already stopped
+
+				Databases.update({ _id: db._id, 'instances.data._id': instance._id }, {
+					$set: { 'instances.data.$.state': 'stopped' },
+					$inc: { 'instances.running': -1 }
+				});
+
+				instance.state = 'stopped';
+				if (_.every(db.instances.data, function(instance) { return instance.state == 'stopped' } ))
+					Databases.update(db._id, { $set: { state: 'stopped' }} );
+
+			});			
+		}, /* stop */
+
+
 		delete: function(db, instance) {
 
 			var data = {
@@ -135,10 +160,11 @@ if (Meteor.isServer) {
 
 	// { adminUser: 'admin', adminPassword: 'password', oplogUser: 'oplogger', oplogPassword: 'PasswordForOplogger'}
 
-	Tasks.define('dbSetup', { manageLogs: false /* for now */ }, [
+	Tasks.define('dbSetup', { manageLogs: true }, [
 		{
 			desc: 'Create user & database',
-			func: function(data) {
+			func: function(data, prevData, log) {
+				var self = this;
 
 				var serverId = freeServer('mongo');
 				if (!serverId)
@@ -147,7 +173,9 @@ if (Meteor.isServer) {
 				var result = sendCommandSync(serverId, 'spawnAndLog', {
 					//instanceId: instance._id,
 					cmd: './dbInstall.sh',
+					updateCallback: function(update) { self.update(null, update); },
 					options: {
+						logId: log.logId,
 						env: {
 							UID: data.db.uid,
 							PORT: data.db.port,

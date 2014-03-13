@@ -9,6 +9,7 @@ USER="db$UID"
 PIDS=`ps -o pid= U $UID`
 if [ "$PIDS" != "" ] ; then
 	echo Warning, processes still running... aborting
+	ps $PIDS
 	exit 1
 fi
 

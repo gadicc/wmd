@@ -1,11 +1,19 @@
 mongoUrl = function(db) {
-	return 'mongodb://' + db.meteorUser + ':' + db.meteorPassword + '@'
-		+ '188.226.177.118' + ':' + '6002/meteor';
+	var out = 'mongodb://' + db.meteorUser + ':' + db.meteorPassword + '@';
+	_.each(db.instances.data, function(instance) {
+		var server = Servers.findOne(instance.serverId);
+		out += server.ip + ':' + db.port; //instance.port;
+	});
+	return out.substr(-1) == '@' ? null : out + '/meteor';
 }
 
 oplogUrl = function(db) {
-	return 'mongodb://' + db.oplogUser + ':' + db.oplogPassword + '@'
-		+ '188.226.177.118' + ':' + '6002/local?authSource=admin';
+	var out = 'mongodb://' + db.oplogUser + ':' + db.oplogPassword + '@';
+	_.each(db.instances.data, function(instance) {
+		var server = Servers.findOne(instance.serverId);
+		out += server.ip + ':' + db.port; //instance.port;
+	});
+	return out.substr(-1) == '@' ? null : out + '/local?authSource=admin';
 }
 
 if (Meteor.isClient) {

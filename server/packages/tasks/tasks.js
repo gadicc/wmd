@@ -31,7 +31,14 @@ TaskStep = function(context) {
 // 'running', and before automatically being set to
 // 'complete' or 'failed' depending on return or throw err
 TaskStep.prototype.update = function(percent, desc) {
-	console.log('update', arguments);
+	Tasks.collection.update(this.task.id, { $set: {
+		currentDesc: desc
+	}});
+
+	if (this.task.updateCol)
+		this.task.updateCol.col.update(this.task.updateCol._id, { $set: {
+			'task.desc': desc
+		}});
 }
 
 TaskStep.prototype.run = function(data, prevData, log) {
@@ -61,6 +68,9 @@ Task = function(slug, context) {
 	this.completed = 0;
 	this.current = 0;
 
+	if (!context)
+		context = {};
+
 	var updateCol;
 	if (context.alsoUpdateCollection)
 		for (key in context.alsoUpdateCollection)
@@ -70,6 +80,9 @@ Task = function(slug, context) {
 			}
 	else
 		updateCol = false;
+
+	// accessible from step instances
+	this.updateCol = updateCol;
 
 	this.id = Tasks.collection.insert({
 		slug: this.slug,
@@ -92,6 +105,7 @@ Task = function(slug, context) {
 		updateCol.col.update(updateCol._id, { $set: { task: {
 			slug: slug,
 			total: this.total,
+			current: this.current,
 			completed: this.completed,
 			logId: this.log.logId
 		}}});
@@ -126,6 +140,7 @@ Task = function(slug, context) {
 
 			if (updateCol)
 				updateCol.col.update(updateCol._id, { $set: {
+					'task.current': self.current,
 					'task.desc': step.desc
 				}});
 
@@ -177,8 +192,7 @@ Task = function(slug, context) {
 			} else {
 				if (updateCol)
 					updateCol.col.update(updateCol._id, { $set: {
-						'task.completed': self.completed,
-						'task.current': self.current
+						'task.completed': self.completed
 					}});
 			}
 
@@ -196,6 +210,13 @@ Task = function(slug, context) {
 	}).run();
 
 }
+
+Meteor.publish('tasks', function(currentTaskId) {
+	return Tasks.collection.find({}, {
+		sort: { createdAt: 1 }
+	});
+});
+
 
 /*
 Tasks.define('moo', [
@@ -216,8 +237,4 @@ Tasks.define('moo', [
 new Task('moo');
 */
 
-Meteor.publish('tasks', function(currentTaskId) {
-	return Tasks.collection.find({}, {
-		sort: { createdAt: 1 }
-	});
-});
+

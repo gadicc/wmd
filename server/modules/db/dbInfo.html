@@ -7,10 +7,7 @@
 
 		<h3>Global Options</h3>
 		{{> appButtons}}
-		{{#with task}}
-			<p>{{slug}} {{completed}}/{{total}}
-			[<a href="/logs/{{logId}}">log</a>]: {{desc}}</p>				
-		{{/with}}
+		{{> taskUpdate}}
 
 		<h3>Instance Options</h3>
 		<table id="instances" class="table table-bordered" style="width: auto">
@@ -34,9 +31,9 @@
 
 		<p>
 		<b>admin:</b>
-		mongo -u {{adminUser}} -p {{adminPassword}} 188.226.177.118:6002/admin<br />
+		mongo -u {{adminUser}} -p {{adminPassword}} 188.226.177.118:{{port}}/admin<br />
 		<b>meteor:</b>
-		mongo -u {{meteorUser}} -p {{meteorPassword}} 188.226.177.118:6002/meteor
+		mongo -u {{meteorUser}} -p {{meteorPassword}} 188.226.177.118:{{port}}/meteor
 		</p>
 
 	{{/with}}

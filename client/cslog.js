@@ -4,9 +4,10 @@
 var _ = require('underscore');
 var shortid = require('shortid');
 
-var cslog = function(ddpclient, title, data) {
+var cslog = function(ddpclient, title, data, logId) {
 	var self = this;
 	self.ddpclient = ddpclient;
+	self.logId = logId; // optional
 	self.localId = shortid.generate();  // TODO, better.
 
 	if (!data) data = {};

@@ -204,8 +204,8 @@ function incomingFile(id, filename, contents, hash, postAction) {
 }
 
 commands = {
-	'spawnAndLog': function(data, done) {
-		spawnAndLog(data.cmd, data.args || [], data.options, done);
+	'spawnAndLog': function(data, done, update) {
+		spawnAndLog(data.cmd, data.args || [], data.options, done, update);
 	},
 	'foreverStart': function(data, done) {
 		var slug = data.slug || data.options.slug || new Date().getTime() + Math.random();
@@ -263,25 +263,51 @@ function execDone(err, result) {
 	});
 }
 
+function cmdUpdate(update) {
+	console.log('cmdUpdate', this.commandId, update);
+	ddpclient.call('cmdUpdate', [this.commandId, update], function(error, result) {
+		if (error)
+			console.log('cmdUpdate error', error);
+	});
+}
+
 function execCommand(id, cmd, options) {
 	console.log('Exec: ' + cmd + '(' + JSON.stringify(options) + ')');
 	if (commands[cmd])
-		commands[cmd](options, _.bind(execDone, { commandId: id }));
+		commands[cmd](options,
+			_.bind(execDone, { commandId: id }),
+			_.bind(cmdUpdate, { commandId: id })
+		);
 }
 
-var spawnAndLog = function(cmd, args, options, done) {
+var spawnAndLog = function(cmd, args, options, done, update) {
+	if (!options)
+		options = {};
+
 	// Preserve PATH
-	if (options && options.env && !options.env.PATH)
+	if (options.env && !options.env.PATH)
 		options.env.PATH = process.env.PATH;
 
+	options.stdio = [ 'pipe', 'pipe', 'pipe', 'pipe' ];
+
 	var child = child_process.spawn(cmd, args || [], options);
-	var log = new cslog(ddpclient, cmd + (args ? ' ' + args + args.join(' ') : ''));
+	var log = new cslog(
+		ddpclient,
+		cmd + (args ? ' ' + args + args.join(' ') : ''),
+		{},
+		options.logId
+	);
 
 	child.stdout.on('data', function(data) {
 		log.addLine(data);
 	});
 	child.stderr.on('data', function(data) {
 		log.addLine(data);
+	});
+
+	// fd3 for task status
+	child.stdio[3].on('data', function(data) {
+		update(data.toString());
 	});
 
 	child.on('close', function(code) {
@@ -359,7 +385,10 @@ var processKill = function(data, signal, done) {
 	} else if (data.pidFile) {
 
 		fs.readFile(data.pidFile, function(err, pid) {
-			if (err) done(err);
+			if (err) {
+				done(err);
+				return;
+			}
 			try {
 				process.kill(parseInt(pid), signal);
 			} catch (err) {

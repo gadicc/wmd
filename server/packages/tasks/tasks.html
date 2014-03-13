@@ -1,3 +1,10 @@
+<template name="taskUpdate">
+	{{#with task}}
+		<p>{{slug}} {{completed}}/{{total}}
+		[<a href="/logs/{{logId}}">log</a>]: {{desc}}</p>				
+	{{/with}}
+</template>
+
 <template name="tasks">
 	<h1>Tasks</h1>
 

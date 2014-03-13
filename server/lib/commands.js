@@ -2,6 +2,7 @@
 
 var Commands = new Meteor.Collection('Commands');
 var commandCallbacks = {};
+var commandUpdateCbs = {};
 
 if (Meteor.isServer) {
 	Meteor.publish('commands', function() {
@@ -33,6 +34,15 @@ if (Meteor.isServer) {
 				commandCallbacks[commandId].call(command, data.error, data);
 				delete(commandCallbacks[commandId]);
 			}
+
+			if (commandUpdateCbs[commandId])
+				delete(commandUpdateCbs[commandId]);
+
+		},
+
+		'cmdUpdate': function(commandId, update) {
+			if (commandUpdateCbs[commandId])
+				commandUpdateCbs[commandId](update);
 		},
 
 		// TODO, DISABLE
@@ -49,6 +59,11 @@ if (Meteor.isServer) {
 
 
 	sendCommand = function(serverId, command, options, callback) {
+		// don't store this in the db
+		var updateCb = options.updateCallback;
+		if (updateCb)
+			delete(options.updateCallback);
+
 		var commandId = Commands.insert({
 			serverId: serverId,
 			status: 'new',
@@ -61,6 +76,9 @@ if (Meteor.isServer) {
 
 		if (callback)
 			commandCallbacks[commandId] = callback;
+
+		if (updateCb)
+			commandUpdateCbs[commandId] = updateCb;
 
 		return commandId;
 	}
