@@ -1,12 +1,17 @@
 // mods of same routines from wmd-client.js incl Fiber support
 // TODO, share lib somehow?  difficult with fibers, etc
 
-var waitForChange = function(file, done) {
+var waitForChange = function(files, done) {
 	var fs = Npm.require('fs');
-	fs.watchFile(file, function(curr, prev) {
-		console.log('change');
-		fs.unwatchFile(file);
-		done();
+	if (!_.isArray(files)) files=[files];
+	_.each(files, function(file) {
+		fs.watchFile(file, function(curr, prev) {
+			console.log('change');
+			_.each(files, function(file) {
+				fs.unwatchFile(file);
+			});
+			done();
+		});
 	});
 }
 Tasks.waitForChange = Async.wrap(waitForChange);

@@ -1,5 +1,7 @@
 if (Meteor.isServer) {
 
+	var LOCAL_METEORS_START_PORT = 4000;
+
 	var path = Meteor.require('path');
 	var LOCAL_HOME = process.env.HOME + '/wmd-local';
 	BUILD_HOME = LOCAL_HOME + '/build';
@@ -56,6 +58,8 @@ if (Meteor.isServer) {
 					killTree: true,
 					minUptime: 2000,
 					spinSleepTime: 1000,
+					watch: true,
+					watchDirectory: '/home/app' + app.appId + '/' + app.repo + '/updates',
 					cwd: '/home/app' + app.appId + '/' + app.repo,
 					env: {
 						ROOT_URL: proto + '://' + app.vhosts[0] + '/',
@@ -204,11 +208,14 @@ if (Meteor.isServer) {
 					console.log(appDir);
 
 				// start Meteor if not already running; task completes on lastStart
+
+				//TODO store in db for persistance!
 				if (!localMeteors[data.app.name]) {
 					// required for rapidRedeploy
 					var localLog = new slog('Meteor run for task ' + this.task.id);
 					localMeteors[data.app.name] = Tasks.asyncSpawnAndLog('mrt', [
-						'--production', '--port', (4000+localMeteorCount++)
+						'--production', '--port',
+						(LOCAL_METEORS_START_PORT+localMeteorCount++)
 					], {
 						cwd: appDir
 					}, localLog, function(error, done) {
@@ -220,8 +227,13 @@ if (Meteor.isServer) {
 
 				// Once app is started, task is done.  Kill if not a rapidRedeploy TODO
 				var build = appDir + '/.meteor/local/build';
-				console.log(build + '/programs/server/lastStart');
-				Tasks.waitForChange(build + '/programs/server/lastStart');
+
+				// changed in 0.7.2 i think
+				var waitFor1 = build + '/programs/server/lastStart';
+				var waitFor2 = appDir + '/lastStart';
+
+				console.log(waitFor1, waitFor2);
+				Tasks.waitForChange([waitFor1, waitFor2]);
 
 				console.log('started');
 			}
@@ -241,11 +253,11 @@ if (Meteor.isServer) {
 				var server = Servers.findOne(data.serverId);
 				data.env.SERVER = server.ip;
 
-				console.log('start');
+				console.log('start ssh');
 				var result = Tasks.spawnAndLog(SCRIPT_HOME + '/appSSH.sh', [], {
 					env: data.env
 				}, log);
-				console.log('end');
+				console.log('end ssh');
 				console.log('result', result);
 
 				var instanceId = Random.id();

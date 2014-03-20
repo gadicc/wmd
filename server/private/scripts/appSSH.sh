@@ -25,7 +25,7 @@ echo "Syncing SSH"
 echo
 
 # --chown=$USER:$USER requres rsync 3.1 on both side :(
-rsync -avze 'ssh -i ./identity' --no-o -L \
+rsync -avze 'ssh -i ./identity' --no-o --no-g -L \
 	$REPO/$METEOR_DIR/.meteor/local/build/  \
 	root@$SERVER:/home/$USER/$REPO
 RET=$?
@@ -34,6 +34,13 @@ ssh  -i ./identity root@$SERVER <<_END_
 # Because of no chown above :(  But only newly created files
 cd /home/$USER
 find -uid 0 -print0 | xargs -0 chown $USER:$USER
+
+cd $REPO
+if [ ! -d updates ]; then
+	mkdir updates
+	chown $USER:$USER updates
+fi
+date > updates/`date "+%Y-%m-%d--%H:%M:%S"`
 _END_
 
 rm identity
