@@ -304,10 +304,11 @@ if (Meteor.isServer) {
 				Apps.update(data.app._id, { $push: { 'instances.data': newInstance } });
 				App.start(data.app, newInstance);
 
+				// TODO, immediately change state of oldInstance for proxy
 				App.stop(data.app, oldInstance);
 
-				inc['instances.' + instance.state] = -1;
-				Apps.update({ _id: app._id}, {
+				//inc['instances.' + instance.state] = -1;
+				Apps.update({ _id: data.app._id}, {
 					$pull: { 'instances.data': { _id: oldInstance._id } }
 					//,$inc: inc
 				});
