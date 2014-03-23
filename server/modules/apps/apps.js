@@ -151,6 +151,7 @@ if (Meteor.isServer) {
 			_.each(instances, function(instance) {
 				var localData = _.clone(data);
 				localData.serverId = instance.serverId;
+				localData.instanceId = instance._id;
 				new Task('appInstall', localData);
 			});
 

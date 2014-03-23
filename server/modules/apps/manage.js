@@ -1,6 +1,7 @@
 if (Meteor.isServer) {
 
 	var LOCAL_METEORS_START_PORT = 4000;
+	APP_START_PORT = 5000;
 
 	var path = Meteor.require('path');
 	var LOCAL_HOME = process.env.HOME + '/wmd-local';
@@ -40,6 +41,9 @@ if (Meteor.isServer) {
 
 		start: function(app, instance) {
 			console.log('starting app');
+
+			var port = APP_START_PORT + incrementCounter('appPort_' + instance.serverId);
+
 			//var instance = _.findWhere(app.instances.data, { _id: instanceId });
 
 			var proto = 'http';
@@ -58,8 +62,6 @@ if (Meteor.isServer) {
 					killTree: true,
 					minUptime: 2000,
 					spinSleepTime: 1000,
-					watch: true,
-					watchDirectory: '/home/app' + app.appId + '/' + app.repo + '/updates',
 					cwd: '/home/app' + app.appId + '/' + app.repo,
 					env: {
 						ROOT_URL: proto + '://' + app.vhosts[0] + '/',
@@ -68,7 +70,7 @@ if (Meteor.isServer) {
 						HOME: '/home/app' + app.appId,
 						PATH: '/bin:/usr/bin:/usr/local/bin',
 						HTTP_FORWARDED_COUNT: 1,
-						PORT: instance.port
+						PORT: port
 
 					},
 					spawnWith: {
@@ -90,7 +92,10 @@ if (Meteor.isServer) {
 					});
 				else { // start success
 					Apps.update({ _id: app._id, 'instances.data._id': instance._id }, {
-						$set: { 'instances.data.$.state': 'running' },
+						$set: {
+							'instances.data.$.state': 'running',
+							'instances.data.$.port': port
+						},
 						$inc: { 'instances.running': 1 }
 					});
 
@@ -196,6 +201,8 @@ if (Meteor.isServer) {
 				console.log('end');
 				console.log('result', result);
 
+				if (result.code)
+					throw new Error(result);
 			}
 		},
 		{
@@ -273,8 +280,7 @@ if (Meteor.isServer) {
 					Apps.update(data.app._id, { $push: { 'instances.data': {
 						_id: instanceId,
 						state: 'deployFailed',
-						serverId: data.serverId,
-						port: 5000
+						serverId: data.serverId
 					}}, $inc: { 'instances.failing': 1 }, $set: set });
 				} else { // install success
 					if (!data.app.instances.data.length)
@@ -282,10 +288,29 @@ if (Meteor.isServer) {
 					Apps.update(data.app._id, { $push: { 'instances.data': {
 						_id: instanceId,
 						state: 'deployed',
-						serverId: data.serverId,
-						port: 5000
+						serverId: data.serverId
 					}}, $inc: { 'instances.deployed': 1 }, $set: set });
 				}
+			}
+		}, {
+			// Step 4
+			desc: 'Start new instance and kill old',
+			func: function(data, prevData, log) {				
+				var oldInstance = _.findWhere(data.app.instances.data,
+					{ _id: data.instanceId });
+				var newInstance = _.clone(oldInstance);
+				newInstance._id = Random.id();
+				newInstance.state = 'deployed';
+				Apps.update(data.app._id, { $push: { 'instances.data': newInstance } });
+				App.start(data.app, newInstance);
+
+				App.stop(data.app, oldInstance);
+
+				inc['instances.' + instance.state] = -1;
+				Apps.update({ _id: app._id}, {
+					$pull: { 'instances.data': { _id: oldInstance._id } }
+					//,$inc: inc
+				});
 			}
 		}
 	]);
