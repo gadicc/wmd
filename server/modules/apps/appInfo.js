@@ -19,7 +19,7 @@ if (Meteor.isClient) {
 			event.preventDefault();
 			var appId, instanceId, app = null;
 			if (tpl.data.serverId) {
-				app = tpl.__component__.parent.parent.templateInstance.data;
+				app = tpl.__component__.parent.parent.parent.data();
 				appId = app._id;
 				instanceId = tpl.data._id;
 			} else {
@@ -33,6 +33,7 @@ if (Meteor.isClient) {
 			if ((this.name && this.name.match(/^db-/)) ||
 					(app && app.name && app.name.match(/^db-/)))
 				what = 'dbAction';
+			console.log(what, appId, action, instanceId);
 			Meteor.call(what, appId, action, instanceId);
 		}
 	});

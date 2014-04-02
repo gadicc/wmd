@@ -61,6 +61,8 @@ if (Meteor.isServer) {
 	        	+ '\t\tproxy_set_header Upgrade $http_upgrade;\n'
 	        	+ '\t\tproxy_set_header Connection "upgrade";\n'
 	        	+ '\t\tproxy_set_header Host $host;\n' // override
+	        	+ '\t\tproxy_set_header X-Forwarded-For $remote_addr;\n'
+	        	+ '\t\tproxy_set_header X-Forwarded-Proto $scheme;\n'
 	        	+ '\t\tproxy_cache_bypass $http_upgrade;\n' // dont cache ddp/WS
 	        	+ '\t}\n'
 	        	+ '}\n\n';

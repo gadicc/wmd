@@ -304,7 +304,14 @@ if (Meteor.isServer) {
 				Apps.update(data.app._id, { $push: { 'instances.data': newInstance } });
 				App.start(data.app, newInstance);
 
-				// TODO, immediately change state of oldInstance for proxy
+				/*
+				 * 1. code for started -> running
+				 * 2. when running, switch old instance to down, update proxy
+				 * 3. down old instance for real
+				 */
+
+				// TODO, immediately change state of oldInstance for proxy,
+				// but only after new app is fully loaded
 				App.stop(data.app, oldInstance);
 
 				//inc['instances.' + instance.state] = -1;

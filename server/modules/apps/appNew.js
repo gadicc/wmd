@@ -39,7 +39,7 @@ if (Meteor.isClient) {
 				sort: { name: 1 }
 			});
 			var reposFetch = repos.fetch();
-			if (reposFetch && !Session.get('selectedRepoId')) {
+			if (reposFetch.length && !Session.get('selectedRepoId')) {
 				Session.set('selectedRepoId', reposFetch[0]._id)
 			}
 			return repos;

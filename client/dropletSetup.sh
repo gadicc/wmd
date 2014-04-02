@@ -211,3 +211,11 @@ echo Starting wmd-client...
 chmod a+x wmd-client.js
 service wmd-client stop
 service wmd-client start
+
+# TODO make optional
+yum install -y ImageMagick
+yum install -y fontconfig freetype libfreetype.so.6 libfontconfig.so.1 libstdc++.so.6
+wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86_64.tar.bz2
+tar xjf phantomjs-1.9.7-linux-x86_64.tar.bz2 
+cp phantomjs-1.9.7-linux-x86_64/bin/phantomjs /usr/local/bin
+
