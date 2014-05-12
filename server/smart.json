@@ -10,7 +10,6 @@
       "_commit1": "bc1c3aeffbac968f898b0c7fd45f43164307a416",
       "_commit2": "f8ffd44bceacc6a55f4ebcc218c072f5a18138b4"
     },
-    "npm": {},
     "reactive-objects": {},
     "mongo-counter": {},
     "bootstrap-3": {},
@@ -23,6 +22,7 @@
       "_path": "/home/dragon/www/smart/meteor-extensions"
     },
     "connection-banner": {},
-    "font-awesome": {}
+    "font-awesome": {},
+    "npm": {}
   }
 }

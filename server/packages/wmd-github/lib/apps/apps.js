@@ -21,7 +21,7 @@ if (Meteor.isClient) {
 }
 
 if (Meteor.isServer) {
-	var path = Meteor.require('path');
+	var path = Npm.require('path');
 
 	var findMeteorDir = function(github, repo, branches) {
 		var master = _.findWhere(branches, { name: 'master' });
@@ -271,7 +271,7 @@ if (Meteor.isServer) {
 		if (!_.isObject(user))
 			user = Meteor.users.findOne(user);
 
-			var Github = Meteor.require('github');
+			var Github = Npm.require('github');
 			var github = new Github({version: "3.0.0"});
 
 			github.user = Async.wrap(github.user, [

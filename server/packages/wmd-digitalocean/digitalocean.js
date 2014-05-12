@@ -5,4 +5,4 @@ ext = new Extension({
     description: "Digital Ocean support for WMD"
 });
 
-DigitalOceanAPI = Meteor.require('digitalocean-api');
+DigitalOceanAPI = Npm.require('digitalocean-api');

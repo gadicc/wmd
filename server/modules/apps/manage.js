@@ -139,25 +139,43 @@ if (Meteor.isServer) {
 			// any hooks?
 			console.log(instance);
 
-			sendCommand(instance.serverId, 'spawnAndLog', {
-				instanceId: instance._id,
-				cmd: './appDelete.sh',
-				options: { env: data.env }
-			}, function(error, result) {
-				console.log('cmd return');
-				console.log(error, result);
-				var inc = {};
-				inc['instances.' + instance.state] = -1;
-				if (result.code) // i.e. non-zero, failure, i.e. couldn't delete
-					Apps.update({ _id: app._id, 'instances.data._id': instance._id }, {
-						$set: { 'instances.data.$.state': 'deleteFailed' },
-					});
-				else // delete success
-					Apps.update({ _id: app._id}, {
-						$pull: { 'instances.data': { _id: instance._id } },
-						$inc: inc
-					});
-			});
+			// NB!  abort if more than 1 instance on this server
+			var instancesOnThisServer = 0;
+			for (var i=0; i < app.instances.data.length; i++) {
+				if (app.instances.data[i].serverId == instance.serverId)
+					instancesOnThisServer++;
+			}
+
+			if (instancesOnThisServer > 1) {
+
+				Apps.update({ _id: app._id}, {
+					$pull: { 'instances.data': { _id: instance._id } },
+					$inc: inc
+				});
+
+			} else {
+
+				sendCommand(instance.serverId, 'spawnAndLog', {
+					instanceId: instance._id,
+					cmd: './appDelete.sh',
+					options: { env: data.env }
+				}, function(error, result) {
+					console.log('cmd return');
+					console.log(error, result);
+					var inc = {};
+					inc['instances.' + instance.state] = -1;
+					if (result.code) // i.e. non-zero, failure, i.e. couldn't delete
+						Apps.update({ _id: app._id, 'instances.data._id': instance._id }, {
+							$set: { 'instances.data.$.state': 'deleteFailed' },
+						});
+					else // delete success
+						Apps.update({ _id: app._id}, {
+							$pull: { 'instances.data': { _id: instance._id } },
+							$inc: inc
+						});
+				});
+
+			}
 
 		}
 
@@ -302,7 +320,9 @@ if (Meteor.isServer) {
 				newInstance._id = Random.id();
 				newInstance.state = 'deployed';
 				Apps.update(data.app._id, { $push: { 'instances.data': newInstance } });
-				App.start(data.app, newInstance);
+
+				if (oldInstance.state == 'running')
+					App.start(data.app, newInstance);
 
 				/*
 				 * 1. code for started -> running

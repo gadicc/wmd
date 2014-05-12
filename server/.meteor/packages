@@ -8,7 +8,6 @@ insecure
 accounts-github
 iron-router
 accounts-password
-npm
 d3
 reactive-objects
 mongo-counter
@@ -23,3 +22,4 @@ blaze-layout
 tasks
 connection-banner
 font-awesome
+npm

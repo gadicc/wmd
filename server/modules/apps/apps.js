@@ -5,6 +5,11 @@ if (Meteor.isClient) {
 			action: function() {
 				this.render();
 				this.render('appSidebar', { to: 'sidebar' });
+			},
+			data: function() {
+				return {
+					apps: Apps.find()
+				}
 			}
 		});
 
