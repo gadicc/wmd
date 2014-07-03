@@ -166,7 +166,7 @@ if (Meteor.isServer) {
 			func: function(data, prevData, log) {
 				var self = this;
 
-				var serverId = freeServer('mongo');
+				var serverId = data.db.forcedOn[0] || freeServer('mongo');
 				if (!serverId)
 					throw err ('No free servers');
 

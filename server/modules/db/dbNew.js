@@ -1,9 +1,17 @@
 if (Meteor.isClient) {
 
+	Template.dbNew.helpers({
+
+		servers: function() {
+			return Servers.find({$or: [ {type:'combo'}, {type:'mongo'} ]});
+		}
+
+	});
+
 	Template.dbNew.events({
 		'submit': function(event, tpl) {
 			event.preventDefault();
-			Meteor.call('dbNew');
+			Meteor.call('dbNew', tpl.$('#dbName').val(), tpl.$('#dbServer').val());
 		}
 	});
 
@@ -13,7 +21,10 @@ if (Meteor.isServer) {
 
 	Meteor.methods({
 
-		dbNew: function(name, appIds, serverIds) {
+		dbNew: function(name, serverIds, appIds) {
+			check(name, Match.Optional(String));
+			check(serverIds, Match.OneOf(String, [String]));
+			check(appIds, Match.Optional(Match.OneOf(String, [String])));
 
 			var dbCounter = incrementCounter('db')
 			var dbId = Databases.insert({

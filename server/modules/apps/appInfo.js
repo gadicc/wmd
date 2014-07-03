@@ -17,22 +17,22 @@ if (Meteor.isClient) {
 	Template.appButtons.events({
 		'click button': function(event, tpl) {
 			event.preventDefault();
-			var appId, instanceId, app = null;
+			var appId, instanceId, app = null, what = null;
+			var action = $(event.target).data('action');
+
 			if (tpl.data.serverId) {
+				// Instance button
 				app = tpl.__component__.parent.parent.parent.data();
 				appId = app._id;
 				instanceId = tpl.data._id;
 			} else {
-				appId = tpl.data._id;
+				// global button
+				app = tpl.data;
+				appId = app._id;
 				instanceId = undefined;
 			}
-			var action = $(event.target).data('action');
+			what = app.appId ? 'appAction' : 'dbAction';
 
-			// TODO, better
-			var what = 'appAction';
-			if ((this.name && this.name.match(/^db-/)) ||
-					(app && app.name && app.name.match(/^db-/)))
-				what = 'dbAction';
 			console.log(what, appId, action, instanceId);
 			Meteor.call(what, appId, action, instanceId);
 		}

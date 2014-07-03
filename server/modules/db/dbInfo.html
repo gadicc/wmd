@@ -29,12 +29,39 @@
 		MONGO_OPLOG_URL=<span class="sensitive">{{oplog_url this}}</span>
 		</p>
 
+		<h3>Admin</h3>
 		<p>
-		<b>admin:</b>
-		mongo -u <span class="sensitive">{{adminUser}}</span> -p <span class="sensitive">{{adminPassword}}</span> 188.226.177.118:{{port}}/admin<br />
-		<b>meteor:</b>
-		mongo -u <span class="sensitive">{{meteorUser}}</span> -p <span class="sensitive">{{meteorPassword}}</span> 188.226.177.118:{{port}}/meteor
-		</p>
+			<b>mongo:</b>
+			mongo -u <span class="sensitive">{{adminUser}}</span> -p <span class="sensitive">{{adminPassword}}</span> {{firstServer.ip}}:{{port}}/admin
+			<br />
+			<b>backup:</b>
+			mongodump -u <span class="sensitive">{{adminUser}}</span>
+				-h {{firstServer.ip}}:{{port}} -d admin
+        -p <span class="sensitive">{{adminPassword}}</span>
+      <br />
+      <b>restore:</b>
+      mongorestore -u <span class="sensitive">{{adminUser}}</span>
+      	-p <span class="sensitive">{{adminPassword}}</span>
+	    	-h {{firstServer.ip}}:{{port}}
+	    	-d admin [DUMP_DIRECTORY]
+    </p>
+
+    <h3>Meteor</h3>
+		<p>
+			<b>mongo:</b>
+			mongo -u <span class="sensitive">{{meteorUser}}</span> -p <span class="sensitive">{{meteorPassword}}</span> {{firstServer.ip}}:{{port}}/meteor
+			<br />
+			<b>backup:</b>
+			mongodump -u <span class="sensitive">{{meteorUser}}</span>
+				-h {{firstServer.ip}}:{{port}} -d admin
+        -p <span class="sensitive">{{meteorPassword}}</span>
+      <br />
+      <b>restore:</b>
+      mongorestore -u <span class="sensitive">{{meteorUser}}</span>
+      	-p <span class="sensitive">{{meteorPassword}}</span>
+	    	-h {{firstServer.ip}}:{{port}}
+	    	-d admin [DUMP_DIRECTORY]
+    </p>
 
 	{{/with}}
 </template>

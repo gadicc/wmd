@@ -9,6 +9,7 @@ if (Meteor.isClient) {
 			});
 	});
 	Template.serverNew.iaasData = function() {
+		console.log(iaasData.digitalocean);
 		return iaasData;
 	}
 
@@ -48,7 +49,7 @@ if (Meteor.isServer) {
 			var size = _.findWhere(iaas.sizes, {id: sizeId});
 
 			var namePrefix = type; //+'-'+size.slug+'-'+region.slug;
-			var imageId = 1646467; // CentOS 6.5 x64
+			var imageId = 3448641; // CentOS 6.5 x64 (post heartbleed)
 			var optionals = {};
 
 			var sshKeyIds = [];

@@ -20,6 +20,10 @@ if (Meteor.isClient) {
 
 	Template.dbInfo.mongo_url = mongoUrl;
 	Template.dbInfo.oplog_url = oplogUrl;
+	Template.dbInfo.firstServer = function() {
+		if (this.instances.data.length)
+		return Servers.findOne(this.instances.data[0].serverId);
+	}
 	/*
 	Template.dbInfo.db = function() {
 		console.log(this);
