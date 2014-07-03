@@ -3,7 +3,6 @@
   "dependencies": {
     "basePackages": {
       "iron-router": {},
-      "reactive-objects": {},
       "mongo-counter": {},
       "bootstrap-3": {},
       "config": {},
@@ -13,18 +12,14 @@
       },
       "connection-banner": {},
       "font-awesome": {},
-      "npm": {}
+      "npm": {},
+      "reactive-object": {}
     },
     "packages": {
       "iron-router": {
         "git": "https://github.com/EventedMind/iron-router.git",
         "tag": "v0.7.1",
         "commit": "d1ffb3f06ea4c112132b030f2eb1a70b81675ecb"
-      },
-      "reactive-objects": {
-        "git": "https://github.com/Meteor-Reaction/meteor-reactive-objects.git",
-        "tag": "v0.7.0",
-        "commit": "6e6a264df82582e58ee11f058d6693189b313d6e"
       },
       "mongo-counter": {
         "git": "https://github.com/awwx/meteor-mongo-counter.git",
@@ -33,13 +28,13 @@
       },
       "bootstrap-3": {
         "git": "https://github.com/mangasocial/meteor-bootstrap-3.git",
-        "tag": "v3.1.1-1",
-        "commit": "63dd38968828bb8963636df93e9a1c45e2dfe67e"
+        "tag": "v3.2.0-1",
+        "commit": "17a63902fc6cf1096c5289d963c66cf28b474727"
       },
       "config": {
         "git": "https://github.com/gadicohen/meteor-config.git",
-        "tag": "v0.0.1",
-        "commit": "1ac1a5a0b6a4ec4157d8ce154d4df8b0393433e1"
+        "tag": "v0.0.4",
+        "commit": "0a94aa26cebef6877ad5d87e655985c0371d3624"
       },
       "extensions": {
         "git": "https://github.com/gadicohen/meteor-extensions.git",
@@ -48,28 +43,28 @@
       },
       "connection-banner": {
         "git": "https://github.com/nate-strauser/meteor-connection-banner.git",
-        "tag": "v0.2.2",
-        "commit": "f82217d8fca950ce55269c749b3da4c31e7240df"
+        "tag": "v0.4.0",
+        "commit": "2652cd4ee4d863651c4b5298aebcf2c5710d2971"
       },
       "font-awesome": {
         "git": "https://github.com/nate-strauser/meteor-font-awesome.git",
-        "tag": "v4.0.3",
-        "commit": "61e9361384347547ae144f8228faa4deffda23db"
+        "tag": "v4.1.0",
+        "commit": "ce6b1e92715d1938babc5d69c655c17e387f5926"
       },
       "npm": {
         "git": "https://github.com/arunoda/meteor-npm.git",
         "tag": "v0.2.6",
         "commit": "177ab6118de5bf8cffb19481343d5762ff7a2aaf"
       },
+      "reactive-object": {
+        "git": "https://github.com/jonjamz/reactive-object.git",
+        "tag": "v0.1.0",
+        "commit": "15dc38ed667a6ca116069deb31346e9a8718855b"
+      },
       "blaze-layout": {
         "git": "https://github.com/EventedMind/blaze-layout.git",
         "tag": "v0.2.4",
         "commit": "b40e9b0612329288d75cf52ad14a7da64bb8618f"
-      },
-      "behave": {
-        "git": "https://github.com/Meteor-Reaction/behave.git",
-        "tag": "v0.2.0",
-        "commit": "0204445f9366556060857d17fb7032d737b66df2"
       }
     }
   }

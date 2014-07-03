@@ -1,6 +1,6 @@
 if (Meteor.isClient) {
-	iaasData = {};
-	ReactiveObjects.setProperties(iaasData, ['digitalocean']);
+	iaasData = new ReactiveObject();
+	iaasData.defineProperty('digitalocean', null);
 
 	Deps.autorun(function() {
 		if (Meteor.user())

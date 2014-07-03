@@ -9,7 +9,6 @@ accounts-github
 iron-router
 accounts-password
 d3
-reactive-objects
 mongo-counter
 bootstrap-3
 accounts-ui
@@ -23,3 +22,4 @@ tasks
 connection-banner
 font-awesome
 npm
+reactive-object

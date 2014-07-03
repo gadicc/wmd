@@ -139,6 +139,9 @@ if (Meteor.isServer) {
 			// any hooks?
 			console.log(instance);
 
+			var inc = {};
+			inc['instances.' + instance.state] = -1;
+
 			// NB!  abort if more than 1 instance on this server
 			var instancesOnThisServer = 0;
 			for (var i=0; i < app.instances.data.length; i++) {
@@ -148,6 +151,7 @@ if (Meteor.isServer) {
 
 			if (instancesOnThisServer > 1) {
 
+				console.log('deleting >1 instance on same server');
 				Apps.update({ _id: app._id}, {
 					$pull: { 'instances.data': { _id: instance._id } },
 					$inc: inc
@@ -162,8 +166,6 @@ if (Meteor.isServer) {
 				}, function(error, result) {
 					console.log('cmd return');
 					console.log(error, result);
-					var inc = {};
-					inc['instances.' + instance.state] = -1;
 					if (result.code) // i.e. non-zero, failure, i.e. couldn't delete
 						Apps.update({ _id: app._id, 'instances.data._id': instance._id }, {
 							$set: { 'instances.data.$.state': 'deleteFailed' },
