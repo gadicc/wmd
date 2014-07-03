@@ -3,7 +3,15 @@ if (Meteor.isClient) {
 	Router.configure({
 	  layoutTemplate: 'layout',
 	  loadingTemplate: 'loading',
-	  waitOn: subAll
+	  waitOn: subAll,
+    onBeforeAction: function(pause) {
+      if (!Meteor.user()) {
+        this.layout('loginLayout');
+        this.render('login');
+        pause();
+      } else
+        this.layout('layout');
+    }
 	});
 
 	Router.map(function() {

@@ -57,6 +57,15 @@
 	</div>
 </template>
 
+<template name="loginLayout">
+  {{> yield}}
+</template>
+
+<template name="login">
+  {{> loginButtons}}
+  {{> connectionBanner}}    
+</template>
+
 <template name="loading">
 loading...
 </template>
