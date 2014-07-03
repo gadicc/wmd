@@ -53,14 +53,14 @@
 			<br />
 			<b>backup:</b>
 			mongodump -u <span class="sensitive">{{meteorUser}}</span>
-				-h {{firstServer.ip}}:{{port}} -d admin
+				-h {{firstServer.ip}}:{{port}} -d meteor
         -p <span class="sensitive">{{meteorPassword}}</span>
       <br />
       <b>restore:</b>
       mongorestore -u <span class="sensitive">{{meteorUser}}</span>
       	-p <span class="sensitive">{{meteorPassword}}</span>
 	    	-h {{firstServer.ip}}:{{port}}
-	    	-d admin [DUMP_DIRECTORY]
+	    	-d meteor [DUMP_DIRECTORY]
     </p>
 
 	{{/with}}
