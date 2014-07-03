@@ -6,6 +6,10 @@ Databases = new Meteor.Collection('databases');
 wmdRepos = new Meteor.Collection('repos');
 subs = {};
 
+var validEmails = [
+	'dean@myresidence.com'
+];
+
 if (Meteor.isClient) {
 	subAll = Meteor.subscribe('all');
 }
@@ -20,10 +24,10 @@ if (Meteor.isServer) {
 
 		var existingNonServer
 			= Meteor.users.findOne({server: {$exists: false}});
-		/*
-		if (_.contains(user.emails, validEmail))
+
+		if (_.contains(validEmails, user.emails[0].address))
 			return true;
-		*/ 
+
 		if (existingNonServer)
 			throw new Meteor.Error(403, "Additional users require preapproval.");
 
