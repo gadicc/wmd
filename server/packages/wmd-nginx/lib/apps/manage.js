@@ -28,12 +28,9 @@ if (Meteor.isServer) {
 				+ '\tip_hash;\n';
 			_.each(app.instances.data, function(ai) {
 				var server = Servers.findOne(ai.serverId); // TODO, cache
-				if (!server || !server.ip)
-					return;
-				out += '\tserver ' + server.ip
-					+ ':' + ai.port
-					+ (ai.state == 'running' ? '' : ' down')
-					+ ';\n';
+				var state = server && ai.state == 'running' ? '' : ' down';
+				var ip = server && server.ip || '127.0.0.1';
+				out += '\tserver ' + ip + ':' + ai.port + state + ';\n';
 			});
 
 			out += '}\n\nserver {\n'
