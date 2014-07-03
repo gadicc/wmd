@@ -1,16 +1,21 @@
 if (Meteor.isClient) {
 
+  var layout;
 	Router.configure({
 	  layoutTemplate: 'layout',
 	  loadingTemplate: 'loading',
 	  waitOn: subAll,
     onBeforeAction: function(pause) {
+      var current = this.layout();
+      if (current != 'loginLayout')
+        layout = current;
+      console.log(layout);
       if (!Meteor.user()) {
         this.layout('loginLayout');
         this.render('login');
         pause();
       } else
-        this.layout('layout');
+        this.layout(layout);
     }
 	});
 
