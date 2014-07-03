@@ -37,11 +37,15 @@
 		</p>
 
 		<p>Database:</p>
-		<label><input type="radio" name="db" value="create"> Create new - required for multiple instances</label><br />
-		<label><input type="radio" name="db" value="meteor"> Meteor internal - great for disposable apps</label><br />
-		<label><input type="radio" name="db" value="existing"> Pick an existing database from WMD</label> 
-			<select name=""></select><br />
-		<label><input type="radio" name="db" value="specify"> Specify your own MONGO_URL</label>
+		<label><input type="radio" name="db" value="create"> Create new - required for multiple instances</label> (TODO)<br />
+		<label><input type="radio" name="db" value="meteor"> Meteor internal - great for disposable apps</label> (TODO)<br />
+		<label><input type="radio" name="db" value="wmd"> Pick an existing database from WMD</label> 
+			<select id="appAdd_dbId">
+				{{#each dbs}}
+					<option value="{{_id}}">{{name}}</option>
+				{{/each}}
+			</select><br />
+		<label><input type="radio" name="db" value="specify" checked> Specify your own MONGO_URL</label>
 			<input type="text" /><br />
 
 		<br />

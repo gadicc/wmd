@@ -43,6 +43,12 @@ if (Meteor.isClient) {
 				Session.set('selectedRepoId', reposFetch[0]._id)
 			}
 			return repos;
+		},
+		'servers': function() {
+			return Servers.find({$or: [ {type:'combo'}, {type:'meteor'} ]});
+		},
+		'dbs': function() {
+			return Databases.find({},{sort:{name:1}});
 		}
 	});
 
@@ -60,12 +66,16 @@ if (Meteor.isClient) {
 			var repoId = $(tpl.find('#appAdd_repoId')).val();
 			var branch = $(tpl.find('#appAdd_branch')).val();
 			var deployOptions = {
-				servers: {
 					forcedOn: [ $(tpl.find('#appAdd_server')).val() ]
-				}
 			}
+
+			var dbOption = tpl.$('input[name="db"]:checked').val();
+			var dbId = tpl.$('#appAdd_dbId').val();
+			if (dbOption == 'wmd') deployOptions.dbId = dbId;
+
 			var meteorDir = $(tpl.find('#appAdd_meteorDir')).val();
 			if (meteorDir) deployOptions.meteorDir = meteorDir;
+
 			Meteor.call('appAdd', name, repoId, branch, deployOptions,
 				function(error) { console.log(error); });
 		}
@@ -104,7 +114,13 @@ if (Meteor.isServer) {
 					running: 0,
 					data: []
 				}
-			}
+			};
+
+			if (deployOptions.forcedOn)
+				appData.forcedOn = _.isArray(deployOptions.forcedOn)
+					? deployOptions.forcedOn : [deployOptions.forcedOn];
+			if (deployOptions.dbId)
+				appData.dbId = deployOptions.dbId;
 
 			// ext.registerPlugin('addApp', 'github', '0.1.0', callback)
 			// Can modify appData if desired before db insert

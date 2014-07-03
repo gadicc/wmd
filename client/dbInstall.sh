@@ -47,11 +47,19 @@ __END__
 use admin;
 rs.status();
 db.isMaster();
-db.addUser("$ADMIN_USER", "$ADMIN_PASSWORD");
-db.addUser({user: "$OPLOG_USER", pwd: "$OPLOG_PASSWORD", roles: [], otherDBRoles: {local: ["read"]}})
-
+// 2.4, partially works but deprecated in 2.6
+//db.addUser("$ADMIN_USER", "$ADMIN_PASSWORD");
+//db.addUser({user: "$OPLOG_USER", pwd: "$OPLOG_PASSWORD", roles: [], otherDBRoles: {local: ["read"]}})
+//use meteor;
+//db.addUser("$METEOR_USER", "$METEOR_PASSWORD");
+//
+// 2.6
+db.createUserUser({user:"$ADMIN_USER", pwd:"$ADMIN_PASSWORD", roles:["dbOwner"]});
+db.runCommand({ createRole: "oplogger", privileges: [   { resource: { db: 'local', collection: 'system.replset'}, actions: ['find']}, ], roles: [{role: 'read', db: 'local'}] })
+db.createUser({user: "$OPLOG_USER", pwd: "$OPLOG_PASSWORD", roles: "oplogger" });
+//db.runCommand({ grantRolesToUser: 'oplogger', roles: ['oplogger']})
 use meteor
-db.addUser("$METEOR_USER", "$METEOR_PASSWORD");
+db.createUser({user:"$METEOR_USER", pwd:"$METEOR_PASSWORD"});
 db.adminCommand({shutdown : 1, force : true});
 exit
 __END__

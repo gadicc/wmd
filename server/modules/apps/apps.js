@@ -102,7 +102,7 @@ if (Meteor.isServer) {
 	// global.  might be called from packages
 	appMethods = {
 		setup: function(app) {
-			appInstall(app, freeServer('meteor'));
+			appInstall(app, app.forcedOn.length ? app.forcedOn[0] : freeServer('meteor'));
 		},
 
 		start: function(app, instance) {

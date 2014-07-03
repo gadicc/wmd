@@ -80,8 +80,19 @@ if (Meteor.isServer) {
 				}
 			};
 
+			if (app.dbId) {
+				var db = Databases.findOne(app.dbId);
+				console.log(db);
+				data.options.env.MONGO_URL = mongoUrl(db);
+				data.options.env.MONGO_OPLOG_URL = oplogUrl(db);
+			}
+
 			// Override our defaults with user specified variables
 			_.extend(data.options.env, app.env);
+
+			console.log('---');
+			console.log(data.options.env);
+			console.log('---');
 
 			sendCommand(instance.serverId, 'foreverStart', data, function(error, result) {
 				console.log(error, result);
