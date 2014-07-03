@@ -116,7 +116,7 @@ if (Meteor.isClient) {
 	Template.appConfig.sourceOptions = function() {
 		// move to seperate repo package
 		if (this.source == 'repo') {
-			console.log(this.repoId);
+			// console.log(this.repoId);
 			var repo = wmdRepos.findOne(this.repoId);
 			if (!repo) return null;
 			return Extensions.runPlugin('appOptions', repo.service, {

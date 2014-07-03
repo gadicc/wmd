@@ -9,7 +9,6 @@ if (Meteor.isClient) {
       var current = this.layout();
       if (current != 'loginLayout')
         layout = current;
-      console.log(layout);
       if (!Meteor.user()) {
         this.layout('loginLayout');
         this.render('login');
