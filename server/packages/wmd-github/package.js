@@ -3,7 +3,7 @@ Package.describe({
 });
 
 Npm.depends({
-  "github": "0.1.14",
+  "github": "0.2.1",
   "connect": "2.13.0"
 });
 

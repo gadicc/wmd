@@ -337,6 +337,7 @@ if (Meteor.isServer) {
 			res.writeHead(200);
 			res.end();
 
+			console.log(req.body.payload);
 			var data = JSON.parse(req.body.payload);
 
 			if (data.hook_id) {

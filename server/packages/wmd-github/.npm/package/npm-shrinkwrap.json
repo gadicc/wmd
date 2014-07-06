@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "github": {
-      "version": "0.1.14"
+      "version": "0.2.1"
     },
     "connect": {
       "version": "2.13.0",
