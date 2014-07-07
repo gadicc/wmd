@@ -6,8 +6,9 @@ if (Meteor.isServer) {
 	var path = Meteor.require('path');
 	var LOCAL_HOME = process.env.HOME + '/wmd-local';
 	BUILD_HOME = LOCAL_HOME + '/build';
-	var SCRIPT_HOME = path.normalize(process.cwd()
-		+ '/../../../../../private/scripts');
+	var SCRIPT_HOME = process.env.NODE_ENV && process.env.NODE_ENV == 'production'
+		? path.normalize(process.cwd() + '/assets/app/scripts/')
+		: path.normalize(process.cwd() + '/../../../../../private/scripts');
 	console.log(SCRIPT_HOME);
 
 	/*
