@@ -46,7 +46,7 @@ if (Meteor.isServer) {
 
 	Meteor.methods({
 
-		'wmd.github.updateRepos': function() {
+		'wmd.github.updateRepos': function(force) {
 			// ensure we are only being run once at a time per user
 			if (updatingUserRepos[this.userId])
 				return;
@@ -68,7 +68,7 @@ if (Meteor.isServer) {
 				type: 'all',
 				per_page: 100,
 				headers: {
-					'If-None-Match': meta && meta.etags.reposGetAll || undefined
+					'If-None-Match': (!force && meta && meta.etags.reposGetAll) || undefined
 				}
 			});
 
@@ -99,7 +99,7 @@ if (Meteor.isServer) {
 				type: 'all',
 				per_page: 100,
 				headers: {
-					'If-None-Match': meta && meta.etags.userGetOrgs || undefined
+					'If-None-Match': (!force && meta && meta.etags.userGetOrgs) || undefined
 				}
 			});
 
@@ -120,7 +120,7 @@ if (Meteor.isServer) {
 					org: org.login,
 					per_page: 100,
 					headers: {
-						'If-None-Match': meta && meta.etags.reposGetFromOrg[org.id] || undefined
+						'If-None-Match': (!force && meta && meta.etags.reposGetFromOrg[org.id]) || undefined
 					}
 				});
 
@@ -144,12 +144,15 @@ if (Meteor.isServer) {
 					userId: self.userId, name: repo.name
 				});
 
+				// TODO, add/update myRepo here, update branches later
+				// TODO, check for renames by using repo id not repo name
+
 				var branches = github.repos.getBranches({
 					user: repo.owner.login,
 					repo: repo.name,
 					per_page: 100,
 					headers: {
-						'If-None-Match': myRepo && myRepo.etagBranches || undefined
+						'If-None-Match': (!force && myRepo && myRepo.etagBranches) || undefined
 					}
 				});
 
@@ -161,6 +164,7 @@ if (Meteor.isServer) {
 				if (myRepo) {
 					console.log('updating ' + repo.name);
 					ghRepos.update(myRepo._id, { $set: {
+						repo: repo,
 						etagBranches: branches.meta.etag
 					}} );
 				} else {
@@ -337,7 +341,6 @@ if (Meteor.isServer) {
 			res.writeHead(200);
 			res.end();
 
-			console.log(req.body.payload);
 			var data = JSON.parse(req.body.payload);
 
 			if (data.hook_id) {
