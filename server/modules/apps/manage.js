@@ -8,6 +8,7 @@ if (Meteor.isServer) {
 	BUILD_HOME = LOCAL_HOME + '/build';
 	var SCRIPT_HOME = path.normalize(process.cwd()
 		+ '/../../../../../private/scripts');
+	console.log(SCRIPT_HOME);
 
 	/*
 	 *  { name: 'can-i-eat#master',
@@ -82,7 +83,6 @@ if (Meteor.isServer) {
 
 			if (app.dbId) {
 				var db = Databases.findOne(app.dbId);
-				console.log(db);
 				data.options.env.MONGO_URL = mongoUrl(db);
 				data.options.env.MONGO_OPLOG_URL = oplogUrl(db);
 			}
@@ -90,9 +90,7 @@ if (Meteor.isServer) {
 			// Override our defaults with user specified variables
 			_.extend(data.options.env, app.env);
 
-			console.log('---');
 			console.log(data.options.env);
-			console.log('---');
 
 			sendCommand(instance.serverId, 'foreverStart', data, function(error, result) {
 				console.log(error, result);

@@ -263,9 +263,9 @@ if (Meteor.isServer) {
 		'hooktest': function() {
 			var github = authedWrappedGithub(this.userId);
 			github.repos.testHook({
-				user: 'gadicohen',
-				repo: 'meteor-messageformat',
-				id: 1878974
+				user: 'gadicc',
+				repo: 'wmd',
+				id: 2545837
 			});
 		}
 
