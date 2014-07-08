@@ -167,8 +167,10 @@ Task = function(slug, context) {
 				Tasks.collection.update(self.id, {
 					$set: update
 				});
-				if (self.log)
+				if (self.log) {
+					self.log.addLine('Error: ' + err.toString());
 					self.log.close('FAILURE');
+				}
 				if (updateCol)
 					updateCol.col.update(updateCol._id, { $set: {
 						'task.desc': 'TASK FAILED'

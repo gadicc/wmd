@@ -9,7 +9,6 @@ if (Meteor.isServer) {
 	var SCRIPT_HOME = process.env.NODE_ENV && process.env.NODE_ENV == 'production'
 		? path.normalize(process.cwd() + '/assets/app/scripts/')
 		: path.normalize(process.cwd() + '/../../../../../private/scripts');
-	console.log(SCRIPT_HOME);
 
 	/*
 	 *  { name: 'can-i-eat#master',
@@ -328,6 +327,9 @@ if (Meteor.isServer) {
 			func: function(data, prevData, log) {				
 				var oldInstance = _.findWhere(data.app.instances.data,
 					{ _id: data.instanceId });
+				if (!(oldInstance && oldInstance.state == 'running'))
+					return;
+
 				var newInstance = _.clone(oldInstance);
 				newInstance._id = Random.id();
 				newInstance.state = 'deployed';
