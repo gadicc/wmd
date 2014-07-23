@@ -21,6 +21,6 @@ blaze-layout
 tasks
 connection-banner
 font-awesome
-npm
 reactive-object
 force-ssl
+npm

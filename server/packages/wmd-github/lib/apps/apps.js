@@ -349,12 +349,20 @@ if (Meteor.isServer) {
 			}
 
 			Fiber(function(data) {
+				var re = /^refs\/heads\/([^\/]+)/;
+				var match = re.exec(data.ref);
+				if (!match) {
+					console.log('ignoring github callback that i dont understand');
+					console.log('no ref of "/refs/heads/BRANCH');
+				}
+				var branch = match[1];
+
 				// wow, a bit convoluted... reconsider how we store everything?
 				var ghRepo = ghRepos.findOne({'repo.id':data.repository.id});
 				var repo = wmdRepos.findOne({
 					service:'github', serviceId: ghRepo._id
 				});
-				var app = Apps.findOne({repoId: repo._id});
+				var app = Apps.findOne({repoId: repo._id, branch: branch});
 
 				console.log('Github push for ' + app.name + ', updating...');
 				appMethods.update(app);
