@@ -245,6 +245,7 @@ if (Meteor.isServer) {
 
 	var glob = Meteor.require('glob');
 	var fs = Meteor.require('fs');
+	var path = Npm.require('path');
 
 	var installScripts = {};
 	/*
@@ -254,17 +255,17 @@ if (Meteor.isServer) {
 	*/
 	// scripts: /../../../../../private/scripts
 	//  client: /../../../../../../client/
-	var path = process.env.NODE_ENV && process.env.NODE_ENV == 'production'
+	var dir = process.env.NODE_ENV && process.env.NODE_ENV == 'production'
 		? path.normalize(process.env.HOME + '/wmd-client/')
 		: path.normalize(process.cwd() + '/../../../../../../client/');
 
 	var loadScript = function(file) {
-		fs.readFile(path + file, 'utf8', function(err, data) {
+		fs.readFile(dir + file, 'utf8', function(err, data) {
 			if (err) throw err;
 			installScripts[file] = data;
 		});		
 	}
-	glob('{*.js,*.sh,*.json}', { cwd: path }, function(err, files) {
+	glob('{*.js,*.sh,*.json}', { cwd: dir }, function(err, files) {
 		if (err) throw err;
 		_.each(files, function(file) {
 			if (file == "credentials.json" || file == "state.json")
@@ -276,7 +277,7 @@ if (Meteor.isServer) {
 	var Inotify = Meteor.require('inotify').Inotify;
 	var inotify = new Inotify();
 	var watch	= inotify.addWatch({
-		path: path,
+		path: dir,
 		watch_for: Inotify.IN_MODIFY | Inotify.IN_CREATE
 			| Inotify.IN_CLOSE_WRITE | Inotify.IN_MOVED_TO,
 		callback: function(event) {
