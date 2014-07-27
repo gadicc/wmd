@@ -252,13 +252,12 @@ if (Meteor.isServer) {
 		? path.normalize(process.cwd() + '/assets/app/scripts/')
 		: path.normalize(process.cwd() + '/../../../../../private/scripts');
 	*/
+	// scripts: /../../../../../private/scripts
+	//  client: /../../../../../../client/
 	var path = process.env.NODE_ENV && process.env.NODE_ENV == 'production'
 		? path.normalize(process.env.HOME + '/wmd-client/')
 		: path.normalize(process.cwd() + '/../../../../../../client/');
 
-	// scripts: /../../../../../private/scripts
-	//  client: /../../../../../../client/
-	var path = ;
 	var loadScript = function(file) {
 		fs.readFile(path + file, 'utf8', function(err, data) {
 			if (err) throw err;
