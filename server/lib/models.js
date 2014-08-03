@@ -7,7 +7,8 @@ wmdRepos = new Meteor.Collection('repos');
 subs = {};
 
 var validEmails = [
-	'dean@myresidence.com'
+	'dean@myresidence.com',
+	'tarang.com@gmail.com'
 ];
 
 if (Meteor.isClient) {

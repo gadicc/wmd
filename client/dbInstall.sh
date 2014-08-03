@@ -54,12 +54,12 @@ db.isMaster();
 //db.addUser("$METEOR_USER", "$METEOR_PASSWORD");
 //
 // 2.6
-db.createUserUser({user:"$ADMIN_USER", pwd:"$ADMIN_PASSWORD", roles:["dbOwner"]});
+db.createUser({user:"$ADMIN_USER", pwd:"$ADMIN_PASSWORD", roles:[{role:"root",db:"admin"}]})
 db.runCommand({ createRole: "oplogger", privileges: [   { resource: { db: 'local', collection: 'system.replset'}, actions: ['find']}, ], roles: [{role: 'read', db: 'local'}] })
-db.createUser({user: "$OPLOG_USER", pwd: "$OPLOG_PASSWORD", roles: "oplogger" });
+db.createUser({user: "$OPLOG_USER", pwd: "$OPLOG_PASSWORD", roles: ["oplogger"] });
 //db.runCommand({ grantRolesToUser: 'oplogger', roles: ['oplogger']})
 use meteor
-db.createUser({user:"$METEOR_USER", pwd:"$METEOR_PASSWORD"});
+db.createUser({user:"$METEOR_USER", pwd:"$METEOR_PASSWORD", roles: [{role:"readWrite", db:"meteor"}]});
 db.adminCommand({shutdown : 1, force : true});
 exit
 __END__
