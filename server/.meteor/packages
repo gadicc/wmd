@@ -17,7 +17,6 @@ extensions
 wmd-digitalocean
 wmd-github
 wmd-nginx
-blaze-layout
 tasks
 connection-banner
 font-awesome

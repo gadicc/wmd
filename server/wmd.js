@@ -8,13 +8,14 @@ if (Meteor.isClient) {
     onBeforeAction: function(pause) {
       var current = this.layout();
       if (current != 'loginLayout')
-        layout = current;
+        layout = current || 'layout';
       if (!Meteor.user()) {
         this.layout('loginLayout');
         this.render('login');
         pause();
-      } else
+      } else {
         this.layout(layout);
+      }
     }
 	});
 

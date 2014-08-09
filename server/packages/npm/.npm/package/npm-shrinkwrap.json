@@ -98,6 +98,48 @@
         }
       }
     },
+    "github": {
+      "version": "0.2.1"
+    },
+    "glob": {
+      "version": "3.2.8",
+      "dependencies": {
+        "minimatch": {
+          "version": "0.2.14",
+          "dependencies": {
+            "lru-cache": {
+              "version": "2.5.0"
+            },
+            "sigmund": {
+              "version": "1.0.0"
+            }
+          }
+        },
+        "inherits": {
+          "version": "2.0.1"
+        }
+      }
+    },
+    "heredoc": {
+      "version": "1.2.0"
+    },
+    "inotify": {
+      "version": "1.2.1"
+    },
+    "mkdirp": {
+      "version": "0.3.5"
+    },
+    "sha1": {
+      "version": "1.1.0",
+      "dependencies": {
+        "charenc": {
+          "version": "0.0.1"
+        },
+        "crypt": {
+          "version": "0.0.1"
+        }
+      }
+    },
     "ssh-keypair": {
       "version": "1.0.1",
       "dependencies": {
@@ -120,9 +162,6 @@
         }
       }
     },
-    "heredoc": {
-      "version": "1.2.0"
-    },
     "walk": {
       "version": "2.3.1",
       "dependencies": {
@@ -135,45 +174,6 @@
           }
         }
       }
-    },
-    "glob": {
-      "version": "3.2.8",
-      "dependencies": {
-        "minimatch": {
-          "version": "0.2.14",
-          "dependencies": {
-            "lru-cache": {
-              "version": "2.5.0"
-            },
-            "sigmund": {
-              "version": "1.0.0"
-            }
-          }
-        },
-        "inherits": {
-          "version": "2.0.1"
-        }
-      }
-    },
-    "inotify": {
-      "version": "1.2.1"
-    },
-    "github": {
-      "version": "0.2.1"
-    },
-    "sha1": {
-      "version": "1.1.0",
-      "dependencies": {
-        "charenc": {
-          "version": "0.0.1"
-        },
-        "crypt": {
-          "version": "0.0.1"
-        }
-      }
-    },
-    "mkdirp": {
-      "version": "0.3.5"
     }
   }
 }

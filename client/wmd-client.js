@@ -12,6 +12,7 @@ var forever = require('forever-monitor');
 var _ = require('underscore');
 var osUtils = require('os-utils');
 var DDPClient = require("ddp");
+var DDPlogin = require('ddp-login');
 
 
 var credentials = require('./credentials.json');
@@ -120,6 +121,20 @@ var ddpclient = new DDPClient({
   // TODO, SSL
 });
 
+// Pending https://github.com/vsivsi/ddp-login/pull/1
+var origCall = ddpclient.call;
+ddpclient.call = function(cmd, params) {
+	if (cmd != 'updateStats') {
+		if (cmd == 'login') {
+//			console.log(1, params[0]);
+			if (params[0].user.user)
+				params[0].user = { username: params[0].user.user };
+//			console.log(2, params[0]);
+		}
+	}
+	origCall.apply(this, arguments);
+}
+
 ddpclient.connect(function(error) {
 	if (error) {
     console.log('DDP connection error!');
@@ -127,20 +142,25 @@ ddpclient.connect(function(error) {
   }
   console.log('Connected to DDP server...');
 
-  ddpclient.loginWithUsername(
-  	credentials.username,
-  	credentials.password,
-  	function(error) {
+  DDPlogin(ddpclient, {
+  	method: "username",
+  	account: credentials.username,
+  	pass: credentials.password,
+		// fallback for non-brcrypt, remove after all clients upgraded  	
+  	plaintext: true
+  }, function(error, userInfo) {
       if (error) {
       	console.log('Authentication failed');
       	console.log(error);
       	process.exit();
       }
-      console.log('Logged in as ' + credentials.username);
-  	});
+      console.log('Logged in as ' + credentials.username);  	
+      console.log(userInfo);
+  });
 
-  	ddpclient.subscribe('commands', [], function(err) {
+	ddpclient.subscribe('commands', [], function(err) {
 	});
+
 	var stateFiles = {};
 	for (key in state.files)
 		stateFiles[key] = state.files[key].hash;

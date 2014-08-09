@@ -4,14 +4,14 @@ logLines = new Meteor.Collection('logLines');
 if (Meteor.isClient) {
 	Router.map(function() {
 		this.route('logs', {
-			before: function() {
+			onBeforeAction: function() {
 				this.subscribe('logs');
 			}
 		});
 
 		this.route('showLog', {
 			path: '/logs/:logId',
-			before: function() {
+			onBeforeAction: function() {
 				subs['logs'] = this.subscribe('logs');
 				subs['logLines'] = this.subscribe('logLines', this.params.logId);
 				subs['logLines'].wait();  // not working!

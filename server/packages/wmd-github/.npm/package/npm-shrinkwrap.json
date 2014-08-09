@@ -1,8 +1,5 @@
 {
   "dependencies": {
-    "github": {
-      "version": "0.2.1"
-    },
     "connect": {
       "version": "2.13.0",
       "dependencies": {
@@ -82,6 +79,9 @@
           }
         }
       }
+    },
+    "github": {
+      "version": "0.2.1"
     }
   }
 }

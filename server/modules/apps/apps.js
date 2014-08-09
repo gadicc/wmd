@@ -16,7 +16,7 @@ if (Meteor.isClient) {
 		this.route('appNew', {
 			layoutTemplate: 'sidebar-layout',
 			path: '/apps/new',
-			before: function() {
+			onBeforeAction: function() {
 				this.subscribe('wmdRepos');
 			},
 			action: function() {
@@ -28,7 +28,7 @@ if (Meteor.isClient) {
 		this.route('appInfo', {
 			path: '/apps/:app',
 			layoutTemplate: 'sidebar-layout',
-			before: function() {
+			onBeforeAction: function() {
 				this.subscribe('wmdRepos');
 			},
 			action: function() {

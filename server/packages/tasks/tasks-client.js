@@ -3,7 +3,7 @@ Meteor.subscribe('tasks');
 
 Router.map(function() {
 	this.route('tasks', {
-		before: function() {
+		onBeforeAction: function() {
 			this.subscribe('tasks');
 		}
 	});
