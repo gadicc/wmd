@@ -22,7 +22,7 @@ if (Meteor.isClient) {
 
 			if (tpl.data.serverId) {
 				// Instance button
-				app = tpl.__component__.parent.parent.parent.data();
+				app = UI._parentData(1);
 				appId = app._id;
 				instanceId = tpl.data._id;
 			} else {
