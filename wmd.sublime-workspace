@@ -4,6 +4,38 @@
 		"selected_items":
 		[
 			[
+				"layout",
+				"layoutTemplate"
+			],
+			[
+				"LO",
+				"LOCAL_METEORS_START_PORT	(num)"
+			],
+			[
+				"isA",
+				"isArray(value)"
+			],
+			[
+				"wa",
+				"waitFor2	(str)"
+			],
+			[
+				"l",
+				"lastStart"
+			],
+			[
+				"de",
+				"define(slug, options, steps)"
+			],
+			[
+				"increment",
+				"incrementCounter"
+			],
+			[
+				"met",
+				"meteorDir"
+			],
+			[
 				"f",
 				"fiber	(?)"
 			],
@@ -88,144 +120,42 @@
 	"buffers":
 	[
 		{
-			"file": "server/lib/models.js",
-			"settings":
-			{
-				"buffer_size": 1841,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "<template name=\"serverSidebar\">\n	<div id=\"appSidebar\">\n		<a href=\"/servers\">Summary<div></div></a>\n		<a href=\"/servers/new\">Create New<div></div></a>\n		<div></div>\n		{{#each servers}}\n			<a href=\"/servers/{{_id}}\">{{username}}<div></div></a>\n			{{activeLinks}}\n		{{/each}}\n	</div>\n</template>\n\n<template name=\"servers\">\n\n	<h1>All Servers</h1>\n\n	<table class=\"table table-bordered\" style=\"width: auto\">\n		<thead>\n			<tr>\n				<th>Name</th>\n				<th>IP</th>\n				<th>Hours</th>\n				<th>Cost</th>\n				<th>Actions</th>\n			</tr>\n		</thead><tbody>\n\n		{{#each servers}}\n			<tr>\n				<td><a href=\"/servers/{{username}}\">{{username}}</a></td>\n				<td>{{ip}}</td>\n				<td>{{hours}}</td>\n				<td>${{totalCost}}</td>\n			  <td>\n			  	{{#if event.action_status}}\n				  	<button class=\"destroy\" data-id=\"{{_id}}\">Destroy</button>\n				  	<button class=\"setup\" data-id=\"{{_id}}\">Setup</button>\n			  	{{else}}\n			  		{{event.event_desc}}\n			  		{{event.percentage}}%\n			  	{{/if}}\n			  </td>\n			</tr>\n		{{/each}}\n\n		</tbody>\n	</table>\n\n</template>\n",
-			"file": "server/modules/servers/servers.html",
-			"file_size": 1026,
-			"file_write_time": 130383235568484536,
-			"settings":
-			{
-				"buffer_size": 1026,
-				"line_ending": "Unix"
-			}
-		},
-		{
 			"file": "server/wmd.js",
 			"settings":
 			{
-				"buffer_size": 2679,
+				"buffer_size": 3010,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "README.md",
+			"file": "client/wmd-client.js",
 			"settings":
 			{
-				"buffer_size": 10555,
+				"buffer_size": 10933,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "server/modules/servers/serverInfo.js",
+			"file": "server/modules/apps/appInfo.js",
 			"settings":
 			{
-				"buffer_size": 3840,
+				"buffer_size": 3323,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "server/packages/tasks/tasks.js",
+			"file": "client/node_modules/ddp-login/lib/index.js",
 			"settings":
 			{
-				"buffer_size": 4168,
+				"buffer_size": 9668,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "server/modules/apps/manage.js",
+			"file": "server/wmd.html",
 			"settings":
 			{
-				"buffer_size": 6600,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "server/packages/tasks/child_process.js",
-			"settings":
-			{
-				"buffer_size": 2238,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "server/modules/logs/logs.js",
-			"settings":
-			{
-				"buffer_size": 4687,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "server/packages.json",
-			"settings":
-			{
-				"buffer_size": 314,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "server/smart.json",
-			"settings":
-			{
-				"buffer_size": 639,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "server/packages/tasks/tasks.html",
-			"settings":
-			{
-				"buffer_size": 359,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"contents": "## meteor-tasks\n\n## Design Goals\n\n* Tasks are written in a synchronous Meteor Style manner\n* Meteor can be restarted in the middle of a task and still resume\n* Maintain a collection of all task info which can be used reactively\n\n## Examples\n\n```js\n// Single task\nTasks.define('createServer', {},\n	{\n		desc: 'Creating new server'\n		func: function(context) { .. }\n	}\n);\n\n// Array of tasks (can use previously defined tasks)\nTasks.define('newServer', {}, [\n	{\n		desc: 'Provisioning resources'\n		func: function(context) {\n			return { resourceId: 1 };\n		}\n	},\n	'newServer',	// TODO, include previously defined steps\n	{\n		desc: 'Setup server',\n		func: function(context, prevData) {\n			// A step will always be called with data from previously\n			// completed step (even if it was halted midway and restarted)\n\n			// Mid resume: the two approaches below serve an identical\n			// purpose and allows the step to be resumed in the \"middle\".\n\n			if (!this.installedId) {\n				this.installedId = installScript(prevData.resourceId);\n				this.resume('installedId');\n				if (this.lastResume == 'installId')\n					searchAndDestroyFailedRemnants();\n			}\n\n			this.resume('installedId', function() {\n				return installScript(prevData.resourceId);\n			}, function() {\n					searchAndDestroyFailedRemnants();\n			});\n\n		}\n	}\n]);\n```\n",
-			"file": "server/packages/tasks/README.md",
-			"file_size": 1079,
-			"file_write_time": 130383899734611677,
-			"settings":
-			{
-				"buffer_size": 1307,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "server/packages/tasks/package.js",
-			"settings":
-			{
-				"buffer_size": 470,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "server/packages/tasks/tasks-client.js",
-			"settings":
-			{
-				"buffer_size": 274,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "server/modules/servers/serverNew.js",
-			"settings":
-			{
-				"buffer_size": 4747,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "server/modules/servers/servers.js",
-			"settings":
-			{
-				"buffer_size": 7349,
+				"buffer_size": 2022,
 				"line_ending": "Unix"
 			}
 		}
@@ -275,64 +205,90 @@
 	},
 	"file_history":
 	[
+		"/home/dragon/www/projects/wmd/client/package.json",
+		"/home/dragon/www/projects/wmd/server/modules/apps/manage.js",
+		"/home/dragon/www/projects/wmd/server/lib/models.js",
+		"/home/dragon/www/projects/wmd/client/dbInstall.sh",
+		"/home/dragon/www/projects/wmd/server/modules/servers/servers.js",
+		"/home/dragon/www/projects/wmd/server/lib/files.js",
+		"/home/dragon/www/projects/wmd/server/packages/wmd-github/lib/apps/apps.js",
+		"/home/dragon/www/projects/wmd/server/modules/apps/appNew.js",
+		"/home/dragon/www/projects/wmd/server/modules/apps/apps.js",
+		"/home/dragon/www/projects/wmd/server/modules/logs/logs.js",
+		"/home/dragon/www/projects/wmd/server/packages/tasks/tasks.js",
+		"/home/dragon/www/projects/wmd/server/packages/tasks/tasks-client.js",
+		"/home/dragon/www/projects/wmd/client/dropletSetup.sh",
+		"/home/dragon/www/projects/wmd/server/private/scripts/appSSH.sh",
+		"/home/dragon/www/projects/wmd/server/modules/apps/appNew.html",
+		"/home/dragon/www/projects/wmd/server/wmd.html",
+		"/home/dragon/www/projects/wmd/server/modules/apps/appInfo.js",
+		"/home/dragon/www/projects/wmd/server/packages/wmd-nginx/lib/apps/manage.js",
+		"/home/dragon/www/projects/wmd/server/wmd.js",
+		"/home/dragon/www/projects/wmd/server/packages/wmd-github/package.js",
+		"/home/dragon/www/projects/wmd/server/packages/tasks/child_process.js",
+		"/home/dragon/www/projects/wmd/server/lib/commands.js",
+		"/home/dragon/www/projects/wmd/server/packages/wmd-nginx/wmd-nginx.js",
+		"/home/dragon/www/projects/wmd/server/wmd.css",
+		"/home/dragon/www/projects/wmd/server/modules/apps/appInfo.html",
+		"/home/dragon/www/projects/wmd/server/packages/tasks/tasks.html",
+		"/home/dragon/www/projects/wmd/server/modules/db/dbNew.html",
+		"/home/dragon/www/projects/wmd/server/modules/db/dbNew.js",
+		"/home/dragon/www/projects/wmd/server/modules/db/manage.js",
+		"/home/dragon/www/projects/wmd/server/server/constants.js",
+		"/home/dragon/www/projects/wmd/server/modules/servers/serverNew.js",
+		"/home/dragon/www/projects/wmd/server/modules/db/db.js",
+		"/home/dragon/www/projects/wmd/server/modules/db/db.html",
+		"/home/dragon/www/projects/wmd/server/modules/servers/serverInfo.js",
+		"/home/dragon/www/projects/wmd/server/modules/db/dbInfo.js",
+		"/home/dragon/www/projects/wmd/server/modules/db/dbInfo.html",
+		"/home/dragon/www/projects/wmd/server/packages/wmd-nginx/lib/apps/apps.js",
+		"/home/dragon/www/projects/wmd/server/packages/wmd-digitalocean/package.js",
+		"/home/dragon/www/projects/wmd/server/lib/constants.js",
+		"/home/dragon/www/projects/wmd/wmd.sublime-project",
+		"/home/dragon/www/projects/wmd/server/packages/tasks/README.md",
+		"/home/dragon/www/projects/wmd/server/modules/servers/servers.html",
+		"/home/dragon/www/projects/wmd/README.md",
+		"/home/dragon/www/projects/wmd/server/private/scripts/appInstall.sh",
+		"/home/dragon/www/projects/wmd/server/modules/user/user.html",
+		"/home/dragon/www/projects/wmd/server/modules/user/user.js",
+		"/home/dragon/www/projects/wmd/server/packages.json",
+		"/home/dragon/www/projects/wmd/server/smart.json",
+		"/home/dragon/www/projects/wmd/server/modules/db/db.css",
+		"/home/dragon/www/projects/wmd/server/smart.lock",
+		"/home/dragon/www/projects/wmd/server/packages/tasks/package.js",
+		"/home/dragon/www/projects/wmd/server/packages/wmd-github/lib/apps/manage.js",
 		"/home/dragon/www/projects/wmd/server/modules/logs/child_process.js",
 		"/home/dragon/www/projects/wmd/server/modules/logs/tasks.js",
 		"/home/dragon/www/projects/wmd/server/modules/logs/tasks.html",
 		"/home/dragon/www/projects/wmd/server/modules/logs/tasks.css",
-		"/home/dragon/www/projects/wmd/wmd.sublime-project",
 		"/home/dragon/.config/sublime-text-3/Packages/User/TernJS.sublime-settings",
 		"/home/dragon/.config/sublime-text-3/Packages/TernJS/TernJS.sublime-settings",
 		"/home/dragon/.config/sublime-text-3/Packages/Default/Preferences.sublime-settings",
 		"/home/dragon/.config/sublime-text-3/Packages/User/Preferences.sublime-settings",
-		"/home/dragon/www/projects/wmd/server/packages/tasks/package.js",
 		"/home/dragon/www/projects/wmd/server/modules/apps/apps.html",
-		"/home/dragon/www/projects/wmd/server/modules/apps/apps.js",
-		"/home/dragon/www/projects/wmd/server/modules/apps/appInfo.js",
-		"/home/dragon/www/projects/wmd/server/modules/apps/appNew.html",
-		"/home/dragon/www/projects/wmd/server/modules/apps/appNew.js",
-		"/home/dragon/www/projects/wmd/server/modules/servers/servers.html",
 		"/home/dragon/www/projects/wmd/server/modules/servers/servers.css",
 		"/home/dragon/www/projects/wmd/server/lib/general.js",
 		"/home/dragon/www/projects/wmd/server/modules/apps/apps.css",
-		"/home/dragon/www/projects/wmd/server/wmd.js",
-		"/home/dragon/www/projects/wmd/server/wmd.html",
-		"/home/dragon/www/projects/wmd/server/modules/apps/appInfo.html",
-		"/home/dragon/www/projects/wmd/server/modules/apps/manage.js",
 		"/home/dragon/www/projects/wmd/server/modules/servers/serverInfo.html",
-		"/home/dragon/www/projects/wmd/README.md",
 		"/home/dragon/www/projects/wmd/server/modules/logs/logs.html",
-		"/home/dragon/www/projects/wmd/server/modules/logs/logs.js",
-		"/home/dragon/www/projects/wmd/server/lib/models.js",
 		"/home/dragon/www/projects/wmd/server/modules/apps/appInfo.css",
 		"/home/dragon/www/projects/wmd/server/modules/apps/appNew.css",
-		"/home/dragon/www/projects/wmd/server/lib/files.js",
-		"/home/dragon/www/projects/wmd/server/modules/servers/serverInfo.js",
-		"/home/dragon/www/projects/wmd/server/smart.json",
 		"/home/dragon/www/projects/wmd/server/modules/servers/serverInfo.css",
-		"/home/dragon/www/projects/wmd/server/lib/commands.js",
-		"/home/dragon/www/projects/wmd/server/modules/servers/servers.js",
-		"/home/dragon/www/projects/wmd/server/modules/servers/serverNew.js",
 		"/home/dragon/www/projects/wmd/server/modules/servers/serverNew.html",
 		"/home/dragon/www/projects/wmd/server/modules/servers/serverNew.css",
-		"/home/dragon/www/projects/wmd/server/packages.json",
 		"/home/dragon/www/projects/wmd/server/modules/apps/showApp.html",
 		"/home/dragon/www/projects/wmd/server/modules/apps/showApp.js",
-		"/home/dragon/www/projects/wmd/server/wmd.css",
 		"/home/dragon/www/projects/wmd/server/client/ansi2html.js",
 		"/home/dragon/www/projects/wmd/server/modules/serverInfo/serverInfo.js",
-		"/home/dragon/www/projects/wmd/server/modules/user/user.js",
 		"/home/dragon/www/projects/wmd/server/modules/serverInfo/serverInfo.html",
-		"/home/dragon/www/projects/wmd/client/dropletSetup.sh",
 		"/home/dragon/www/projects/wmd/server/modules/apps/Extensions.md",
 		"/home/dragon/www/projects/wmd/LICENSE",
 		"/home/dragon/www/projects/wmd/server/commands.js",
 		"/home/dragon/www/projects/wmd/server/pages/user/user.html",
 		"/home/dragon/www/projects/wmd/client/wmd-client.js",
 		"/home/dragon/www/projects/wmd/server/modules/user/user.css",
-		"/home/dragon/www/projects/wmd/server/modules/user/user.html",
 		"/home/dragon/www/projects/wmd/server/pages/servers/servers.js",
 		"/home/dragon/www/projects/wmd/server/pages/serverInfo/serverInfo.js",
-		"/home/dragon/www/projects/wmd/client/package.json",
 		"/home/dragon/www/projects/wmd/server/pages/servers/servers.html",
 		"/home/dragon/www/projects/wmd/server/pages/user/user.css",
 		"/home/dragon/www/projects/wmd/server/pages/logs/logs.css",
@@ -387,6 +343,81 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"installscripts",
+			"}\n",
+			"wmd-client",
+			"attemptlogin",
+			"login",
+			"ddpclient",
+			"before",
+			"nodejs",
+			"$METEOR",
+			"installscripts",
+			"installclient",
+			"substr",
+			"branch",
+			"close",
+			"console.",
+			"console.log",
+			"nginxgenconf",
+			"SCRIPT_HOME",
+			"autoupdate",
+			"updaterepos",
+			"authedwrapped",
+			"out",
+			"conf",
+			"out",
+			"console.log",
+			".ip",
+			"ENV",
+			"LOCAL_METEORS",
+			"appinstall",
+			"appInstall",
+			"appinstall",
+			"freeserver",
+			"servers",
+			"deploy",
+			"forced",
+			"appinstall",
+			"setup",
+			"iaas",
+			"install",
+			"delete",
+			"remove",
+			"instance",
+			"foreverstart",
+			"counter",
+			"setup",
+			"console.log(\"update",
+			"console.log('update",
+			"update",
+			"checked",
+			"updateCol",
+			"updatecol",
+			"new Task",
+			"Task",
+			"new Task",
+			"meteorPassword",
+			"port",
+			"'db'+':'+db._id+\":\"+instance._id",
+			"serverid",
+			"instance",
+			"appinstall",
+			"sidebar",
+			"\n            ",
+			"update",
+			"err",
+			"log",
+			"METEOR",
+			"updatecol",
+			"desc",
+			"Apps:",
+			");\n",
+			"app",
+			"alert",
+			"console.log",
+			"instance.serverid",
+			"delete",
 			"done",
 			"key",
 			".close(",
@@ -439,45 +470,7 @@
 			"join",
 			"freeserver",
 			"failed",
-			"deployoptions.meteordir",
-			"appadd_meteordir",
-			"addapp",
-			".name",
-			"runplugin",
-			"appinstall",
-			"github",
-			"security",
-			"commands",
-			"commands.insert",
-			"DO_destroy",
-			"newserver",
-			"servers.",
-			"serverStats.",
-			"servers.",
-			"serverstats",
-			"servers.",
-			"h2>",
-			"publish",
-			"servers",
-			"mkdir",
-			"__EOF__",
-			"console.log",
-			"username",
-			"devServer",
-			"self",
-			"eventdesc",
-			"do_destroy",
-			"suball",
-			"serverId",
-			"console.log",
-			"procs",
-			"console.log",
-			"message",
-			"mf_extract",
-			"params",
-			"processhtml",
-			"publish",
-			"meteor.methods"
+			"deployoptions.meteordir"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -502,250 +495,54 @@
 	"groups":
 	[
 		{
-			"selected": 6,
+			"selected": 3,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "server/lib/models.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1841,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								536,
-								536
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 60.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 14,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "server/modules/servers/servers.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1026,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								887,
-								887
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 270.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 16,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
 					"file": "server/wmd.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2679,
+						"buffer_size": 3010,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								991,
-								991
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 385.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 8,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "README.md",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 10555,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								10555,
-								10555
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Markdown/Markdown.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 13,
-					"type": "text"
-				},
-				{
-					"buffer": 4,
-					"file": "server/modules/servers/serverInfo.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 3840,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								954,
-								954
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 237.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 5,
-					"file": "server/packages/tasks/tasks.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4168,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								780,
-								780
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 360.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 6,
-					"file": "server/modules/apps/manage.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 6600,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								4739,
-								4739
+								3007,
+								3007
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"tab_size": 2
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2294.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 7,
-					"file": "server/packages/tasks/child_process.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2238,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1028,
-								1028
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1302.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
-					"file": "server/modules/logs/logs.js",
-					"semi_transient": true,
+					"buffer": 1,
+					"file": "client/wmd-client.js",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4687,
+						"buffer_size": 10933,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								3253,
+								3253
 							]
 						],
 						"settings":
@@ -754,234 +551,99 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 270.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 12,
-					"type": "text"
-				},
-				{
-					"buffer": 9,
-					"file": "server/packages.json",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 314,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								311,
-								311
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 9,
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "server/smart.json",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 639,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								92,
-								92
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JSON.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "server/packages/tasks/tasks.html",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 359,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								228,
-								228
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/HTML/HTML.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 6,
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "server/packages/tasks/README.md",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1307,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								669,
-								669
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Markdown/Markdown.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 360.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "server/packages/tasks/package.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 470,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								204,
-								204
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "server/packages/tasks/tasks-client.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 274,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								263,
-								263
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 15,
-					"file": "server/modules/servers/serverNew.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 4747,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								2971,
-								2971
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 359.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 15,
-					"type": "text"
-				},
-				{
-					"buffer": 16,
-					"file": "server/modules/servers/servers.js",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7349,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								3156,
-								3156
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/JavaScript/JavaScript.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 2174.0,
+						"translation.y": 1800.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "server/modules/apps/appInfo.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3323,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								567,
+								567
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "client/node_modules/ddp-login/lib/index.js",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9668,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								288,
+								288
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "server/wmd.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2022,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1478,
+								1478
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
 					"type": "text"
 				}
 			]

@@ -4,7 +4,8 @@ if (Meteor.isClient) {
 			serverId = this.serverId;
 		if (!serverId)
 			return '(undefined)';
-		return Servers.findOne(serverId).username;
+		var server = Servers.findOne(serverId);
+		return server ? server.username : '(not found)';
 	});
 
 	Template.appInfo.name = function() {

@@ -42,8 +42,8 @@
       },
       "connection-banner": {
         "git": "https://github.com/nate-strauser/meteor-connection-banner.git",
-        "tag": "v0.4.0",
-        "commit": "2652cd4ee4d863651c4b5298aebcf2c5710d2971"
+        "tag": "v0.4.2",
+        "commit": "4f384cef1fbff4fd1a26b1e03aa05e1cf3825ad9"
       },
       "font-awesome": {
         "git": "https://github.com/nate-strauser/meteor-font-awesome.git",
@@ -52,8 +52,8 @@
       },
       "reactive-object": {
         "git": "https://github.com/jonjamz/reactive-object.git",
-        "tag": "v0.1.0",
-        "commit": "15dc38ed667a6ca116069deb31346e9a8718855b"
+        "tag": "v0.2.1",
+        "commit": "5a94f6f14fdb83d99a99686dfadc36ba82844718"
       },
       "iron-layout": {
         "git": "https://github.com/EventedMind/iron-layout.git",

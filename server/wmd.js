@@ -6,9 +6,9 @@ if (Meteor.isClient) {
 	  loadingTemplate: 'loading',
 	  waitOn: subAll,
     onBeforeAction: function(pause) {
-      var current = this.layout();
+      var current = this.lookupLayoutTemplate();
       if (current != 'loginLayout')
-        layout = current || 'layout';
+        layout = current || 'sidebar-layout';
       if (!Meteor.user()) {
         this.layout('loginLayout');
         this.render('login');
