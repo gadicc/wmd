@@ -28,3 +28,11 @@ random
 
 orgztion:meteor-global-tether
 twbs:bootstrap@4.0.0-alpha.2
+
+wmd-iaas
+wmd-iaas-digitalocean
+wmd-extensions
+wmd-servers
+wmd-services
+wmd-apps
+wmd-sources

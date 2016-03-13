@@ -7,12 +7,17 @@ module.exports = function (wallaby) {
 
   return {
     files: [
+//      'lib/*.js',
+      '!lib/**/tests/*.js',
+      'lib/**/*.js',
       'client/modules/**/components/*.jsx',
       'client/modules/**/actions/*.js',
       'client/modules/**/containers/*.js',
       'client/modules/**/libs/*.js'
     ],
     tests: [
+//      'lib/tests/*.js',
+      'lib/**/tests/*.js',
       'client/**/tests/*.js'
     ],
     compilers: {

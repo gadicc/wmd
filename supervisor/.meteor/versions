@@ -79,3 +79,10 @@ underscore@1.0.5-beta.12
 url@1.0.6-beta.12
 webapp@1.2.5-beta.12
 webapp-hashing@1.0.6-beta.12
+wmd-apps@0.0.1
+wmd-extensions@0.0.1
+wmd-iaas@0.0.1
+wmd-iaas-digitalocean@0.0.1
+wmd-servers@0.0.1
+wmd-services@0.0.1
+wmd-sources@0.0.1

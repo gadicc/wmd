@@ -37,6 +37,7 @@
     "react-dom": "^0.14.6",
     "react-mounter": "^1.0.0",
     "react-transform-hmr": "^1.0.4",
-    "tether": "^1.2.0"
+    "tether": "^1.2.0",
+    "extensions": "file:/home/dragon/www/npm/extensions"
   }
 }

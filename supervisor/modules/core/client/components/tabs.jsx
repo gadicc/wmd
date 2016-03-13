@@ -6,13 +6,13 @@ export class Tabs extends React.Component {
     super(props);
 
     this.state = {
-      activeTabId: props.activeTabId || props.children[0].props.id
+      activeTabKey: props.activeTabKey || props.children[0].key || props.children[0].props.key
     };
 
   }
 
-  setActiveTabId(tabId) {
-    this.setState({ activeTabId: tabId });
+  setActiveTabKey(tabKey) {
+    this.setState({ activeTabKey: tabKey });
   }
 
   render() {
@@ -20,16 +20,17 @@ export class Tabs extends React.Component {
     var tabContent;
 
     this.props.children.forEach((tab) => {
+      var tabKey = tab.key || tab.props.key;
       var className = 'tabHeader';
-      var onClick = this.setActiveTabId.bind(this, tab.props.id);
+      var onClick = this.setActiveTabKey.bind(this, tabKey);
 
-      if (tab.props.id === this.state.activeTabId) {
+      if (tabKey === this.state.activeTabKey) {
         tabContent = tab.props.children;
         className += " active";
       }
 
       tabHeaders.push(
-        <div key={tab.props.id} className={className} onClick={onClick}>{tab.props.name}</div>
+        <div key={tabKey} className={className} onClick={onClick}>{tab.props.name}</div>
       );
 
     });
@@ -37,26 +38,11 @@ export class Tabs extends React.Component {
     return (
       <div className="tabPane">
         <div className="tabHeaders">{tabHeaders}</div>
-        <div className="tabContent">{tabContent}</div>
+        <div className="tabContent">{tabContent()}</div>
       </div>
     );
   }
 
 }
 
-export class Tab extends React.Component {
-
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    console.log(this);
-    var { id, name } = this.props;
-
-    return (
-      <div class="tab" key={id} name={name}>XX</div>
-    );
-  }
-
-}
+export class Tab extends React.Component {}

@@ -1,15 +1,20 @@
 import React from 'react';
 import { Tabs, Tab } from './tabs';
+import { tabs } from 'meteor/wmd-extensions';
 
-const Layout = ({content = () => null }) => (
-  <div>
-    <Tabs>
-       <Tab id="apps" name="Apps">
-       </Tab>
-       <Tab id="servers" name="Servers">servers</Tab>
-       <Tab id="iaas" name="IAAS">IAAS</Tab>
-    </Tabs>    
-  </div>
-);
+/*
+tabList.push(<Tab key="apps" name="Apps">apps</Tab>);
+tabList.push(<Tab key="servers" name="Servers">servers</Tab>);
+*/
+
+const Layout = ({content = () => null }) => {
+  return (
+    <div>
+      <Tabs>
+       { tabs.map(({key, name, content}) => ( <Tab key={key} name={name}>{content}</Tab> )) }
+      </Tabs>    
+    </div>
+  );
+};
 
 export default Layout;
