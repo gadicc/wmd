@@ -5,10 +5,10 @@ export class Tabs extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      activeTabKey: props.activeTabKey || props.children[0].key || props.children[0].props.key
-    };
-
+    if (!props.tab)
+      this.state = {
+        activeTabKey: props.activeTabKey || props.children[0].key || props.children[0].props.key
+      };
   }
 
   setActiveTabKey(tabKey) {
@@ -20,11 +20,14 @@ export class Tabs extends React.Component {
     var tabContent;
 
     this.props.children.forEach((tab) => {
-      var tabKey = tab.key || tab.props.key;
-      var className = 'tabHeader';
-      var onClick = this.setActiveTabKey.bind(this, tabKey);
+      const tabKey = tab.key || tab.props.key;
+      const currentTabKey = this.props.tab || tabKey === this.state.activeTabKey;
+      const onClick = this.props.onTabClick
+        ? this.props.onTabClick.bind(null, tabKey)
+        : this.setActiveTabKey.bind(this, tabKey);
 
-      if (tabKey === this.state.activeTabKey) {
+      var className = 'tabHeader';
+      if (tabKey === currentTabKey) {
         tabContent = tab.props.children;
         className += " active";
       }

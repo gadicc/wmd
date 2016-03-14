@@ -1,7 +1,6 @@
 //import methodStubs from './configs/method_stubs';
-//import actions from './actions';
-var actions = {};
 import routes from './routes.jsx';
+import actions from './actions';
 
 export default {
   routes,

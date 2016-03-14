@@ -1,42 +1,33 @@
 import React from 'react';
 import {mount} from 'react-mounter';
 
-import MainLayout from './components/main_layout.jsx';
+import MainLayout from './containers/main_layout.jsx';
 /*
 import PostList from './containers/postlist';
 import Post from './containers/post';
 import NewPost from './containers/newpost';
 */
 
-export default function (injectDeps, {FlowRouter}) {
+export default function (injectDeps, {DefaultRouter}) {
   const MainLayoutCtx = injectDeps(MainLayout);
 
-  FlowRouter.route('/', {
-    name: 'posts.list',
+  const origRoute = DefaultRouter.route;
+  DefaultRouter.route = function(path, options) {
+    if (typeof options === 'string')
+      options = { name: options };
+    if (!options.action)
+      options.action = function() {
+        mount(MainLayoutCtx)
+      }
+    origRoute.call(this, path, options);
+  };
+
+
+  DefaultRouter.route('/', {
     action() {
-      mount(MainLayoutCtx, {
-        content: () => (<div />)
-      });
+      FlowRouter.go('/apps');
     }
   });
 
-/*
-  FlowRouter.route('/post/:postId', {
-    name: 'posts.single',
-    action({postId}) {
-      mount(MainLayoutCtx, {
-        content: () => (<Post postId={postId}/>)
-      });
-    }
-  });
-
-  FlowRouter.route('/new-post', {
-    name: 'newpost',
-    action() {
-      mount(MainLayoutCtx, {
-        content: () => (<NewPost/>)
-      });
-    }
-  });
-*/
+  DefaultRouter.route('/:tab', 'main');
 }

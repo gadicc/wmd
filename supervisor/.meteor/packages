@@ -26,13 +26,16 @@ audit-argument-checks
 check
 random
 
-orgztion:meteor-global-tether
-twbs:bootstrap@4.0.0-alpha.2
+#orgztion:meteor-global-tether
+#twbs:bootstrap@4.0.0-alpha.2
 
-wmd-iaas
-wmd-iaas-digitalocean
 wmd-extensions
-wmd-servers
-wmd-services
+
+# note the order here affects Tab order
 wmd-apps
+wmd-servers
 wmd-sources
+wmd-iaas
+wmd-services
+
+wmd-iaas-digitalocean
