@@ -16,7 +16,7 @@ standard-minifier-css   # CSS minifier run for production mode
 standard-minifier-js    # JS minifier run for production mode
 es5-shim                # ECMAScript 5 compatibility for older browsers.
 #ecmascript              # Enable ECMAScript2015+ syntax in app code
-gadicc:ecmascript-hot
+gadicc:ecmascript-hot@0.0.11-rc.4
 
 #practicalmeteor:mocha   # An excellent default test driver package.
 
@@ -29,6 +29,12 @@ random
 #orgztion:meteor-global-tether
 #twbs:bootstrap@4.0.0-alpha.2
 
+#gwendall:blaze-to-react
+gadicc:blaze-react-component
+accounts-ui
+accounts-password
+accounts-github
+
 wmd-extensions
 
 # note the order here affects Tab order
@@ -37,5 +43,7 @@ wmd-servers
 wmd-sources
 wmd-iaas
 wmd-services
+wmd-docker
 
 wmd-iaas-digitalocean
+wmd-sources-meteor

@@ -1,5 +1,9 @@
 import React from 'react';
 
+const isReactComponent = function (Component) {
+  return 'prototype' in Component && typeof Component.prototype.render === 'function';
+};
+
 export class Tabs extends React.Component {
 
   constructor(props) {
@@ -29,6 +33,9 @@ export class Tabs extends React.Component {
       var className = 'tabHeader';
       if (tabKey === currentTabKey) {
         tabContent = tab.props.children;
+        if (isReactComponent(tabContent))
+          tabContent = React.createElement(tabContent);
+
         className += " active";
       }
 
@@ -41,7 +48,7 @@ export class Tabs extends React.Component {
     return (
       <div className="tabPane">
         <div className="tabHeaders">{tabHeaders}</div>
-        <div className="tabContent">{tabContent()}</div>
+        <div className="tabContent">{tabContent}</div>
       </div>
     );
   }

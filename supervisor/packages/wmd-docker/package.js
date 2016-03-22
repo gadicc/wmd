@@ -1,5 +1,5 @@
 Package.describe({
-  name: 'wmd-sources',
+  name: 'wmd-docker',
   version: '0.0.1',
   summary: '',
   git: '',
@@ -11,8 +11,8 @@ Package.onUse(function(api) {
   api.use('ecmascript');
   api.use('wmd-extensions');
   api.mainModule('client/index.js', 'client');
-  api.addFiles('client/components/sourcesList.css', 'client');
-  api.mainModule('server/index.js', 'server');
+  // api.addFiles('client/components/serverList.css', 'client');
+  //api.mainModule('server/index.js', 'server');
 });
 
 Package.onTest(function(api) {

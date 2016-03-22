@@ -1,8 +1,10 @@
 import 'babel-polyfill';
-import promisify from './promisify';
-import login from './auth';
 import fs from 'fs';
 import path from 'path';
+
+import promisify from './promisify';
+import login from './auth';
+import upload from './upload';
 
 const fsAsync = promisify(fs);
 
@@ -37,6 +39,12 @@ var err = (async function main() {
     session = rcFile.sessions[server] = await login(rcFile.sessions[server]);
     await fs.writeFile(rcFilePath, JSON.stringify(rcFile, null, 2));
   }
+
+  //var file = '/home/dragon/alerts.txt';
+  var file = '/home/dragon/www/tmp/basic/out/basic.tar.gz';
+  
+  upload(file, `http://localhost:7000/meteorDeploy/${session.token}/www.gadi.cc`);
+
 })().catch((err) => {
   setTimeout(() => { throw err; });
 });

@@ -1,41 +1,33 @@
-Instanceables (nginx, app, database)
-* Has global state: starting, started, stopped + actions
-* Has instance state per each instance + actions
-* Must have clear transition on what to do from one state to another
+# Wastelands Meteor Deployer
 
-Process
-* Can be run locally or via remotely via wmd-agent
-* Provide an extra FD to communicate with process / be passed to task
-* Optionally log or stream stdout and stderr.
-* Log must be integratable as part of a task log
-* Can be synchronous (via fibers) or asynchronous (with callbacks)
-* Run a build process, docker container, nginx, meteor app, mongo
-* Can be used for ongoing process
+"Deploy Meteor with Meteor". A web interface to bring up new cloud servers,
+handle deployments (via github), load-balance, scale-on-demand, etc. A work
+in progress.
 
-Packages
-* Total separataion.  github package, wmd-github package, etc.
-* wmd-* via gadicohen:extensions
+Copyright (c) 2014 - 2016 Gadi Cohen, see license below.
 
-Tasks
-* Task is an array of steps.
-* Each step is an object which defines the step
-* A step can also be an array of objects, which will be run in parallel
-- or a function which will be run when the step is reached to generate object or array of objects
-* Step ultimately includes a function which can be sync (fibers) or async (done callback)
-* Task can be an ongoing task which runs indefinitely (status: "ongoing")
-* Show all tasks, and related info (where they're running, percent complete, etc)
-* Task gets it's own log file, each step can optionally have it's own logfile
+## Target Audience
 
-App update task
-* Update code
-* Launch new instances
-* Wait for start -> running
-* Update proxy
-* Down old servers
+You understand linux servers, nginx, docker and various hosting technologies
+and want a tool to help you manage your deployments.  You don't require any
+support, take sole responsibility for your uptime, and are interesting in
+contributing to this project.
 
-Agents
-* Report server CPU
-* Run processes, stream logs
-* Sync files by sha1 (nginx.conf, scripts)
-* Restore state across reload
+If you're looking for stable, maintenance free hosting backed by a
+professional team whose sole purpose is to keep your app running,
+you're looking for Galaxy.
 
+This is meant to handle private code. You run your own WMD server for all
+your own projects. This is not intended to be cloud-hosted and offer
+deployment services to others (which is against the license). PLEASE READ
+"IMPORTANT NOTES", BELOW.
+
+## Features
+
+## Important Notes
+
+LICENSE: [Ms-SS](http://directory.fsf.org/wiki/License:Ms-SS) (for now :)).
+Open source for non-commercial use. To be clear, companies may use the code
+freely under the license, they simply cannot charge for the use of the
+product, i.e. the license probibits using the code, or modifications of the
+code, to operate a paid deployment service for end-users.

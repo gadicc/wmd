@@ -1,0 +1,8 @@
+.sourcesList {
+  padding: 20px;
+}
+
+.source h2 {
+  font-size: 140%;
+  border-bottom: 1px solid #ccc;
+}

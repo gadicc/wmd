@@ -1,10 +1,9 @@
-import Extension from 'meteor/wmd-extensions';
-import ExtensionHost from 'extensions';
+import ee, { ext } from '../lib/index.js';
+import SourcesList, { addSource } from './containers/sourcesList.jsx';
 
-import SourcesList from './containers/sourcesList.jsx';
+ext.addTab('sources', "Sources", SourcesList);
 
-var wmd = new Extension({
-  name: 'wmd-sources'
-});
+ee.prototype.addSource = addSource;
 
-wmd.addTab('sources', "Sources", SourcesList);
+export { ext };
+export default ee;
