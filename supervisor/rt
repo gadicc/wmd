@@ -1,0 +1,7 @@
+#!/bin/sh
+RT=node_modules/react-toolbox
+SRT=/home/dragon/www/npm/react-toolbox
+
+rm -rf $RT
+mkdir $RT
+cp -a $SRT/lib $SRT/package.json $RT

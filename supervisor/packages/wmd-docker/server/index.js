@@ -1,13 +1,22 @@
 import Docker from 'dockerode';
 
+import { MongoStream } from 'meteor/gadicc:mongo-stream';
+
 var docker = new Docker({socketPath: '/var/run/docker.sock'});
+
+var ms = new MongoStream({id: 'a'});
+
+/*
+import fs from 'fs';
+var r = fs.createReadStream('/home/dragon/stream');
+*/
 
 /*
 docker.pull('meteorhacks/meteord:onbuild', (err, stream) => {
   if (err)
     console.log(err);
-  stream.pipe(process.stdout);
-  stream.pipe(process.stderr);
+  //docker.modem.demuxStream(stream, ms.stdout, ms.stderr);
+  stream.pipe(ms.stdout);
 });
 */
 

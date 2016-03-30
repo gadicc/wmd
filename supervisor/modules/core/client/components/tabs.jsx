@@ -33,7 +33,7 @@ export class Tabs extends React.Component {
       var className = 'tabHeader';
       if (tabKey === currentTabKey) {
         tabContent = tab.props.children;
-        if (isReactComponent(tabContent))
+        if (1 || isReactComponent(tabContent))
           tabContent = React.createElement(tabContent);
 
         className += " active";

@@ -3,8 +3,10 @@ import ExtensionHost from 'extensions';
 
 import ServerList from './containers/appList.jsx';
 
-var wmd = new Extension({
+var ext = new Extension({
   name: 'wmd-apps'
 });
 
-wmd.addTab('apps', "Apps", ServerList);
+ext.addTab('apps', "Apps", ServerList);
+
+export default ext;

@@ -5,6 +5,7 @@ import {FlowRouter} from 'meteor/kadira:flow-router';
 import {ReactiveDict} from 'meteor/reactive-dict';
 import {Tracker} from 'meteor/tracker';
 import {createStore} from 'redux';
+import {reducer as formReducer} from 'redux-form';
 
 /*
 FlowRouter.wait();
@@ -41,8 +42,6 @@ const Reducers = {
 
 }
 
-const Store = createStore(Reducers.apply);
-
 Reducers.add('route', (state, action) => {
   if (action.type === 'route')
     return {
@@ -57,6 +56,17 @@ Reducers.add('route', (state, action) => {
   else
     return state;
 });
+
+Reducers.add('form', (state, action) => {
+  var form = formReducer(state.form, action);
+  return {
+    ...state,
+    form
+  }
+});
+
+const Store = createStore(Reducers.apply, {},
+  window.devToolsExtension ? window.devToolsExtension() : undefined);
 
 var firstTime = true;
 Tracker.autorun(function() {

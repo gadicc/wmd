@@ -16,9 +16,15 @@ standard-minifier-css   # CSS minifier run for production mode
 standard-minifier-js    # JS minifier run for production mode
 es5-shim                # ECMAScript 5 compatibility for older browsers.
 #ecmascript              # Enable ECMAScript2015+ syntax in app code
-gadicc:ecmascript-hot@0.0.11-rc.4
+gadicc:ecmascript-hot@1.3.0-1
 
 #practicalmeteor:mocha   # An excellent default test driver package.
+
+gadicc:mongo-stream
+
+simple:dev-error-overlay
+
+nathantreid:css-modules@1.0.0-beta.9
 
 kadira:flow-router
 reactive-dict
@@ -47,3 +53,4 @@ wmd-docker
 
 wmd-iaas-digitalocean
 wmd-sources-meteor
+

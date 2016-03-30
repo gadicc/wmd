@@ -1,21 +1,29 @@
 import React from 'react';
-import { Tabs, Tab } from './tabs';
+//import { Tabs, Tab } from './tabs';
+import { Tab, Tabs } from 'react-toolbox/lib/tabs';
 import { tabs } from 'meteor/wmd-extensions';
 import Blaze from 'meteor/gadicc:blaze-react-component';
+import { Provider } from 'react-redux'
 
-const Layout = ({tab, actions}) => {
-  const onTabClick = actions().mainLayout.onTabClick;
+const Layout = ({tab, actions, context}) => {
+  const { Store } = context();
+  const onChange = actions().mainLayout.onChange;
   return (
-    <div>
-      <div style={{ float: 'right' }}>
-        <Blaze template="loginButtons" align="right" />
-      </div>
+    <Provider store={Store}>
       <div>
-        <Tabs tab={tab} onTabClick={onTabClick}>
-         { tabs.map(({key, name, content}) => ( <Tab key={key} name={name}>{content}</Tab> )) }
-        </Tabs>    
+        <div style={{ float: 'right' }}>
+          <Blaze template="loginButtons" align="right" />
+        </div>
+        <div>
+          <Tabs tab={tab} onChange={onChange}>
+           { tabs.map(({key, name, content}) => {
+              content = React.createElement(content); // if...
+              return (<Tab key={key} label={name}>{content}</Tab> );
+            }) }
+          </Tabs>    
+        </div>
       </div>
-    </div>
+    </Provider>
   );
 };
 

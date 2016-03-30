@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { _ } from 'meteor/underscore';
+import Input from 'react-toolbox/lib/input';
 
 class Form extends Component {
   constructor(props) {
@@ -7,12 +8,19 @@ class Form extends Component {
     this.state = {}
   }
 
-  onChange(name, event) {
-    this.setState({ [name]: event.currentTarget.value });
+  onChange(name, value, event) {
+    if (!event) {
+      event = value;
+      value = undefined;
+    }
+
+    this.setState({ [name]: value || event.currentTarget.value });
   }
 
   onSubmit(event) {
     event.preventDefault();
+    console.log(JSON.stringify(this.state, null, 2));
+    return;
     if (this.props.onSubmit)
       this.props.onSubmit(this.state, event);
   }
@@ -24,11 +32,13 @@ class Form extends Component {
       children = children.map((child, i) => {
         return React.cloneElement(child, {
           key: i,
+          value: this.state[child.props.name],
           onChange: this.onChange.bind(this, child.props.name)
         }, child.props.children)
       });
     else
       children = React.cloneElement(children, {
+        value: this.state[child.props.name],
         onChange: this.onChange.bind(this, children.props.name)
       });
 
@@ -67,6 +77,7 @@ const ServerList = ({servers, addServer}) => (
       </p>
       <Form onSubmit={addServer}>
         <TextInput name="hostname" title="Hostname" />
+        <Input type='text' label='Name' name='name' />
         <input type="submit" />
       </Form>
     </div>

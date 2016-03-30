@@ -19,5 +19,9 @@ ee.prototype.getStorageDir = function() {
   return '/tmp';
 }
 
+ee.prototype.appContext = function() {
+  return require('/client/configs/context.js').default();
+};
+
 export { tabs };
 export default ee;
