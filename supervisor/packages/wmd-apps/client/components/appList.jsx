@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
-import { Card, CardMedia, CardTitle, CardText, CardActions } from 'react-toolbox/lib/card';
-import { Button } from 'react-toolbox/lib/button';
-import Input from 'react-toolbox/lib/input';
+
 import Dialog from 'react-toolbox/lib/dialog';
 
-var cardStyle = { width: '250px', height: '250px', display: 'inline-block', marginRight: '10px' };
+import Card from 'material-ui/lib/card/card';
+import CardActions from 'material-ui/lib/card/card-actions';
+import CardTitle from 'material-ui/lib/card/card-title';
+import CardText from 'material-ui/lib/card/card-text';
+
+import Button from 'material-ui/lib/flat-button';
+import TextField from 'material-ui/lib/text-field';
+
+var cardStyle = { width: '250px', height: '250px', display: 'inline-block', marginRight: '10px', verticalAlign: 'top' };
 
 class RemoveButton extends Component {
 
@@ -48,7 +54,7 @@ const AppList = ({apps, handleSubmit, actions, fields}) => (
           Create a new project here, or alternatively, via meteor-deploy.
         </div>
         <form onSubmit={handleSubmit(actions.submit2)}>
-          <Input type='text' label='App Name' {...fields.name} />
+          <TextField floatingLabelText='App Name' fullWidth={true} {...fields.name} />
           <CardActions>
             <Button label="Go" />
           </CardActions>

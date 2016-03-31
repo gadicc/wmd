@@ -7,11 +7,11 @@ const composer = ({context}, onData) => {
   const { Store } = context();
 
   var route = Store.getState().route;
-  onData(null, { tab: (route.params && route.params.tab) || defaultTab });
+  onData(null, { value: (route.params && route.params.value) || defaultTab });
 
   return Store.subscribe(() => {
     var route = Store.getState().route;
-    onData(null, { tab: (route.params && route.params.tab) || defaultTab });
+    onData(null, { value: (route.params && route.params.value) || defaultTab });
   });
 }
 
