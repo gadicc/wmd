@@ -1,21 +1,6 @@
 {
   "presets": [ "meteor", "stage-0" ],
+  "plugins": [ "jsx-control-statements" ],
   // "presets": ["es2015", "stage-2", "react"],
-  // "plugins": ["react-require", "babel-root-slash-import"],
-  "env": {
-    "development": {
-      "plugins": [
-        ["react-transform", {
-          "transforms": [{
-            "transform": "react-transform-hmr",
-            "imports": ["react"],
-            "locals": ["module"]
-          }, {
-            "transform": "react-transform-catch-errors",
-            "imports": ["react", "redbox-react"]
-          }]
-        }]
-      ]
-    }
-  }
+  // "plugins": ["react-require", "babel-root-slash-import"]
 }

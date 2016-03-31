@@ -29,7 +29,7 @@ class RemoveButton extends Component {
           <div>
             <b>{this.props.app.name}</b>
             <span> will be permanently removed</span>
-            <p>(TODO, disallow if any active stuff running, or if services arent removed first?)</p>
+            <p>(TODO, disallow if any active stuff running, or if services aren't removed first?)</p>
           </div>
         </Dialog>
       </div>
@@ -37,7 +37,7 @@ class RemoveButton extends Component {
   }
 } 
 
-const AppList = ({apps, handleSubmit, handleSubmit2, fields, removeApp}) => (
+const AppList = ({apps, handleSubmit, actions, fields}) => (
   <div className="appList">
 
     <Card style={cardStyle}>
@@ -47,7 +47,7 @@ const AppList = ({apps, handleSubmit, handleSubmit2, fields, removeApp}) => (
         <div style={{marginBottom: '10px'}}>
           Create a new project here, or alternatively, via meteor-deploy.
         </div>
-        <form onSubmit={handleSubmit(handleSubmit2)}>
+        <form onSubmit={handleSubmit(actions.submit2)}>
           <Input type='text' label='App Name' {...fields.name} />
           <CardActions>
             <Button label="Go" />
@@ -60,8 +60,8 @@ const AppList = ({apps, handleSubmit, handleSubmit2, fields, removeApp}) => (
       <Card key={app._id} style={cardStyle}>
         <CardTitle title={app.name} />
         <CardActions>
-          <Button label="Edit" />
-          <RemoveButton app={app} remove={removeApp} />
+          <Button label="Edit" onClick={actions.edit.bind(this, app)} />
+          <RemoveButton app={app} remove={actions.remove} />
         </CardActions>
       </Card>
     )) }

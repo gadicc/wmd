@@ -7,19 +7,28 @@ import AppList from '../components/appList.jsx';
 import { Apps } from '../configs/context.js';
 import ext from '../index.js';
 
-function handleSubmit2({name}) {
-  const { dispatch } = ext.appContext().Store;
-  Apps.insert({name});
-  dispatch(reset('app_new'));
-}
+const actions = {
 
-function removeApp(app) {
-  Apps.remove(app._id);
+  submit2({name}) {
+    const { dispatch } = ext.appContext().Store;
+    Apps.insert({name});
+    dispatch(reset('app_new'));
+  },
+
+  remove(app) {
+    Apps.remove(app._id);
+  },
+
+  edit(app) {
+    const { FlowRouter } = ext.appContext();
+    FlowRouter.go(`/apps/${app._id}`);
+  }
+
 }
 
 function composer(props, onData) {
   const apps = Apps.find().fetch();
-  onData(null, {apps, handleSubmit2, removeApp});
+  onData(null, {apps, actions});
 }
 
 const FormContainer = reduxForm({
