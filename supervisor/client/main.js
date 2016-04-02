@@ -6,7 +6,8 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 // https://github.com/zilverline/react-tap-event-plugin
 injectTapEventPlugin();
 
-
+if (process.env.NODE_ENV === 'development')
+  window.Perf = require('react-addons-perf');
 
 import {createApp} from 'mantra-core';
 import initContext from './configs/context';

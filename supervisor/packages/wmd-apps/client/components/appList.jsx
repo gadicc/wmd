@@ -20,7 +20,7 @@ class RemoveButton extends Component {
 
   toggle = () => {
     this.setState({active: !this.state.active});
-  }
+  };
 
   actions = [
     { label: 'Cancel', onClick: this.toggle },
