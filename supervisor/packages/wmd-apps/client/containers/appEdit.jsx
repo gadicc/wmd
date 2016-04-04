@@ -1,23 +1,20 @@
 import React, { Component } from 'react';
 import { reduxForm, reset } from 'redux-form'
 import { composeWithTracker } from 'mantra-core';
-//import Dialog from 'react-toolbox/lib/dialog';
+import { connect } from 'react-redux';
 
-import AppEdit from '../components/appEdit.jsx';
 import { Apps } from '../configs/context.js';
-import ext from '../index.js';
+import { services } from 'meteor/wmd-services';
 
-const actions = {
-  back() {
-    const { FlowRouter } = ext.appContext();
-    FlowRouter.go('/apps');
-  }
-}
+import actions from '../actions/appEdit.jsx';
+import AppEdit from '../components/appEdit.jsx';
 
 function composer(props, onData) {
   const app = Apps.findOne(props._id);
-  onData(null, {app, actions});
+  onData(null, { ...props, app, actions, services });
 }
 
-export default composeWithTracker(composer)(AppEdit);
+const mapStateToProps = ({ appsEditAddServices }) => { return { appsEditAddServices }; };
+
+export default connect(mapStateToProps)(composeWithTracker(composer)(AppEdit));
 

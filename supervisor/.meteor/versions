@@ -111,5 +111,6 @@ wmd-iaas@0.0.1
 wmd-iaas-digitalocean@0.0.1
 wmd-servers@0.0.1
 wmd-services@0.0.1
+wmd-services-app-meteor@0.0.1
 wmd-sources@0.0.1
 wmd-sources-meteor@0.0.1

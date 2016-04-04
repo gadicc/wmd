@@ -5,7 +5,7 @@ import actions from './actions';
 export default {
   routes,
   actions,
-  load(context) {
+  load(context) {      
     //methodStubs(context);
   }
 };

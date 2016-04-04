@@ -26,7 +26,7 @@ const MainLayout = pure(({tab, actions}) => {
   const onChange = actions().mainLayout.onChange;
   return (
     <div>
-      <div style={{ float: 'right' }}>
+      <div style={{ position: 'absolute', top: 0, right: 0 }}>
         <Blaze template="loginButtons" align="right" />
       </div>
       <div>

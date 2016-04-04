@@ -11,3 +11,13 @@
 /* Rules for using icons as white on a dark background. */
 .material-icons.md-light { color: rgba(255, 255, 255, 1); }
 .material-icons.md-light.md-inactive { color: rgba(255, 255, 255, 0.3); }
+
+h3 {
+  text-transform: uppercase;
+  font-size: 18px;
+  line-height: 18px;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #bbb;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}

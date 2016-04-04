@@ -1,10 +1,10 @@
-import Extension from 'meteor/wmd-extensions';
-import ExtensionHost from 'extensions';
+import ee, { ext } from '../lib/index.js';
 
-import ServicesList from './containers/servicesList.jsx';
+import ServicesList, { registerService, services } from './containers/servicesList.jsx';
 
-var wmd = new Extension({
-  name: 'wmd-services'
-});
+ext.addTab('services', "Services", ServicesList);
 
-wmd.addTab('serverices', "Services", ServicesList);
+ee.prototype.registerService = registerService;
+
+export { ext, services };
+export default ee;
