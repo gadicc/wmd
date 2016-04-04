@@ -6,6 +6,9 @@ import { modules } from 'meteor/wmd-extensions';
 // modules
 import coreModule from '../modules/core/client';
 
+if (process.env.NODE_ENV === 'development')
+  window.Perf = require('react-addons-perf');
+
 // init context
 const context = initContext();
 
