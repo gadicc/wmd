@@ -2,6 +2,7 @@ import React from 'react';
 import AppBar from 'react-toolbox/lib/app_bar';
 import { Button } from 'react-toolbox/lib/button';
 import pure from 'recompose/pure';
+import {reduxForm} from 'redux-form';
 
 const iconStyle = {
   height: '50%',
@@ -26,12 +27,39 @@ const ServiceButtons = pure(function ServiceButtons({appId, services, actions, a
   }</div> );
 });
 
-const ServiceAdds = pure(function ServiceAdds({appServices}) {
-  return ( <div>{
-    appServices ? appServices.map(service => (
-      <div key={service.id}>{service.id}</div>
-    )) : null
-  }</div> );
+const ServiceAddsForm = ({service, fields}) => (
+  <form key={service.id}>
+    <h3>{service.name}</h3>
+    <input type="text" name='moo' {...fields.moo} />
+    <input type="submit" />
+  </form>
+);
+
+ServiceAddsForm.propTypes = {
+  service: React.PropTypes.object,
+  fields: React.PropTypes.object
+};
+
+const ServiceAdds = pure(function ServiceAdds({appId, appServices}) {
+  if (!appServices)
+    return null;
+
+  return (
+    <div id="x">
+      {
+        appServices.map(service => {
+          const ServiceAddsSubForm = reduxForm({
+            form: `appsEditAddServices_${appId}_${service.id}`,
+            fields: [ 'moo' ]
+          })(ServiceAddsForm);
+
+          return (
+              <ServiceAddsSubForm key={service.id} service={service} />
+          ); 
+        })
+      }
+    </div>
+  );
 });
 
 const AppEdit = ({ app, actions, services, appsEditAddServices }) => (
@@ -56,7 +84,8 @@ const AppEdit = ({ app, actions, services, appsEditAddServices }) => (
       <ServiceButtons appId={app._id} services={services} actions={actions}
         appServices={appsEditAddServices && appsEditAddServices[app._id]} />
 
-      <ServiceAdds appServices={appsEditAddServices && appsEditAddServices[app._id]} />
+      <ServiceAdds appId={app._id}
+        appServices={appsEditAddServices && appsEditAddServices[app._id]} />
 
     </If>
   </div>
