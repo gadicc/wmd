@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
+import React from 'react';
 import AppBar from 'react-toolbox/lib/app_bar';
-import {Button, IconButton} from 'react-toolbox/lib/button';
-import FontIcon from 'react-toolbox/lib/font_icon';
+import { Button } from 'react-toolbox/lib/button';
 import pure from 'recompose/pure';
 
 const iconStyle = {
@@ -9,7 +8,7 @@ const iconStyle = {
   position: 'relative',
   bottom: '-3px',
   marginRight: '10px'
-}
+};
 
 const ServiceButtons = pure(function ServiceButtons({appId, services, actions, appServices}) {
   const disabled = {};
@@ -62,5 +61,12 @@ const AppEdit = ({ app, actions, services, appsEditAddServices }) => (
     </If>
   </div>
 );
+
+AppEdit.propTypes = {
+  app: React.PropTypes.oneOfType([ React.PropTypes.object, React.PropTypes.any ]),
+  actions: React.PropTypes.object,
+  services: React.PropTypes.array,
+  appsEditAddServices: React.PropTypes.oneOfType([ React.PropTypes.object, React.PropTypes.any ])
+};
 
 export default AppEdit;
