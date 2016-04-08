@@ -7,15 +7,19 @@ export default {
       if (!state.appsEditAddServices[action.appId])
         state.appsEditAddServices[action.appId] = [];
 
+      /* {
+        appsEditAddServices: {
+          XbCDFAsgF: [ 'meteor', 'mongo' ]
+        }
+      } */
+
       return {
         ...state,
         appsEditAddServices: {
           ...state.appsEditAddServices,
           [action.appId]: [
             ...state.appsEditAddServices[action.appId],
-            {
-              id: action.service.id
-            }
+            action.service.id
           ]
         }
       };

@@ -31,4 +31,5 @@ export default function (injectDeps, {DefaultRouter}) {
 
   DefaultRouter.route('/:tab', 'main');
   DefaultRouter.route('/:tab/:_id', 'main');
+  DefaultRouter.route('/:tab/:_id/:action', 'main');
 }

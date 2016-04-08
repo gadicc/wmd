@@ -14,7 +14,7 @@ const iconStyle = {
 const ServiceButtons = pure(function ServiceButtons({appId, services, actions, appServices}) {
   const disabled = {};
   if (appServices)
-    appServices.forEach(service => disabled[service.id] = true);
+    appServices.forEach(serviceId => disabled[serviceId] = true);
 
   return ( <div>{
     services.map(service => (
@@ -27,27 +27,26 @@ const ServiceButtons = pure(function ServiceButtons({appId, services, actions, a
   }</div> );
 });
 
-const ServiceAddsForm = ({service, fields}) => (
-  <form key={service.id}>
-    <h3>{service.name}</h3>
-    <input type="text" name='moo' {...fields.moo} />
-    <input type="submit" />
-  </form>
-);
-
-ServiceAddsForm.propTypes = {
-  service: React.PropTypes.object,
-  fields: React.PropTypes.object
-};
-
-const ServiceAdds = pure(function ServiceAdds({appId, appServices}) {
+const ServiceAdds = pure(function ServiceAdds({appId, appServices, services}) {
   if (!appServices)
     return null;
 
   return (
     <div id="x">
       {
-        appServices.map(service => {
+        appServices.map(serviceId => {
+          const service = services.find(s => s.id === serviceId);
+          const ServiceAddsSubForm = service.AddServiceForm;
+
+          return (
+            <div key={service.id}>
+              <b>{service.name}:</b>
+              <ServiceAddsSubForm appId={appId} />
+            </div>
+          );
+
+          /*
+          const service = services.find(s => s.id === serviceId);
           const ServiceAddsSubForm = reduxForm({
             form: `appsEditAddServices_${appId}_${service.id}`,
             fields: [ 'moo' ]
@@ -55,7 +54,8 @@ const ServiceAdds = pure(function ServiceAdds({appId, appServices}) {
 
           return (
               <ServiceAddsSubForm key={service.id} service={service} />
-          ); 
+          );
+          */ 
         })
       }
     </div>
@@ -84,7 +84,7 @@ const AppEdit = ({ app, actions, services, appsEditAddServices }) => (
       <ServiceButtons appId={app._id} services={services} actions={actions}
         appServices={appsEditAddServices && appsEditAddServices[app._id]} />
 
-      <ServiceAdds appId={app._id}
+      <ServiceAdds appId={app._id} services={services}
         appServices={appsEditAddServices && appsEditAddServices[app._id]} />
 
     </If>

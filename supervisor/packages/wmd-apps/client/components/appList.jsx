@@ -60,6 +60,7 @@ const AppList = ({apps, handleSubmit, actions, fields}) => (
       <Card key={app._id} style={cardStyle}>
         <CardTitle title={app.name} />
         <CardActions>
+          <Button label="Info" onClick={actions.info.bind(this, app)} />
           <Button label="Edit" onClick={actions.edit.bind(this, app)} />
           <RemoveButton app={app} remove={actions.remove} />
         </CardActions>

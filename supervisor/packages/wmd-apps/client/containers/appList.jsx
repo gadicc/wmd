@@ -1,30 +1,10 @@
-import React, { Component } from 'react';
-import { reduxForm, reset } from 'redux-form'
 import { composeWithTracker } from 'mantra-core';
+import { reduxForm } from 'redux-form'
 //import Dialog from 'react-toolbox/lib/dialog';
 
+import actions from '../actions/appList.jsx';
 import AppList from '../components/appList.jsx';
 import { Apps } from '../configs/context.js';
-import ext from '../index.js';
-
-const actions = {
-
-  submit2({name}) {
-    const { dispatch } = ext.appContext().Store;
-    Apps.insert({name});
-    dispatch(reset('app_new'));
-  },
-
-  remove(app) {
-    Apps.remove(app._id);
-  },
-
-  edit(app) {
-    const { FlowRouter } = ext.appContext();
-    FlowRouter.go(`/apps/${app._id}`);
-  }
-
-}
 
 function composer(props, onData) {
   const apps = Apps.find().fetch();

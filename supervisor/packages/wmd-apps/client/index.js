@@ -1,7 +1,7 @@
 import Extension from 'meteor/wmd-extensions';
-import ExtensionHost from 'extensions';
+// import ExtensionHost from 'extensions';
 
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 
 import AppList from './containers/appList.jsx';
@@ -9,20 +9,29 @@ import AppEdit from './containers/appEdit.jsx';
 
 import reducers from './reducers';
 
-const AppRouter = ({_id}) => (
+const AppRouter = ({_id, action}) => (
   <If condition={_id}>
-    <AppEdit _id={_id} />
+    <If condition={action==='edit'}>
+      <AppEdit _id={_id} />
+    <Else />
+      <div>Coming soon</div>
+    </If>
   <Else />
     <AppList />
   </If>
 );
+
+AppRouter.propTypes = {
+  _id: React.PropTypes.string,
+  action: React.PropTypes.string
+};
 
 var ext = new Extension({
   name: 'wmd-apps'
 });
 
 ext.addTab('apps', "Apps",
-  connect(state => ({ _id: state.route.params._id }))(AppRouter));
+  connect(state => ({ _id: state.route.params._id, action: state.route.params.action }))(AppRouter));
 
 var routes = undefined;
 var actions = undefined;
