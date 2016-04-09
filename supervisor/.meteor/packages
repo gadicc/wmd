@@ -22,7 +22,7 @@ gadicc:ecmascript-hot
 
 gadicc:mongo-stream
 
-simple:dev-error-overlay
+#simple:dev-error-overlay
 
 nathantreid:css-modules@1.0.0-beta.9
 
