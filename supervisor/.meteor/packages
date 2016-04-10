@@ -20,11 +20,9 @@ gadicc:ecmascript-hot
 
 #practicalmeteor:mocha   # An excellent default test driver package.
 
-gadicc:mongo-stream
-
 #simple:dev-error-overlay
 
-nathantreid:css-modules@1.0.0-beta.9
+nathantreid:css-modules@=1.0.0-beta.9
 
 kadira:flow-router
 reactive-dict
@@ -32,10 +30,6 @@ audit-argument-checks
 check
 random
 
-#orgztion:meteor-global-tether
-#twbs:bootstrap@4.0.0-alpha.2
-
-#gwendall:blaze-to-react
 gadicc:blaze-react-component
 accounts-ui
 accounts-password
