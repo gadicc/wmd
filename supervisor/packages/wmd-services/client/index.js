@@ -1,10 +1,10 @@
 import ee, { ext } from '../lib/index.js';
 
-import ServicesList, { registerService, services } from './containers/servicesList.jsx';
+import ServicesList, { registerServiceType, serviceTypes } from './containers/servicesList.jsx';
 
 ext.addTab('services', "Services", ServicesList);
 
-ee.prototype.registerService = registerService;
+ee.prototype.registerServiceType = registerServiceType;
 
-export { ext, services };
+export { ext, serviceTypes };
 export default ee;

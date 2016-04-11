@@ -1,5 +1,5 @@
 Package.describe({
-  name: 'wmd-services-app-meteor',
+  name: 'wmd-services-app',
   version: '0.0.1',
   // Brief, one-line summary of the package.
   summary: '',
@@ -15,10 +15,7 @@ Package.onUse(function(api) {
   //api.use('ecmascript');
   api.use('gadicc:ecmascript-hot@1.3.0_4');
 
-  api.use('wmd-services-app');
-
   api.mainModule('client/index.js', 'client');
-  api.addAssets('images/meteor-logo.svg', 'client');
 
   api.mainModule('server/index.js', 'server');
 });

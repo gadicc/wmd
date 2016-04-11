@@ -1,25 +1,26 @@
-import React, { Component } from 'react';
-import ServicesList from '../components/servicesList.jsx';
+import React from 'react';
+import ServicesListTypes from '../components/servicesList.jsx';
 import { _ } from 'meteor/underscore';
 
-const services = [];
+const serviceTypes = {};
 
 const Container = () => (
-  <ServicesList services={services} />
+  <ServicesListTypes serviceTypes={serviceTypes} />
 );
 
-const baseService = {
+const baseServiceType = {
 
 };
 
-const registerService = (service) => {
-  if (!service.id)
-    throw new Error('registerService called without id prop');
-  if (!service.name)
-    throw new Error('registerService called without name prop');
+const registerServiceType = (serviceType) => {
+  if (!serviceType.id)
+    throw new Error('registerServiceType called without id prop');
+  if (!serviceType.name)
+    throw new Error('registerServiceType called without name prop');
 
-  services.push( _.extend({}, baseService, service) );
+  serviceTypes[serviceType.id] = _.extend({}, baseServiceType, serviceType);
 };
 
-export { registerService, services };
+
+export { registerServiceType, serviceTypes };
 export default Container;

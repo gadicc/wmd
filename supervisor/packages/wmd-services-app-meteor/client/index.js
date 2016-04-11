@@ -1,4 +1,4 @@
-import Extension from 'meteor/wmd-services';
+import Extension from 'meteor/wmd-services-app';
 import AddServiceForm from './containers/addServiceForm';
 
 var ext = new Extension({
@@ -8,7 +8,6 @@ var ext = new Extension({
 ext.registerService({
   id: 'meteor',
   name: "Meteor",
-  category: 'app',
   icon: "/packages/wmd-services-app-meteor/images/meteor-logo.svg",
   AddServiceForm
 //  Content: Info

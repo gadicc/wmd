@@ -4,8 +4,8 @@ import Extension from 'meteor/wmd-extensions';
 import React from 'react';
 import { connect } from 'react-redux';
 
-import AppList from './containers/appList.jsx';
-import AppEdit from './containers/appEdit.jsx';
+import AppList from './components/appList';
+import AppEdit from './components/appEdit';
 
 import reducers from './reducers';
 

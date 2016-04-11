@@ -12,4 +12,20 @@ const ServicesList = ({services}) => (
   </div>
 );
 
-export default ServicesList;
+const ServiceTypesList = ({serviceTypes}) => (
+  <div>
+    <div className="serviceTypesList">{
+      serviceTypes.map((st) => (
+        <div key={st.id} className="serviceType">
+          <h2>ST: {st.name}</h2>
+        </div>
+      ))
+    }</div>
+  </div>
+);
+
+ServiceTypesList.propTypes = {
+  serviceTypes: React.PropTypes.array
+};
+
+export default ServiceTypesList;
