@@ -1,7 +1,9 @@
 import { Meteor } from 'meteor/meteor'; 
 import { Mongo } from 'meteor/mongo';
 
-Apps = new Mongo.Collection('apps');
+const Apps = new Mongo.Collection('apps');
+window.Apps = Apps;
+
 Meteor.subscribe('apps');
 
 export { Apps };

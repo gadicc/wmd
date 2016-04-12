@@ -1,24 +1,34 @@
 import React from 'react';
 import { Button } from 'react-toolbox/lib/button';
 
-const AddServiceForm = () => (
-  <form>
-    <p>
-      Hostnames (updated on blur, no restart required): <br />
-      <textarea name="hostnames">
-      </textarea>
-    </p>
+const noop = (event) => { event.preventDefault(); };
+
+const AddServiceForm = (fields) => (
+  <div>
     <p>
       <span style={{marginRight: '15px'}}>Source:</span>
-      <Button label='CLI Deploy' raised />
-      <Button label='GitHub' />
-    </p>
-      {/*
-      <input type="text" name='moo' {...fields.moo} />
-    */}
-    <Button type="submit" label="Submit" raised primary />
-  </form>
 
+      <label>
+        <Button label='CLI Deploy' {...fields.source} value="cli"
+          onClick={noop} raised={fields.source.value === 'cli'} />
+      </label>
+      <label>
+        <Button label='GitHub' {...fields.source} value="github"
+          onClick={noop} raised={fields.source.value === 'github'} />
+      </label>
+
+    </p>
+  </div>
 );
+
+const AddServiceFormFields = [
+  'source'
+];
+
+const AddServiceFormInitialValues = {
+  source: 'cli'
+};
+
+export { AddServiceFormFields, AddServiceFormInitialValues };
 
 export default AddServiceForm;

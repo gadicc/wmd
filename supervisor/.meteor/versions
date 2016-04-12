@@ -92,6 +92,7 @@ standard-minifier-css@1.0.5
 standard-minifier-js@1.0.5
 templating@1.1.8
 templating-tools@1.0.3
+tmeasday:check-npm-versions@0.3.0
 tracker@1.0.12
 ui@1.0.10
 underscore@1.0.7

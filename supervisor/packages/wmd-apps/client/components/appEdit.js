@@ -1,3 +1,4 @@
+import { _ } from 'meteor/underscore';
 import React, { PropTypes } from 'react';
 import pure from 'recompose/pure';
 
@@ -9,14 +10,14 @@ import { composeWithTracker } from 'mantra-core';
 import { reduxForm } from 'redux-form'
 import { connect } from 'react-redux';
 
-import ext from '../index.js';
+import { ext } from '../index.js';
 
 import { Apps } from '../context.js';
 import { serviceTypes } from 'meteor/wmd-services';
 
 /* --------------------------- presentational ----------------------------- */
 
-const AppEditUI = ({ app, actions, serviceTypes, appsEditAddServices }) => (
+const AppEditUI = ({ app, actions, serviceTypes, servicesToAdd }) => (
   <div>
     <AppBar>
       <span style={{color:'white'}}>
@@ -31,15 +32,29 @@ const AppEditUI = ({ app, actions, serviceTypes, appsEditAddServices }) => (
 
       <h3>App Settings</h3>
 
-      <h3>Services</h3>
+      <h3>Edit Existing Services</h3>
 
-      <h3>Add Services</h3>
+      <ServiceForms
+        appId={app._id}
+        serviceTypes={serviceTypes}
+        servicesToShow={app.services ? _.pluck(app.services, 'service') : undefined}
+        appServiceData={app.services}
+      />
 
-      <ServiceTypes appId={app._id} serviceTypes={serviceTypes} actions={actions}
-        appServices={appsEditAddServices && appsEditAddServices[app._id]} />
+      <h3>Add New Services</h3>
 
-      <ServiceAdds appId={app._id} serviceTypes={serviceTypes}
-        appServices={appsEditAddServices && appsEditAddServices[app._id]} />
+      <ServiceTypes
+        appId={app._id}
+        serviceTypes={serviceTypes}
+        actions={actions}
+        servicesBeingAdded={servicesToAdd}
+      />
+
+      <ServiceForms
+        appId={app._id}
+        serviceTypes={serviceTypes}
+        servicesToShow={servicesToAdd}
+      />
 
     </If>
   </div>
@@ -47,9 +62,9 @@ const AppEditUI = ({ app, actions, serviceTypes, appsEditAddServices }) => (
 
 AppEditUI.propTypes = {
   app: PropTypes.object,
-  actions: PropTypes.object,
-  serviceTypes: PropTypes.object,
-  appEditAddServices: PropTypes.array
+  actions: PropTypes.object.isRequired,
+  serviceTypes: PropTypes.object.isRequired,
+  servicesToAdd: PropTypes.array
 };
 
 /*
@@ -68,10 +83,10 @@ const iconStyle = {
   marginRight: '10px'
 };
 
-const ServiceButtons = pure(function ServiceButtons({appId, services, actions, appServices}) {
+const ServiceButtons = pure(function ServiceButtons({appId, services, actions, servicesToAdd}) {
   const disabled = {};
-  if (appServices)
-    appServices.forEach(serviceId => disabled[serviceId] = true);
+  if (servicesToAdd)
+    servicesToAdd.forEach(serviceId => disabled[serviceId] = true);
 
   return ( <span>{
     services.map(service => (
@@ -84,14 +99,18 @@ const ServiceButtons = pure(function ServiceButtons({appId, services, actions, a
   }</span> );
 });
 
-const ServiceAdds = pure(function ServiceAdds({appId, appServices, serviceTypes }) {
-  if (!appServices)
+const ServiceForms = pure(function ServiceForms({appId, servicesToShow, serviceTypes, appServiceData }) {
+  if (!servicesToShow)
     return null;
+
+  const serviceData = {};
+  if (appServiceData)
+    appServiceData.forEach(service => serviceData[service.service] = service);
 
   return (
     <div>
       {
-        appServices.map(serviceId => {
+        servicesToShow.map(serviceId => {
           // :(
           var service, serviceType;
           for (serviceType in serviceTypes) {
@@ -99,8 +118,8 @@ const ServiceAdds = pure(function ServiceAdds({appId, appServices, serviceTypes 
             if (service) break;
           }
 
-          //const ServiceAddsSubForm = service.AddServiceForm;
-          const ServiceAddsSubForm = serviceTypes[serviceType].AddServiceForm(service);
+          const ServiceAddsSubForm = serviceTypes[serviceType]
+            .AddServiceForm(appId, service, serviceData[serviceId]);
 
           return (
             <div key={service.id}>
@@ -126,23 +145,23 @@ const ServiceAdds = pure(function ServiceAdds({appId, appServices, serviceTypes 
   );
 });
 
-const ServiceTypes = ({appId, actions, appServices, serviceTypes }) => (
+const ServiceTypes = ({appId, actions, servicesBeingAdded, serviceTypes }) => (
   <div>
     { Object.keys(serviceTypes).map(k => serviceTypes[k]).map((st) => (
       <div key={st.id}>
         <span>{st.name}</span>: &nbsp;&nbsp;&nbsp;
         <ServiceButtons appId={appId} services={st.services} actions={actions}
-           appServices={appServices} />
+           servicesToAdd={servicesBeingAdded} />
       </div>
     )) }
   </div>
 );
 
 ServiceTypes.propTypes = {
-  appId: PropTypes.string,
-  actions: PropTypes.object,
-  appServices: PropTypes.array,
-  serviceTypes: PropTypes.object
+  appId: PropTypes.string.isRequired,
+  actions: PropTypes.object.isRequired,
+  servicesBeingAdded: PropTypes.array,
+  serviceTypes: PropTypes.object.isRequired
 };
 
 /* ------------------------------ actions --------------------------------- */
@@ -193,6 +212,22 @@ const reducers = {
       };
     } else
       return state;
+  },
+
+  // the name means in "Add New Services", we've added a service and now we
+  // want to remove it.
+  appsEditAddServiceRemove(state, action) {
+    if (action.type === 'APPS_EDIT_ADDSERVICE_REMOVE') {
+      return {
+        ...state,
+        appsEditAddServices: {
+          ...state.appsEditAddServices,
+          [action.appId]:
+            _.without(state.appsEditAddServices[action.appId], action.serviceId)
+        }
+      }
+    } else
+      return state;   
   }
 
 };
@@ -202,7 +237,15 @@ const reducers = {
 
 function composer(props, onData) {
   const app = Apps.findOne(props._id);
-  onData(null, { ...props, app, actions, serviceTypes });
+
+  // we only care about the servicesToAdd for this app.  note, the full
+  // appsEditAddServices object is passed too, that's leak, but would only
+  // really ever cause superfluous re-renders if we viewed multiple apps
+  // at a time, which we don't.
+  const servicesToAdd = props.appsEditAddServices
+    ? props.appsEditAddServices[props._id] : undefined;
+
+  onData(null, { servicesToAdd, app, actions, serviceTypes });
 }
 
 const mapStateToProps = ({ appsEditAddServices }) => { return { appsEditAddServices }; };

@@ -10,7 +10,7 @@ import { Button } from 'react-toolbox/lib/button';
 import Input from 'react-toolbox/lib/input';
 import Dialog from 'react-toolbox/lib/dialog';
 
-import ext from '../index.js';
+import { ext } from '../index.js';
 
 import { Apps } from '../context.js';
 

@@ -1,9 +1,10 @@
 import Extension from 'meteor/wmd-extensions';
-// import ExtensionHost from 'extensions';
+import ExtensionHost from 'extensions';
 
 import React from 'react';
 import { connect } from 'react-redux';
 
+import { Apps } from './context'
 import AppList from './components/appList';
 import AppEdit from './components/appEdit';
 
@@ -49,4 +50,10 @@ ext.loadModule({
   }
 });
 
-export default ext;
+var eh = new ExtensionHost('wmd-apps');
+var ee = eh.export();
+
+ee.prototype.Apps = Apps;
+
+export { ext };
+export default ee;

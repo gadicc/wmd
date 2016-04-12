@@ -1,7 +1,7 @@
 import ee, { ext } from '../lib/index.js';
 import { _ } from 'meteor/underscore';
 
-//import AddServiceForm from './containers/addServiceForm';
+import AddServiceForm from './components/addServiceForm';
 
 const services = [];
 
@@ -22,10 +22,7 @@ ext.registerServiceType({
   id: 'app',
   name: "Apps",
   services,
-  AddServiceForm: (service) => {
-    console.log(service, service.AddServiceForm);
-    return service.AddServiceForm;
-  }
+  AddServiceForm
 });
 
 ee.prototype.registerService = registerService;
