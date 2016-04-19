@@ -1,3 +1,4 @@
+import { Meteor } from 'meteor/meteor';
 import React, { Component } from 'react';
 import { reset } from 'redux-form'
 
@@ -9,6 +10,7 @@ import { Card, CardTitle, CardText, CardActions } from 'react-toolbox/lib/card';
 import { Button } from 'react-toolbox/lib/button';
 import Input from 'react-toolbox/lib/input';
 import Dialog from 'react-toolbox/lib/dialog';
+import Switch from 'react-toolbox/lib/switch';
 
 import { ext } from '../index.js';
 
@@ -16,7 +18,7 @@ import { Apps } from '../context.js';
 
 /* --------------------------- presentational ----------------------------- */
 
-const AppListUI = ({apps, handleSubmit, actions, fields}) => (
+const AppListUI = ({apps, handleSubmit, fields}) => (
   <div className="appList">
 
     <Card style={cardStyle}>
@@ -38,6 +40,10 @@ const AppListUI = ({apps, handleSubmit, actions, fields}) => (
     { apps.map((app) => (
       <Card key={app._id} style={cardStyle}>
         <CardTitle title={app.name} />
+        <CardText>
+          <Switch label={statusLabel(app.state)} checked={isRunning(app.state)}
+            onChange={actions.toggleStatus.bind(null, app._id)} />
+        </CardText>
         <CardActions>
           <Button label="Info" onClick={actions.info.bind(this, app)} />
           <Button label="Edit" onClick={actions.edit.bind(this, app)} />
@@ -49,8 +55,25 @@ const AppListUI = ({apps, handleSubmit, actions, fields}) => (
   </div>
 );
 
-
 var cardStyle = { width: '250px', height: '250px', display: 'inline-block', marginRight: '10px' };
+
+function statusLabel(status) {
+  if (!status)
+    return 'Unknown';
+  return status.charAt(0).toUpperCase() + status.substr(1);
+}
+
+function isRunning(status) {
+  switch(status) {
+    case 'running':
+    case 'starting':
+    case 'updating':
+      return true;
+
+    default:
+      return false;
+  }
+}
 
 class RemoveButton extends Component {
 
@@ -106,6 +129,13 @@ const actions = {
   info(app) {
     const { FlowRouter } = ext.appContext();
     FlowRouter.go(`/apps/${app._id}`);    
+  },
+
+  toggleStatus(appId, value) {
+    if (value)
+      Meteor.call('appStart', appId);
+    else
+      Meteor.call('appStop', appId);
   }
 
 };
@@ -120,7 +150,7 @@ const reducers = {
 
 function composer(props, onData) {
   const apps = Apps.find().fetch();
-  onData(null, {apps, actions});
+  onData(null, {apps});
 }
 
 const AppListData = reduxForm({
