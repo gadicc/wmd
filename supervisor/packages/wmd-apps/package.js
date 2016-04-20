@@ -12,6 +12,7 @@ Package.onUse(function(api) {
   api.use('gadicc:ecmascript-hot@1.3.0-1');
   api.use('wmd-extensions');
   api.use('wmd-services');
+  api.use('gadicc:async-composable-tasks@0.0.1');
   api.mainModule('client/index.js', 'client');
   api.addFiles('client/components/appList.css', 'client');
   api.mainModule('server/index.js', 'server');

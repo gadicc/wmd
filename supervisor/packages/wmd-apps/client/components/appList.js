@@ -12,6 +12,8 @@ import Input from 'react-toolbox/lib/input';
 import Dialog from 'react-toolbox/lib/dialog';
 import Switch from 'react-toolbox/lib/switch';
 
+import Task from 'meteor/gadicc:async-composable-tasks';
+
 import { ext } from '../index.js';
 
 import { Apps } from '../context.js';
@@ -43,6 +45,11 @@ const AppListUI = ({apps, handleSubmit, fields}) => (
         <CardText>
           <Switch label={statusLabel(app.state)} checked={isRunning(app.state)}
             onChange={actions.toggleStatus.bind(null, app._id)} />
+          <If condition={app.taskId}>
+            <Task id={app.taskId}>
+              <TaskShow />
+            </Task>
+          </If>
         </CardText>
         <CardActions>
           <Button label="Info" onClick={actions.info.bind(this, app)} />
@@ -54,6 +61,18 @@ const AppListUI = ({apps, handleSubmit, fields}) => (
 
   </div>
 );
+
+import ProgressBar from 'react-toolbox/lib/progress_bar';
+var TaskShow = ({progress, status}) => (
+  <div>
+    <span>{status}</span><br />
+    <ProgressBar type="linear" mode="determinate" value={progress*100} />
+  </div>
+);
+TaskShow.propTypes = {
+  progress: React.PropTypes.number,
+  status: React.PropTypes.string
+};
 
 var cardStyle = { width: '250px', height: '250px', display: 'inline-block', marginRight: '10px' };
 
