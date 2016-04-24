@@ -1,6 +1,6 @@
 {
   "presets": [ "meteor", "stage-0" ],
-  "plugins": [ "jsx-control-statements" ],
+  "plugins": [ "jsx-control-statements", "react-hot-loader/babel" ],
   // "presets": ["es2015", "stage-2", "react"],
   // "plugins": ["react-require", "babel-root-slash-import"]
 }

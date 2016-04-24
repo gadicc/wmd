@@ -17,13 +17,14 @@ standard-minifier-js    # JS minifier run for production mode
 es5-shim                # ECMAScript 5 compatibility for older browsers.
 #ecmascript              # Enable ECMAScript2015+ syntax in app code
 #gadicc:ecmascript-hot
-gadicc:ecmascript-hot@=1.3.1-fast.11
+gadicc:ecmascript-hot@=1.3.2-refactor.5
 
 #practicalmeteor:mocha   # An excellent default test driver package.
 
 #simple:dev-error-overlay
 
-nathantreid:css-modules@=1.0.0-beta.9
+#nathantreid:css-modules@=1.0.0-beta.9
+nathantreid:css-modules
 
 kadira:flow-router
 reactive-dict

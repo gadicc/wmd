@@ -14,7 +14,7 @@ Meteor.startup(() => {
 });
 */
 
-DefaultRouter = FlowRouter.group({
+const DefaultRouter = FlowRouter.group({
   /*
   triggersEnter: [
     function loginRedirects(context, redirect) {
@@ -79,15 +79,26 @@ Tracker.autorun(function() {
   Store.dispatch({ type: 'route', name: route.name, params, queryParams, path });
 });
 
-export default function () {
-  return {
-    Meteor,
-    FlowRouter,
-    DefaultRouter,
-    Collections,
-    LocalState: new ReactiveDict(),
-    Tracker,
-    Store,
-    Reducers
-  };
-}
+const LocalState = new ReactiveDict();
+
+export {
+  Collections,
+  DefaultRouter,
+  FlowRouter,
+  LocalState,
+  Meteor,
+  Reducers,
+  Store,
+  Tracker
+};
+
+export default {
+  Collections,
+  DefaultRouter,
+  FlowRouter,
+  LocalState,
+  Meteor,
+  Reducers,
+  Store,
+  Tracker
+};

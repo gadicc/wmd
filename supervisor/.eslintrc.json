@@ -26,6 +26,11 @@
       "For": true
   },
 
+  "env": {
+    "node": true,
+    "browser": true
+  },
+
   "settings": {
     "react": {
       "pragma": "React",
