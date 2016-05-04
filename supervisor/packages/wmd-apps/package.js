@@ -9,7 +9,7 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('1.3-beta.12');
   //api.use('ecmascript');
-  api.use('gadicc:ecmascript-hot@1.3.0-1');
+  api.use('gadicc:ecmascript-hot@1.3.2-refactor.7');
   api.use('wmd-extensions');
   api.use('wmd-services');
   api.use('gadicc:async-composable-tasks@0.0.1');

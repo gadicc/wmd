@@ -13,7 +13,7 @@ Package.describe({
 Package.onUse(function(api) {
   api.versionsFrom('1.3-beta.12');
   //api.use('ecmascript');
-  api.use('gadicc:ecmascript-hot@1.3.0_4');
+  api.use('gadicc:ecmascript-hot@1.3.2-refactor.7');
 
   api.use('wmd-services-app');
 

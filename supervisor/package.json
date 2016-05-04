@@ -80,8 +80,7 @@
       "client/toolbox-theme.scss"
     ],
     "outputJsFilePath": {
-      "node_modules/react-toolbox/.*": "{dirname}/{basename}.js",
-      ".*": "{dirname}/{basename}{ext}.js"
+      "node_modules/.*": "{dirname}/{basename}.js"
     },
     "//explicitIncludes": [
       "node_modules/react-toolbox"

@@ -12,17 +12,17 @@ const StoreProvider = (props) => (
   </Provider>
 );
 
-const throwingErrorReporter = ({error}) => {
-  setTimeout(() => { throw error; });
+const consoleErrorReporter = ({error}) => {
+  console.error(error);
   return <Redbox error={error} />;
 };
 
-throwingErrorReporter.propTypes = {
+consoleErrorReporter.propTypes = {
   error: React.PropTypes.error
 };
 
 const AppRoot = (
-  <AppContainer errorReporter={throwingErrorReporter} component={StoreProvider} />
+  <AppContainer errorReporter={consoleErrorReporter} component={StoreProvider} />
 );
 
 export default AppRoot;
