@@ -24,7 +24,7 @@ const AppListUI = ({apps, handleSubmit, fields}) => (
   <div className="appList">
 
     <Card style={cardStyle}>
-      <CardTitle title="Create New"/>
+      <CardTitle title="Create X New"/>
 
       <CardText>
         <div style={{marginBottom: '10px'}}>
